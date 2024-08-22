@@ -13,40 +13,54 @@ public class MapDisplay : MonoBehaviour
     [Range(0, 1)]
     public float density;
 
+    private int width, height;
+
     public void DrawNoiseMap(float[,] map)
     {
         tileMap.ClearAllTiles();
 
-        int width = map.GetLength(0);
-        int height = map.GetLength(1);
-
-        //Texture2D texture = new(width, height);
-
-        //Color[] colorMap = new Color[width * height];
-
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                if (map[x, y] <= density)
-                {
-                    tileMap.SetTile(new Vector3Int(x, y), floor);
-                }
-                else
-                {
-                    tileMap.SetTile(new Vector3Int(x, y), wall);
-                }
-            }
-        }
-
+        width = map.GetLength(0);
+        height = map.GetLength(1);
 
         for (int i = 0; i < cellularIterations; i++)
         {
-            for (int y = 0; y < height; y++)
+            for (int j = 0; j < height; j++)
             {
-                for (int x = 0; x < width; x++)
+                for (int k = 0; k < width; k++)
                 {
+                    int neighborWallCount = 0;
 
+                    for (int y = j - 1; y <= j + 1; y++)
+                    {
+                        for (int x = k - 1; x <= k + 1; x++)
+                        {
+                            if (InBounds(x, y))
+                            {
+                                if (y != j || x != k)
+                                {
+                                    if (tileMap.GetTile(new Vector3Int(y, x)) == wall)
+                                    {
+                                        neighborWallCount++;
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                neighborWallCount++;
+                            }
+                        }
+                    }
+
+                    if (neighborWallCount > 4)
+                    {
+                        tileMap.SetTile(new Vector3Int(j, k), wall);
+                    }
+                    else
+                    {
+                        tileMap.SetTile(new Vector3Int(j, k), floor);
+                    }
+
+                    tileMap.RefreshTile(new Vector3Int(k, j));
                 }
             }
         }
@@ -56,5 +70,9 @@ public class MapDisplay : MonoBehaviour
 
         //textureRenderer.sharedMaterial.mainTexture = texture;
         //textureRenderer.transform.localScale = new Vector3(width, height);
+    }
+    private bool InBounds(int x, int y)
+    {
+        return 0 <= y && y < height && 0 <= x && x < width;
     }
 }

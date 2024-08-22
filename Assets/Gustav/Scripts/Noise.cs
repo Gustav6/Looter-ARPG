@@ -10,13 +10,15 @@ public class Noise : MonoBehaviour
         float[,] map = new float[width, height];
 
         System.Random prng = new(seed);
-        Vector2[] octaveOffset = new Vector2[octaves];
+
+        Vector2[] octaveOffsets = new Vector2[octaves];
+
 
         for (int i = 0; i < octaves; i++)
         {
             float offsetX = prng.Next(-100000, 100000) + offset.x;
             float offsetY = prng.Next(-100000, 100000) + offset.y;
-            octaveOffset[i] = new Vector2(offsetX, offsetY);
+            octaveOffsets[i] = new Vector2(offsetX, offsetY);
         }
 
         if (scale <= 0)
@@ -27,8 +29,8 @@ public class Noise : MonoBehaviour
         float maxNoiseHeight = float.MinValue;
         float minNoiseHeight = float.MaxValue;
 
-        //float halfwidth = width / 2;
-        //float halfHeight = height / 2;
+        float halfWidth = width / 2;
+        float halfHeight = height / 2;
 
         for (int x = 0; x < width; x++)
         {
@@ -40,8 +42,9 @@ public class Noise : MonoBehaviour
 
                 for (int i = 0; i < octaves; i++)
                 {
-                    float sampleX = x / scale * frequency * octaveOffset[i].x;
-                    float sampleY = y / scale * frequency * octaveOffset[i].y;
+                    float sampleX = ((x - halfWidth) / scale * frequency) + (octaveOffsets[i].x / scale * frequency);
+                    float sampleY = ((y - halfHeight) / scale * frequency) + (octaveOffsets[i].y / scale * frequency);
+
 
                     float perlinValue = Mathf.PerlinNoise(sampleX, sampleY) * 2 - 1;
                     noiseHeight += perlinValue * amplitude;

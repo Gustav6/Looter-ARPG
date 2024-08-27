@@ -15,7 +15,6 @@ public class MapGenerationManager : MonoBehaviour
 
     public static MapGenerationManager instance;
 
-    public int seed = 1;
     public int generationRadius;
     public Vector2Int roomMaxSize;
 
@@ -23,7 +22,8 @@ public class MapGenerationManager : MonoBehaviour
     public Tilemap tileMap;
     public int amountOfRooms;
 
-    public const int tileSize = 64;
+    // Inom tilemap på uni
+    public const int tileSize = 100 / 64;
 
     private void Start()
     {

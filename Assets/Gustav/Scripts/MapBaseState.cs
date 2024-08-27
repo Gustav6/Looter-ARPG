@@ -26,7 +26,8 @@ public class GeneratingMapState : MapBaseState
         {
             rooms.Add(GenerateRoom());
 
-            Object.Instantiate(new GameObject(), rooms[i].WorldPosition, Quaternion.identity);
+            GameObject g = new();
+            g.transform.position = rooms[i].WorldPosition;
         }
 
         PlaceRooms();
@@ -34,14 +35,14 @@ public class GeneratingMapState : MapBaseState
 
     public override void UpdateState(MapGenerationManager manager)
     {
-
+        SeparateRooms();
     }
 
     public override void ExitState(MapGenerationManager manager)
     {
-
     }
 
+    #region Generate Room methods
     private Room GenerateRoom()
     {
         int roomWidth = UnityEngine.Random.Range(5, MapGenerationManager.instance.roomMaxSize.x + 1);
@@ -50,7 +51,7 @@ public class GeneratingMapState : MapBaseState
         Vector2Int offset = new(roomWidth / 2, roomHeight / 2);
         Vector2 position = RandomPosition(MapGenerationManager.instance.generationRadius) - offset;
 
-        return new Room(roomWidth, roomHeight, position);
+        return new Room(roomWidth, roomHeight, new Vector2(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y)));
     }
 
     public Vector2 RandomPosition(float radius)
@@ -61,11 +62,12 @@ public class GeneratingMapState : MapBaseState
         return new Vector2(r * Mathf.Cos(theta), r * Mathf.Sin(theta));
         //return new Vector2(RoundM(r * Mathf.Cos(theta), MapGenerationManager.tileSize), RoundM(r * Mathf.Sin(theta), MapGenerationManager.tileSize));
     }
+    #endregion
 
-    public float RoundM(float n, float m)
-    {
-        return math.floor((n + m - 1) / m) * m;
-    }
+    //public float RoundM(float n, float m)
+    //{
+    //    return math.floor((n + m - 1) / m) * m;
+    //}
 
     private void PlaceRooms()
     {
@@ -86,12 +88,19 @@ public class GeneratingMapState : MapBaseState
 
     }
 
-    private void GetMainRooms()
+    private List<Room> GetMainRooms()
     {
-        // Get rooms with biggest area and return those as main rooms
+        // Find the rooms with biggest area and return those as main rooms
+
+        return new List<Room>();
     }
 
-    private void GetDelaunayTriangulation()
+    private void GetShortestSpanningTree()
+    {
+
+    }
+
+    private void PlaceWalls()
     {
 
     }
@@ -120,8 +129,18 @@ public class LoadMapState : MapBaseState
 
 public class Room
 {
-    public Vector2 WorldPosition { get { return position; } }
-    private Vector2 position;
+    public Vector2 WorldPosition
+    {
+        get
+        {
+            Vector2 worldPosition = MapGenerationManager.instance.tileMap.CellToWorld((Vector3Int)tiles[width - 1, height - 1].gridPosition) + Vector3.one;
+
+            worldPosition.x -= width / 2f;
+            worldPosition.y -= height / 2f;
+
+            return worldPosition;
+        }
+    }
 
     public RoomTile[,] tiles;
     public readonly int width, height;
@@ -142,13 +161,17 @@ public class Room
                 tiles[x, y] = new RoomTile(new Vector2Int(xPosition, yPosition));
             }
         }
+    }
 
-        Vector2 worldPosition = MapGenerationManager.instance.tileMap.CellToWorld((Vector3Int)tiles[0, 0].gridPosition);
-        //Vector2 worldPosition = MapGenerationManager.instance.tileMap.CellToWorld((Vector3Int)tiles[width - 1, height - 1].gridPosition);
-        //worldPosition.x -= Mathf.Abs(MapGenerationManager.instance.tileMap.CellToWorld((Vector3Int)tiles[0, 0].gridPosition).x);
-        //worldPosition.y -= Mathf.Abs(MapGenerationManager.instance.tileMap.CellToWorld((Vector3Int)tiles[0, 0].gridPosition).y);
-
-        this.position = worldPosition;
+    public void MoveRoom(Vector2Int direction)
+    {
+        for (int x = 0; x < width; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                tiles[x, y].gridPosition += direction;
+            }
+        }
     }
 }
 

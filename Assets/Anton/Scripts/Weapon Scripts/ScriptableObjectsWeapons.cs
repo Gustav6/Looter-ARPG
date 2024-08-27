@@ -14,5 +14,5 @@ public class ScriptableObjectsWeapons : ScriptableObject
     public int attackSpeed;
     public int staminaCost;
     public int critChanse;
-    public int range;
+    public float range;
 }

@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Mathematics;
 using Unity.VisualScripting;
+using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using UnityEngine.UIElements;
@@ -19,9 +20,14 @@ public abstract class MapBaseState
 public class GeneratingMapState : MapBaseState
 {
     public List<Room> rooms = new();
+    private Tilemap tileMap;
+    private bool canMoveRooms = true;
+    private bool generationComplete = false;
 
     public override void EnterState(MapGenerationManager manager)
     {
+        tileMap = manager.tileMap;
+
         for (int i = 0; i < MapGenerationManager.instance.amountOfRooms; i++)
         {
             rooms.Add(GenerateRoom());
@@ -29,17 +35,34 @@ public class GeneratingMapState : MapBaseState
             GameObject g = new();
             g.transform.position = rooms[i].WorldPosition;
         }
-
-        PlaceRooms();
     }
 
     public override void UpdateState(MapGenerationManager manager)
     {
+        generationComplete = true;
+
         SeparateRooms();
+
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            for (int j = 0; j < rooms.Count; j++)
+            {
+                if (RoomIntersects(rooms[i], rooms[j]))
+                {
+                    generationComplete = false;
+                }
+            }
+        }
+
+        if (generationComplete)
+        {
+            manager.SwitchState(manager.loadingState);
+        }
     }
 
     public override void ExitState(MapGenerationManager manager)
     {
+        PlaceRooms();
     }
 
     #region Generate Room methods
@@ -83,10 +106,88 @@ public class GeneratingMapState : MapBaseState
         }
     }
 
+    #region Methods for separating the rooms
+
     private void SeparateRooms()
     {
-
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            rooms[i].MoveRoom(GetDirection(rooms[i]));
+        }
     }
+
+    private bool RoomIntersects(Room roomA, Room roomB)
+    {
+        if (roomA != roomB)
+        {
+            Vector2 roomALowerLeft = tileMap.CellToWorld((Vector3Int)roomA.tiles[0, 0].gridPosition);
+            Vector2 roomATopRight = tileMap.CellToWorld((Vector3Int)roomA.tiles[roomA.width - 1, roomA.height - 1].gridPosition) + Vector3.one;
+
+            Vector2 roomBLowerLeft = tileMap.CellToWorld((Vector3Int)roomB.tiles[0, 0].gridPosition);
+            Vector2 roomBTopRight = tileMap.CellToWorld((Vector3Int)roomB.tiles[roomB.width - 1, roomB.height - 1].gridPosition) + Vector3.one;
+
+            if (roomALowerLeft.x < roomBTopRight.x && roomATopRight.x > roomBLowerLeft.x)
+            {
+                if (roomALowerLeft.y < roomBTopRight.y && roomATopRight.y > roomBLowerLeft.y)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public Vector2Int GetDirection(Room room)
+    {
+        Vector2 separationVelocity = Vector2.zero;
+        float numberOfAgentsToAvoid = 0;
+
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            if (ReferenceEquals(rooms[i], room) || !RoomIntersects(room, rooms[i]))
+            {
+                continue;
+            }
+
+            Vector2 otherPosition = rooms[i].WorldPosition;
+
+            //float distance = Vector2.Distance(otherPosition, room.WorldPosition);
+
+            Vector2 otherAgentToCurrent = room.WorldPosition - otherPosition;
+            Vector2 directionToTravel = otherAgentToCurrent.normalized;
+
+            separationVelocity += directionToTravel;
+            numberOfAgentsToAvoid++;
+        }
+
+        if (separationVelocity != Vector2.zero)
+        {
+            separationVelocity.Normalize();
+        }
+
+        #region Set velocity
+        if (separationVelocity.x > 0)
+        {
+            separationVelocity.x = 1;
+        }
+        else if (separationVelocity.x < 0)
+        {
+            separationVelocity.x = -1;
+        }
+        if (separationVelocity.y > 0)
+        {
+            separationVelocity.y = 1;
+        }
+        else if (separationVelocity.y < 0)
+        {
+            separationVelocity.y = -1;
+        }
+        #endregion
+
+        return new Vector2Int((int)separationVelocity.x, (int)separationVelocity.y);
+    }
+    #endregion
 
     private List<Room> GetMainRooms()
     {

@@ -286,11 +286,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1675e689b4e4b5c4c9c5c07b0dd70e95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generationRadius: 20
+  generationRadius: 1
   roomMaxSize: {x: 15, y: 15}
-  tileTexture: {fileID: 11400000, guid: d21a77d5d0e4d4d45b1a5c0d3fffcda3, type: 2}
+  tileTexture: {fileID: 11400000, guid: 83d28c1bac103fb46810f1236af6bb19, type: 2}
   tileMap: {fileID: 28663809}
-  amountOfRooms: 2
+  amountOfRooms: 15
 --- !u!1 &178355442
 GameObject:
   m_ObjectHideFlags: 0

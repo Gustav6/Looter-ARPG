@@ -34,6 +34,7 @@ public class MapGenerationManager : MonoBehaviour
         }
 
         instance = this;
+
         SwitchState(generationState);
     }
 
@@ -44,7 +45,7 @@ public class MapGenerationManager : MonoBehaviour
 
     public void SwitchState(MapBaseState state)
     {
-        state.ExitState(this);
+        currentState?.ExitState(this);
 
         currentState = state;
 

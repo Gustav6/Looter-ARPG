@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEditor.PackageManager;
@@ -20,6 +21,8 @@ public abstract class MapBaseState
 public class GeneratingMapState : MapBaseState
 {
     public List<Room> rooms = new();
+    private Heap<Room> heap;
+
     private Tilemap tileMap;
     private bool canMoveRooms = true;
     private bool generationComplete = false;
@@ -27,13 +30,14 @@ public class GeneratingMapState : MapBaseState
     public override void EnterState(MapGenerationManager manager)
     {
         tileMap = manager.tileMap;
+        heap = new(manager.amountOfRooms);
+        manager.MainRoomDepth = 4;
 
-        for (int i = 0; i < MapGenerationManager.instance.amountOfRooms; i++)
+        for (int i = 0; i < manager.amountOfRooms; i++)
         {
-            rooms.Add(GenerateRoom());
+            rooms.Add(GenerateRoom(manager));
 
-            GameObject g = new();
-            g.transform.position = rooms[i].WorldPosition;
+            heap.Add(rooms[i]);
         }
     }
 
@@ -50,7 +54,13 @@ public class GeneratingMapState : MapBaseState
                 if (RoomIntersects(rooms[i], rooms[j]))
                 {
                     generationComplete = false;
+                    break;
                 }
+            }
+
+            if (!generationComplete)
+            {
+                break;
             }
         }
 
@@ -62,17 +72,27 @@ public class GeneratingMapState : MapBaseState
 
     public override void ExitState(MapGenerationManager manager)
     {
-        PlaceRooms();
+        List<Room> test = new()
+        {
+            heap.First()
+        };
+
+        for (int i = 0; i < manager.MainRoomDepth; i++)
+        {
+            test.AddRange(heap.GetChildrenOnIndex(i));
+        }
+
+        PlaceRooms(manager, rooms);
     }
 
     #region Generate Room methods
-    private Room GenerateRoom()
+    private Room GenerateRoom(MapGenerationManager manager)
     {
-        int roomWidth = UnityEngine.Random.Range(5, MapGenerationManager.instance.roomMaxSize.x + 1);
-        int roomHeight = UnityEngine.Random.Range(5, MapGenerationManager.instance.roomMaxSize.y + 1);
+        int roomWidth = UnityEngine.Random.Range(5, manager.roomMaxSize.x + 1);
+        int roomHeight = UnityEngine.Random.Range(5, manager.roomMaxSize.y + 1);
         
         Vector2Int offset = new(roomWidth / 2, roomHeight / 2);
-        Vector2 position = RandomPosition(MapGenerationManager.instance.generationRadius) - offset;
+        Vector2 position = RandomPosition(manager.generationRadius) - offset;
 
         return new Room(roomWidth, roomHeight, new Vector2(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y)));
     }
@@ -87,22 +107,20 @@ public class GeneratingMapState : MapBaseState
     }
     #endregion
 
-    //public float RoundM(float n, float m)
-    //{
-    //    return math.floor((n + m - 1) / m) * m;
-    //}
-
-    private void PlaceRooms()
+    private void PlaceRooms(MapGenerationManager manager, List<Room> mainRooms)
     {
-        for (int i = 0; i < rooms.Count; i++)
+        for (int i = 0; i < mainRooms.Count; i++)
         {
-            for (int x = 0; x < rooms[i].tiles.GetLength(0); x++)
+            for (int x = 0; x < mainRooms[i].tiles.GetLength(0); x++)
             {
-                for (int y = 0; y < rooms[i].tiles.GetLength(1); y++)
+                for (int y = 0; y < mainRooms[i].tiles.GetLength(1); y++)
                 {
-                    MapGenerationManager.instance.tileMap.SetTile((Vector3Int)rooms[i].tiles[x, y].gridPosition, MapGenerationManager.instance.tileTexture);
+                    manager.tileMap.SetTile((Vector3Int)mainRooms[i].tiles[x, y].gridPosition, manager.tileTexture);
                 }
             }
+
+            GameObject g = new();
+            g.transform.position = mainRooms[i].WorldPosition;
         }
     }
 
@@ -228,7 +246,7 @@ public class LoadMapState : MapBaseState
 }
 #endregion
 
-public class Room
+public class Room : IHeapItem<Room>
 {
     public Vector2 WorldPosition
     {
@@ -242,9 +260,24 @@ public class Room
             return worldPosition;
         }
     }
+    
+    public int Size
+    {
+        get
+        {
+            return width * height;
+        }
+    }
 
     public RoomTile[,] tiles;
     public readonly int width, height;
+
+    private int heapIndex;
+    public int HeapIndex
+    {
+        get { return heapIndex; }
+        set { heapIndex = value; }
+    }
 
     public Room(int width, int height, Vector2 position)
     {
@@ -273,6 +306,13 @@ public class Room
                 tiles[x, y].gridPosition += direction;
             }
         }
+    }
+
+    public int CompareTo(Room other)
+    {
+        int compare = Size.CompareTo(other.Size);
+
+        return compare;
     }
 }
 

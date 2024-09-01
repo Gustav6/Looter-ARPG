@@ -18,12 +18,26 @@ public class MapGenerationManager : MonoBehaviour
     public int generationRadius;
     public Vector2Int roomMaxSize;
 
+    private int mainRoomDepth;
+    public int MainRoomDepth
+    {
+        get { return mainRoomDepth; }
+        set
+        {
+            if (value >= amountOfRooms / 2)
+            {
+                mainRoomDepth = amountOfRooms / 2 - 1;
+            }
+            else
+            {
+                mainRoomDepth = value;
+            }
+        }
+    }
+
     public TileBase tileTexture;
     public Tilemap tileMap;
     public int amountOfRooms;
-
-    // Inom tilemap på uni
-    public const int tileSize = 100 / 64;
 
     private void Start()
     {

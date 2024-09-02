@@ -16,24 +16,52 @@ public class MapGenerationManager : MonoBehaviour
     public static MapGenerationManager instance;
 
     public int generationRadius;
-    public Vector2Int roomMaxSize;
 
-    private int mainRoomDepth;
-    public int MainRoomDepth
+    #region Room size variables
+    public Vector2Int roomMaxSize;
+    private Vector2Int roomMinSize;
+    public Vector2Int RoomMinSize
     {
-        get { return mainRoomDepth; }
+        get { return roomMinSize; }
         set
         {
-            if (value >= amountOfRooms / 2)
+            if (value.x <= roomMaxSize.x && value.y <= roomMaxSize.y)
             {
-                mainRoomDepth = amountOfRooms / 2 - 1;
+                roomMinSize = value;
             }
             else
             {
-                mainRoomDepth = value;
+                if (value.x > roomMaxSize.x)
+                {
+                    roomMinSize.x = roomMaxSize.x;
+                }
+                if (value.y > roomMaxSize.y)
+                {
+                    roomMinSize.y = roomMaxSize.y;
+                }
             }
         }
     }
+    #endregion
+
+    #region Main room variable
+    private int amountOfMainRooms;
+    public int AmountOfMainRooms
+    {
+        get { return amountOfMainRooms; }
+        set
+        {
+            if (value >= amountOfRooms)
+            {
+                amountOfMainRooms = amountOfRooms - 1;
+            }
+            else
+            {
+                amountOfMainRooms = value;
+            }
+        }
+    }
+    #endregion
 
     public TileBase tileTexture;
     public Tilemap tileMap;
@@ -63,6 +91,6 @@ public class MapGenerationManager : MonoBehaviour
 
         currentState = state;
 
-        state.EnterState(this);
+        currentState.EnterState(this);
     }
 }

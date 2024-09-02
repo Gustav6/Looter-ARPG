@@ -20,24 +20,22 @@ public abstract class MapBaseState
 #region Generation State
 public class GeneratingMapState : MapBaseState
 {
-    public List<Room> rooms = new();
+    public List<Room> totalRooms = new();
+    public List<Room> mainRooms = new();
     private Heap<Room> heap;
 
-    private Tilemap tileMap;
-    private bool canMoveRooms = true;
     private bool generationComplete = false;
 
     public override void EnterState(MapGenerationManager manager)
     {
-        tileMap = manager.tileMap;
         heap = new(manager.amountOfRooms);
-        manager.MainRoomDepth = 4;
+        manager.AmountOfMainRooms = 15;
 
         for (int i = 0; i < manager.amountOfRooms; i++)
         {
-            rooms.Add(GenerateRoom(manager));
+            totalRooms.Add(GenerateRoom(manager));
 
-            heap.Add(rooms[i]);
+            heap.Add(totalRooms[i]);
         }
     }
 
@@ -45,13 +43,13 @@ public class GeneratingMapState : MapBaseState
     {
         generationComplete = true;
 
-        SeparateRooms();
+        SeparateRooms(manager);
 
-        for (int i = 0; i < rooms.Count; i++)
+        foreach (Room roomA in totalRooms)
         {
-            for (int j = 0; j < rooms.Count; j++)
+            foreach (Room roomB in totalRooms)
             {
-                if (RoomIntersects(rooms[i], rooms[j]))
+                if (RoomIntersects(manager, roomA, roomB))
                 {
                     generationComplete = false;
                     break;
@@ -72,17 +70,14 @@ public class GeneratingMapState : MapBaseState
 
     public override void ExitState(MapGenerationManager manager)
     {
-        List<Room> test = new()
-        {
-            heap.First()
-        };
+        mainRooms.Clear();
 
-        for (int i = 0; i < manager.MainRoomDepth; i++)
+        for (int i = 0; i < manager.AmountOfMainRooms; i++)
         {
-            test.AddRange(heap.GetChildrenOnIndex(i));
+            mainRooms.Add(heap.RemoveFirst());
         }
 
-        PlaceRooms(manager, rooms);
+        PlaceRooms(manager, mainRooms);
     }
 
     #region Generate Room methods
@@ -107,42 +102,25 @@ public class GeneratingMapState : MapBaseState
     }
     #endregion
 
-    private void PlaceRooms(MapGenerationManager manager, List<Room> mainRooms)
-    {
-        for (int i = 0; i < mainRooms.Count; i++)
-        {
-            for (int x = 0; x < mainRooms[i].tiles.GetLength(0); x++)
-            {
-                for (int y = 0; y < mainRooms[i].tiles.GetLength(1); y++)
-                {
-                    manager.tileMap.SetTile((Vector3Int)mainRooms[i].tiles[x, y].gridPosition, manager.tileTexture);
-                }
-            }
+    #region Seperate room methods
 
-            GameObject g = new();
-            g.transform.position = mainRooms[i].WorldPosition;
+    private void SeparateRooms(MapGenerationManager manager)
+    {
+        for (int i = 0; i < totalRooms.Count; i++)
+        {
+            totalRooms[i].MoveRoom(GetDirection(manager, totalRooms[i]));
         }
     }
 
-    #region Methods for separating the rooms
-
-    private void SeparateRooms()
-    {
-        for (int i = 0; i < rooms.Count; i++)
-        {
-            rooms[i].MoveRoom(GetDirection(rooms[i]));
-        }
-    }
-
-    private bool RoomIntersects(Room roomA, Room roomB)
+    private bool RoomIntersects(MapGenerationManager manager, Room roomA, Room roomB)
     {
         if (roomA != roomB)
         {
-            Vector2 roomALowerLeft = tileMap.CellToWorld((Vector3Int)roomA.tiles[0, 0].gridPosition);
-            Vector2 roomATopRight = tileMap.CellToWorld((Vector3Int)roomA.tiles[roomA.width - 1, roomA.height - 1].gridPosition) + Vector3.one;
+            Vector2 roomALowerLeft = manager.tileMap.CellToWorld((Vector3Int)roomA.tiles[0, 0].gridPosition);
+            Vector2 roomATopRight = manager.tileMap.CellToWorld((Vector3Int)roomA.tiles[roomA.width - 1, roomA.height - 1].gridPosition) + Vector3.one;
 
-            Vector2 roomBLowerLeft = tileMap.CellToWorld((Vector3Int)roomB.tiles[0, 0].gridPosition);
-            Vector2 roomBTopRight = tileMap.CellToWorld((Vector3Int)roomB.tiles[roomB.width - 1, roomB.height - 1].gridPosition) + Vector3.one;
+            Vector2 roomBLowerLeft = manager.tileMap.CellToWorld((Vector3Int)roomB.tiles[0, 0].gridPosition);
+            Vector2 roomBTopRight = manager.tileMap.CellToWorld((Vector3Int)roomB.tiles[roomB.width - 1, roomB.height - 1].gridPosition) + Vector3.one;
 
             if (roomALowerLeft.x < roomBTopRight.x && roomATopRight.x > roomBLowerLeft.x)
             {
@@ -156,21 +134,19 @@ public class GeneratingMapState : MapBaseState
         return false;
     }
 
-    public Vector2Int GetDirection(Room room)
+    public Vector2Int GetDirection(MapGenerationManager manager, Room room)
     {
         Vector2 separationVelocity = Vector2.zero;
         float numberOfAgentsToAvoid = 0;
 
-        for (int i = 0; i < rooms.Count; i++)
+        for (int i = 0; i < totalRooms.Count; i++)
         {
-            if (ReferenceEquals(rooms[i], room) || !RoomIntersects(room, rooms[i]))
+            if (ReferenceEquals(totalRooms[i], room) || !RoomIntersects(manager, room, totalRooms[i]))
             {
                 continue;
             }
 
-            Vector2 otherPosition = rooms[i].WorldPosition;
-
-            //float distance = Vector2.Distance(otherPosition, room.WorldPosition);
+            Vector2 otherPosition = totalRooms[i].WorldPosition;
 
             Vector2 otherAgentToCurrent = room.WorldPosition - otherPosition;
             Vector2 directionToTravel = otherAgentToCurrent.normalized;
@@ -207,14 +183,12 @@ public class GeneratingMapState : MapBaseState
     }
     #endregion
 
-    private List<Room> GetMainRooms()
+    private void GetShortestSpanningTree()
     {
-        // Find the rooms with biggest area and return those as main rooms
 
-        return new List<Room>();
     }
 
-    private void GetShortestSpanningTree()
+    private void GenerateCorridors()
     {
 
     }
@@ -222,6 +196,23 @@ public class GeneratingMapState : MapBaseState
     private void PlaceWalls()
     {
 
+    }
+
+    private void PlaceRooms(MapGenerationManager manager, List<Room> rooms)
+    {
+        for (int i = 0; i < rooms.Count; i++)
+        {
+            for (int x = 0; x < rooms[i].tiles.GetLength(0); x++)
+            {
+                for (int y = 0; y < rooms[i].tiles.GetLength(1); y++)
+                {
+                    manager.tileMap.SetTile((Vector3Int)rooms[i].tiles[x, y].gridPosition, manager.tileTexture);
+                }
+            }
+
+            GameObject g = new();
+            g.transform.position = rooms[i].WorldPosition;
+        }
     }
 }
 #endregion
@@ -246,8 +237,10 @@ public class LoadMapState : MapBaseState
 }
 #endregion
 
+#region Room and tile class
 public class Room : IHeapItem<Room>
 {
+    #region World position
     public Vector2 WorldPosition
     {
         get
@@ -260,7 +253,10 @@ public class Room : IHeapItem<Room>
             return worldPosition;
         }
     }
-    
+    #endregion
+
+    #region Size of room
+    public readonly int width, height;
     public int Size
     {
         get
@@ -268,16 +264,18 @@ public class Room : IHeapItem<Room>
             return width * height;
         }
     }
+    #endregion
 
-    public RoomTile[,] tiles;
-    public readonly int width, height;
-
+    #region Heap variables
     private int heapIndex;
     public int HeapIndex
     {
         get { return heapIndex; }
         set { heapIndex = value; }
     }
+    #endregion
+
+    public RoomTile[,] tiles;
 
     public Room(int width, int height, Vector2 position)
     {
@@ -325,3 +323,4 @@ public struct RoomTile
         this.gridPosition = gridPosition;
     }
 }
+#endregion

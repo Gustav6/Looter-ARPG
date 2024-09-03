@@ -51,9 +51,9 @@ public class MapGenerationManager : MonoBehaviour
         get { return amountOfMainRooms; }
         set
         {
-            if (value >= amountOfRooms)
+            if (value >= totalRoomsAmount)
             {
-                amountOfMainRooms = amountOfRooms - 1;
+                amountOfMainRooms = totalRoomsAmount - 1;
             }
             else
             {
@@ -65,7 +65,9 @@ public class MapGenerationManager : MonoBehaviour
 
     public TileBase tileTexture;
     public Tilemap tileMap;
-    public int amountOfRooms;
+    public int totalRoomsAmount;
+
+    public bool showEveryRoom = false;
 
     private void Start()
     {

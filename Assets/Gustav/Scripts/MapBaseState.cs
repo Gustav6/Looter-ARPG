@@ -24,14 +24,16 @@ public class GeneratingMapState : MapBaseState
     public List<Room> mainRooms = new();
     private Heap<Room> heap;
 
-    private bool generationComplete = false;
+    private bool canMoveRoom = false;
 
     public override void EnterState(MapGenerationManager manager)
     {
-        heap = new(manager.amountOfRooms);
-        manager.AmountOfMainRooms = 15;
+        heap = new(manager.totalRoomsAmount);
+        manager.AmountOfMainRooms = 5;
 
-        for (int i = 0; i < manager.amountOfRooms; i++)
+        totalRooms.Clear();
+
+        for (int i = 0; i < manager.totalRoomsAmount; i++)
         {
             totalRooms.Add(GenerateRoom(manager));
 
@@ -41,9 +43,7 @@ public class GeneratingMapState : MapBaseState
 
     public override void UpdateState(MapGenerationManager manager)
     {
-        generationComplete = true;
-
-        SeparateRooms(manager);
+        canMoveRoom = true;
 
         foreach (Room roomA in totalRooms)
         {
@@ -51,18 +51,22 @@ public class GeneratingMapState : MapBaseState
             {
                 if (RoomIntersects(manager, roomA, roomB))
                 {
-                    generationComplete = false;
+                    canMoveRoom = false;
                     break;
                 }
             }
 
-            if (!generationComplete)
+            if (!canMoveRoom)
             {
                 break;
             }
         }
 
-        if (generationComplete)
+        if (canMoveRoom)
+        {
+            SeparateRooms(manager);
+        }
+        else
         {
             manager.SwitchState(manager.loadingState);
         }
@@ -70,14 +74,21 @@ public class GeneratingMapState : MapBaseState
 
     public override void ExitState(MapGenerationManager manager)
     {
-        mainRooms.Clear();
-
-        for (int i = 0; i < manager.AmountOfMainRooms; i++)
+        if (manager.showEveryRoom)
         {
-            mainRooms.Add(heap.RemoveFirst());
+            PlaceRooms(manager, totalRooms);
         }
+        else
+        {
+            mainRooms.Clear();
 
-        PlaceRooms(manager, mainRooms);
+            for (int i = 0; i < manager.AmountOfMainRooms; i++)
+            {
+                mainRooms.Add(heap.RemoveFirst());
+            }
+
+            PlaceRooms(manager, mainRooms);
+        }
     }
 
     #region Generate Room methods
@@ -182,6 +193,11 @@ public class GeneratingMapState : MapBaseState
         return new Vector2Int((int)separationVelocity.x, (int)separationVelocity.y);
     }
     #endregion
+
+    private void GenerateDelaunayTriangulation()
+    {
+
+    }
 
     private void GetShortestSpanningTree()
     {

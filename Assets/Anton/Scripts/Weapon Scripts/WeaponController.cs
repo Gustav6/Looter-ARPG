@@ -9,28 +9,35 @@ public class WeaponController : MonoBehaviour
     [SerializeField] public ScriptableObjectsWeapons weapon;
     public CircleCollider2D damageHitbox;
 
-    private int timer;
+    public Transform sword;
+    private int attackTimer;
+
     void Start()
     {
-        timer = weapon.attackSpeed;
+        attackTimer = weapon.attackSpeed;
         damageHitbox.radius = weapon.range;
     }
 
     void Update()
     {
-        if (timer >= weapon.attackSpeed)
+        Attack();
+    }
+
+    void Attack()
+    {
+        if (attackTimer >= weapon.attackSpeed)
         {
             if (Input.GetMouseButtonDown(0))
             {
                 Debug.Log("Attack");
                 //deal damage
-                timer = 0;
+                attackTimer = 0;
             }
-        }
+        }      
 
-        if (timer < weapon.attackSpeed)
+        if (attackTimer < weapon.attackSpeed)
         {
-            timer += 1;
-        }    
+            attackTimer += 1;
+        }
     }
 }

@@ -69,6 +69,9 @@ public class MapGenerationManager : MonoBehaviour
 
     public bool showEveryRoom = false;
 
+    public GameObject debugLineObject;
+    public TileBase debugTexture;
+
     private void Start()
     {
         if (instance != null && instance != this)

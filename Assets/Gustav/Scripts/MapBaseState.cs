@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using Unity.Mathematics;
 using Unity.VisualScripting;
@@ -43,7 +44,7 @@ public class GeneratingMapState : MapBaseState
 
     public override void UpdateState(MapGenerationManager manager)
     {
-        canMoveRoom = true;
+        canMoveRoom = false;
 
         foreach (Room roomA in totalRooms)
         {
@@ -51,12 +52,12 @@ public class GeneratingMapState : MapBaseState
             {
                 if (RoomIntersects(manager, roomA, roomB))
                 {
-                    canMoveRoom = false;
+                    canMoveRoom = true;
                     break;
                 }
             }
 
-            if (!canMoveRoom)
+            if (canMoveRoom)
             {
                 break;
             }
@@ -68,6 +69,8 @@ public class GeneratingMapState : MapBaseState
         }
         else
         {
+            GenerateDelaunayTriangulation(manager, totalRooms);
+
             manager.SwitchState(manager.loadingState);
         }
     }
@@ -210,33 +213,31 @@ public class GeneratingMapState : MapBaseState
 
         left = new Vector2(-manager.generationRadius, -manager.generationRadius);
         right = new Vector2(manager.generationRadius, -manager.generationRadius);
-        top = new Vector2(0, -manager.generationRadius);
+        top = new Vector2(0, manager.generationRadius);
 
         Triangle superTriangle;
-        int iterations = 1;
 
         while (true)
         {
             superTriangle = new Triangle(left, top, right);
 
-            bool triangelContainsAllPoints = true;
+            bool triangleContainsAllPoints = true;
 
             for (int i = 0; i < points.Length; i++)
             {
-                if (!superTriangle.InterSects(points[i]))
+                if (!superTriangle.PointInTriangle(points[i]))
                 {
-                    iterations++;
-                    triangelContainsAllPoints = false;
+                    triangleContainsAllPoints = false;
 
-                    top *= iterations;
-                    left *= iterations;
-                    right *= iterations;
+                    top *= 2;
+                    left *= 2;
+                    right *= 2;
 
                     break;
                 }
             }
 
-            if (triangelContainsAllPoints)
+            if (triangleContainsAllPoints)
             {
                 break;
             }
@@ -247,16 +248,34 @@ public class GeneratingMapState : MapBaseState
 
         List<Circle> circumCircles = new();
 
-        for (int i = 0; i < points.Length; i++)
-        {
-            circumCircles.Clear();
+        //for (int i = 0; i < points.Length; i++)
+        //{
+        //    circumCircles.Clear();
 
-        }
+        //    for (int j = 0; j < triangles.Count; j++)
+        //    {
+        //        Vector2 circumPosition = triangles[j].Center();
+        //        float radius = Vector2.Distance(circumPosition, triangles[j].a);
 
-        for (int i = 0; i < triangles.Count; i++)
-        {
-            // Debug
-        }
+        //        Circle circumTemp = new(circumPosition, radius);
+
+        //        if (circumTemp.Intersects(points[i]))
+        //        {
+        //            circumCircles.Add(circumTemp);
+        //        }
+        //    }
+        //}
+
+        GameObject debug = GameObject.Instantiate(manager.debugLineObject);
+
+        LineRenderer ln = debug.GetComponent<LineRenderer>();
+
+        ln.positionCount = 4;
+
+        ln.SetPosition(0, new Vector3(superTriangle.a.x, superTriangle.a.y, -1));
+        ln.SetPosition(1, new Vector3(superTriangle.b.x, superTriangle.b.y, -1));
+        ln.SetPosition(2, new Vector3(superTriangle.c.x, superTriangle.c.y, -1));
+        ln.SetPosition(3, new Vector3(superTriangle.a.x, superTriangle.a.y, -1));
     }
 
     private void GetShortestSpanningTree()
@@ -282,7 +301,18 @@ public class GeneratingMapState : MapBaseState
             {
                 for (int y = 0; y < rooms[i].tiles.GetLength(1); y++)
                 {
-                    manager.tileMap.SetTile((Vector3Int)rooms[i].tiles[x, y].gridPosition, manager.tileTexture);
+                    TileBase tileTexture = manager.tileTexture;
+
+                    if (x == 0 && y == 0)
+                    {
+                        tileTexture = manager.debugTexture;
+                    }
+                    else if (x == rooms[i].tiles.GetLength(0) - 1 && y == rooms[i].tiles.GetLength(1) - 1)
+                    {
+                        tileTexture = manager.debugTexture;
+                    }
+
+                    manager.tileMap.SetTile((Vector3Int)rooms[i].tiles[x, y].gridPosition, tileTexture);
                 }
             }
 
@@ -427,27 +457,29 @@ public class Circle
 
 public class Triangle
 {
-    Vector2 a, b, c;
+    public Vector2 a, b, c;
 
     public Triangle(Vector2 left, Vector2 top, Vector2 right)
     {
         a = left;
-        b = top;
-        c = right;
+        c = top;
+        b = right;
+    }
+    public bool PointInTriangle(Vector2 p)
+    {
+        double s1 = c.y - a.y;
+        double s2 = c.x - a.x;
+        double s3 = b.y - a.y;
+        double s4 = p.y - a.y;
+
+        double w1 = (a.x * s1 + s4 * s2 - p.x * s1) / (s3 * s2 - (b.x - a.x) * s1);
+        double w2 = (s4 - w1 * s3) / s1;
+
+        return w1 >= 0 && w2 >= 0 && (w1 + w2) <= 1;
     }
 
-    public bool InterSects(Vector2 point)
+    public Vector2 Center()
     {
-        float w1 = (a.x * (c.y - a.y) + (point.y - a.y) * (c.x - a.x) - point.x * (c.y - a.y)) / ((b.y - a.y) * (c.x - a.x) - (b.x - a.x) * (c.y - a.y));
-        float w2 = (point.y - a.y - w1 * (b.y - a.y)) / c.y - a.y;
-
-        if (w1 >= 0 && w2 >= 0 && w1 + w2 <= 1)
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return new Vector2((a.x + b.x + c.x) / 3, (a.y + b.y + c.y) / 3);
     }
 }

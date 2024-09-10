@@ -194,9 +194,69 @@ public class GeneratingMapState : MapBaseState
     }
     #endregion
 
-    private void GenerateDelaunayTriangulation()
+    private void GenerateDelaunayTriangulation(MapGenerationManager manager, List<Room> rooms)
     {
+        Vector2[] points = new Vector2[rooms.Count];
 
+        for (int i = 0; i < points.Length; i++)
+        {
+            points[i] = rooms[i].WorldPosition;
+        }
+
+        List<Triangle> triangles = new();
+
+        #region Super Triangle
+        Vector2 left, right, top;
+
+        left = new Vector2(-manager.generationRadius, -manager.generationRadius);
+        right = new Vector2(manager.generationRadius, -manager.generationRadius);
+        top = new Vector2(0, -manager.generationRadius);
+
+        Triangle superTriangle;
+        int iterations = 1;
+
+        while (true)
+        {
+            superTriangle = new Triangle(left, top, right);
+
+            bool triangelContainsAllPoints = true;
+
+            for (int i = 0; i < points.Length; i++)
+            {
+                if (!superTriangle.InterSects(points[i]))
+                {
+                    iterations++;
+                    triangelContainsAllPoints = false;
+
+                    top *= iterations;
+                    left *= iterations;
+                    right *= iterations;
+
+                    break;
+                }
+            }
+
+            if (triangelContainsAllPoints)
+            {
+                break;
+            }
+        }
+
+        triangles.Add(superTriangle);
+        #endregion
+
+        List<Circle> circumCircles = new();
+
+        for (int i = 0; i < points.Length; i++)
+        {
+            circumCircles.Clear();
+
+        }
+
+        for (int i = 0; i < triangles.Count; i++)
+        {
+            // Debug
+        }
     }
 
     private void GetShortestSpanningTree()
@@ -340,3 +400,54 @@ public struct RoomTile
     }
 }
 #endregion
+
+public class Circle
+{
+    public Vector2 position;
+    public float radius;
+
+    public Circle(Vector2 position, float radius)
+    {
+        this.position = position;
+        this.radius = radius;
+    }
+
+    public bool Intersects(Vector2 point)
+    {
+        float distance = Mathf.Sqrt((position.x - point.x) * (position.x - point.x) + (position.y - point.y) * (position.y - point.y));
+
+        if (distance <= radius)
+        {
+            return true;
+        }
+
+        return false;
+    }
+}
+
+public class Triangle
+{
+    Vector2 a, b, c;
+
+    public Triangle(Vector2 left, Vector2 top, Vector2 right)
+    {
+        a = left;
+        b = top;
+        c = right;
+    }
+
+    public bool InterSects(Vector2 point)
+    {
+        float w1 = (a.x * (c.y - a.y) + (point.y - a.y) * (c.x - a.x) - point.x * (c.y - a.y)) / ((b.y - a.y) * (c.x - a.x) - (b.x - a.x) * (c.y - a.y));
+        float w2 = (point.y - a.y - w1 * (b.y - a.y)) / c.y - a.y;
+
+        if (w1 >= 0 && w2 >= 0 && w1 + w2 <= 1)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+    }
+}

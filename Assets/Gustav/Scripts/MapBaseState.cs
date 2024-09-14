@@ -247,16 +247,72 @@ public class GeneratingMapState : MapBaseState
                 break;
             }
         }
+
+        triangles.Add(superTriangle);
         #endregion
 
-        Vector2 circumPosition = superTriangle.Center();
-        float radius = Vector2.Distance(circumPosition, superTriangle.left);
-        Circle temp = new(circumPosition, radius);
+        List<Triangle> tempTriangles = new();
 
-        triangles.Add(new Triangle(points[0], superTriangle.left, superTriangle.right));
-        triangles.Add(new Triangle(points[0], superTriangle.top, superTriangle.right));
-        triangles.Add(new Triangle(points[0], superTriangle.left, superTriangle.top));
+        List<Triangle> closedTriangles = new();
 
+        for (int i = 0; i < points.Length; i++)
+        {
+            tempTriangles.Clear();
+
+            for (int j = triangles.Count - 1; j >= 0; j--)
+            {
+                if (closedTriangles.Contains(triangles[j]))
+                {
+                    continue;
+                }
+
+                Vector2 circumPosition = triangles[j].Center();
+                float radius = Vector2.Distance(circumPosition, triangles[j].top);
+
+                Circle circumTemp = new(circumPosition, radius);
+
+                if (circumTemp.Intersects(points[i]))
+                {
+                    tempTriangles.Add(new Triangle(points[i], triangles[j].left, triangles[j].right));
+                    tempTriangles.Add(new Triangle(points[i], triangles[j].top, triangles[j].right));
+                    tempTriangles.Add(new Triangle(points[i], triangles[j].left, triangles[j].top));
+                    closedTriangles.Add(triangles[j]);
+                }
+            }
+
+            for (int j = 0; j < tempTriangles.Count; j++)
+            {
+                triangles.Add(tempTriangles[j]);
+
+                for (int k = 0; k < triangles.Count; k++)
+                {
+                    if (tempTriangles[j].Intersects(triangles[k]))
+                    {
+                        triangles.Remove(triangles[k]);
+                    }
+                }
+            }
+        }
+
+        //#region Remove triangles connected to super triangel
+        //for (int i = triangles.Count - 1; i >= 0; i--)
+        //{
+        //    if (triangles[i].ContainsPoint(superTriangle.top))
+        //    {
+        //        triangles.Remove(triangles[i]);
+        //    }
+        //    else if (triangles[i].ContainsPoint(superTriangle.right))
+        //    {
+        //        triangles.Remove(triangles[i]);
+        //    }
+        //    else if (triangles[i].ContainsPoint(superTriangle.left))
+        //    {
+        //        triangles.Remove(triangles[i]);
+        //    }
+        //}
+        //#endregion
+
+        #region Debug
         for (int i = 0; i < triangles.Count; i++)
         {
             GameObject debug = GameObject.Instantiate(manager.debugLineObject);
@@ -270,38 +326,18 @@ public class GeneratingMapState : MapBaseState
             ln.SetPosition(2, new Vector3(triangles[i].top.x, triangles[i].top.y, -1));
             ln.SetPosition(3, new Vector3(triangles[i].left.x, triangles[i].left.y, -1));
         }
+        #endregion
 
+        //GameObject debugSuperTriangle = GameObject.Instantiate(manager.debugLineObject);
 
-        //List<Circle> circumCircles = new();
+        //LineRenderer lnTemp = debugSuperTriangle.GetComponent<LineRenderer>();
 
-        //for (int i = 1; i < points.Length; i++)
-        //{
-        //    circumCircles.Clear();
+        //lnTemp.positionCount = 4;
 
-        //    for (int j = 0; j < triangles.Count; j++)
-        //    {
-        //        Vector2 circumPosition = triangles[j].Center();
-        //        float radius = Vector2.Distance(circumPosition, triangles[j].a);
-
-        //        Circle circumTemp = new(circumPosition, radius);
-
-        //        if (circumTemp.Intersects(points[i]))
-        //        {
-        //            circumCircles.Add(circumTemp);
-        //        }
-        //    }
-        //}
-
-        GameObject debugSuperTriangle = GameObject.Instantiate(manager.debugLineObject);
-
-        LineRenderer lnTemp = debugSuperTriangle.GetComponent<LineRenderer>();
-
-        lnTemp.positionCount = 4;
-
-        lnTemp.SetPosition(0, new Vector3(superTriangle.left.x, superTriangle.left.y, -1));
-        lnTemp.SetPosition(1, new Vector3(superTriangle.right.x, superTriangle.right.y, -1));
-        lnTemp.SetPosition(2, new Vector3(superTriangle.top.x, superTriangle.top.y, -1));
-        lnTemp.SetPosition(3, new Vector3(superTriangle.left.x, superTriangle.left.y, -1));
+        //lnTemp.SetPosition(0, new Vector3(superTriangle.left.x, superTriangle.left.y, -1));
+        //lnTemp.SetPosition(1, new Vector3(superTriangle.right.x, superTriangle.right.y, -1));
+        //lnTemp.SetPosition(2, new Vector3(superTriangle.top.x, superTriangle.top.y, -1));
+        //lnTemp.SetPosition(3, new Vector3(superTriangle.left.x, superTriangle.left.y, -1));
     }
 
     private void GetShortestSpanningTree()
@@ -491,25 +527,40 @@ public class Triangle
         {
             top = a;
 
-            GetLeftAndRight(b, c);
+            SetLeftAndRight(b, c);
         }
         else if (a.y < b.y && c.y < b.y)
         {
             top = b;
 
-            GetLeftAndRight(a, c);
+            SetLeftAndRight(a, c);
         }
         else if (b.y < c.y && a.y < c.y)
         {
             top = c;
 
-            GetLeftAndRight(a, b);
+            SetLeftAndRight(a, b);
+        }
+    }
+
+    public bool ContainsPoint(Vector2 point)
+    {
+        if (top == point)
+        {
+            return true;
+        }
+        else if (left == point)
+        {
+            return true;
+        }
+        else if (right == point)
+        {
+            return true;
         }
 
-        //a = left;
-        //c = top;
-        //b = right;
+        return false;
     }
+
     public bool PointInTriangle(Vector2 p)
     {
         double s1 = top.y - left.y;
@@ -523,7 +574,12 @@ public class Triangle
         return w1 >= 0 && w2 >= 0 && (w1 + w2) <= 1;
     }
 
-    private void GetLeftAndRight(Vector2 pointA, Vector2 pointB)
+    public bool Intersects(Triangle triangle)
+    {
+        return false;
+    }
+
+    private void SetLeftAndRight(Vector2 pointA, Vector2 pointB)
     {
         if (pointA.x < pointB.x)
         {

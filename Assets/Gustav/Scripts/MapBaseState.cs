@@ -211,6 +211,11 @@ public class GeneratingMapState : MapBaseState
         #region Super Triangle
         Vector2 left, right, top;
 
+        if (manager.generationRadius <= 0)
+        {
+            manager.generationRadius = 1;
+        }
+
         left = new Vector2(-manager.generationRadius, -manager.generationRadius);
         right = new Vector2(manager.generationRadius, -manager.generationRadius);
         top = new Vector2(0, manager.generationRadius);
@@ -219,7 +224,7 @@ public class GeneratingMapState : MapBaseState
 
         while (true)
         {
-            superTriangle = new Triangle(left, top, right);
+            superTriangle = new Triangle(top, right, left);
 
             bool triangleContainsAllPoints = true;
 
@@ -242,13 +247,34 @@ public class GeneratingMapState : MapBaseState
                 break;
             }
         }
-
-        triangles.Add(superTriangle);
         #endregion
 
-        List<Circle> circumCircles = new();
+        Vector2 circumPosition = superTriangle.Center();
+        float radius = Vector2.Distance(circumPosition, superTriangle.left);
+        Circle temp = new(circumPosition, radius);
 
-        //for (int i = 0; i < points.Length; i++)
+        triangles.Add(new Triangle(points[0], superTriangle.left, superTriangle.right));
+        triangles.Add(new Triangle(points[0], superTriangle.top, superTriangle.right));
+        triangles.Add(new Triangle(points[0], superTriangle.left, superTriangle.top));
+
+        for (int i = 0; i < triangles.Count; i++)
+        {
+            GameObject debug = GameObject.Instantiate(manager.debugLineObject);
+
+            LineRenderer ln = debug.GetComponent<LineRenderer>();
+
+            ln.positionCount = 4;
+
+            ln.SetPosition(0, new Vector3(triangles[i].left.x, triangles[i].left.y, -1));
+            ln.SetPosition(1, new Vector3(triangles[i].right.x, triangles[i].right.y, -1));
+            ln.SetPosition(2, new Vector3(triangles[i].top.x, triangles[i].top.y, -1));
+            ln.SetPosition(3, new Vector3(triangles[i].left.x, triangles[i].left.y, -1));
+        }
+
+
+        //List<Circle> circumCircles = new();
+
+        //for (int i = 1; i < points.Length; i++)
         //{
         //    circumCircles.Clear();
 
@@ -266,16 +292,16 @@ public class GeneratingMapState : MapBaseState
         //    }
         //}
 
-        GameObject debug = GameObject.Instantiate(manager.debugLineObject);
+        GameObject debugSuperTriangle = GameObject.Instantiate(manager.debugLineObject);
 
-        LineRenderer ln = debug.GetComponent<LineRenderer>();
+        LineRenderer lnTemp = debugSuperTriangle.GetComponent<LineRenderer>();
 
-        ln.positionCount = 4;
+        lnTemp.positionCount = 4;
 
-        ln.SetPosition(0, new Vector3(superTriangle.a.x, superTriangle.a.y, -1));
-        ln.SetPosition(1, new Vector3(superTriangle.b.x, superTriangle.b.y, -1));
-        ln.SetPosition(2, new Vector3(superTriangle.c.x, superTriangle.c.y, -1));
-        ln.SetPosition(3, new Vector3(superTriangle.a.x, superTriangle.a.y, -1));
+        lnTemp.SetPosition(0, new Vector3(superTriangle.left.x, superTriangle.left.y, -1));
+        lnTemp.SetPosition(1, new Vector3(superTriangle.right.x, superTriangle.right.y, -1));
+        lnTemp.SetPosition(2, new Vector3(superTriangle.top.x, superTriangle.top.y, -1));
+        lnTemp.SetPosition(3, new Vector3(superTriangle.left.x, superTriangle.left.y, -1));
     }
 
     private void GetShortestSpanningTree()
@@ -457,29 +483,62 @@ public class Circle
 
 public class Triangle
 {
-    public Vector2 a, b, c;
+    public Vector2 left, right, top;
 
-    public Triangle(Vector2 left, Vector2 top, Vector2 right)
+    public Triangle(Vector2 a, Vector2 b, Vector2 c)
     {
-        a = left;
-        c = top;
-        b = right;
+        if (b.y < a.y && c.y < a.y)
+        {
+            top = a;
+
+            GetLeftAndRight(b, c);
+        }
+        else if (a.y < b.y && c.y < b.y)
+        {
+            top = b;
+
+            GetLeftAndRight(a, c);
+        }
+        else if (b.y < c.y && a.y < c.y)
+        {
+            top = c;
+
+            GetLeftAndRight(a, b);
+        }
+
+        //a = left;
+        //c = top;
+        //b = right;
     }
     public bool PointInTriangle(Vector2 p)
     {
-        double s1 = c.y - a.y;
-        double s2 = c.x - a.x;
-        double s3 = b.y - a.y;
-        double s4 = p.y - a.y;
+        double s1 = top.y - left.y;
+        double s2 = top.x - left.x;
+        double s3 = right.y - left.y;
+        double s4 = p.y - left.y;
 
-        double w1 = (a.x * s1 + s4 * s2 - p.x * s1) / (s3 * s2 - (b.x - a.x) * s1);
+        double w1 = (left.x * s1 + s4 * s2 - p.x * s1) / (s3 * s2 - (right.x - left.x) * s1);
         double w2 = (s4 - w1 * s3) / s1;
 
         return w1 >= 0 && w2 >= 0 && (w1 + w2) <= 1;
     }
 
+    private void GetLeftAndRight(Vector2 pointA, Vector2 pointB)
+    {
+        if (pointA.x < pointB.x)
+        {
+            left = pointA;
+            right = pointB;
+        }
+        else
+        {
+            left = pointB;
+            right = pointA;
+        }
+    }
+
     public Vector2 Center()
     {
-        return new Vector2((a.x + b.x + c.x) / 3, (a.y + b.y + c.y) / 3);
+        return new Vector2((left.x + right.x + top.x) / 3, (left.y + right.y + top.y) / 3);
     }
 }

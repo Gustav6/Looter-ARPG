@@ -32,15 +32,21 @@ public class GeneratingMapState : MapBaseState
     public override void EnterState(MapGenerationManager manager)
     {
         heap = new(manager.totalRoomsAmount);
-        manager.AmountOfMainRooms = 5;
+        manager.AmountOfMainRooms = manager.totalRoomsAmount / 5;
 
         totalRooms.Clear();
+        mainRooms.Clear();
 
         for (int i = 0; i < manager.totalRoomsAmount; i++)
         {
             totalRooms.Add(GenerateRoom(manager));
 
             heap.Add(totalRooms[i]);
+        }
+
+        for (int i = 0; i < manager.AmountOfMainRooms; i++)
+        {
+            mainRooms.Add(heap.RemoveFirst());
         }
     }
 
@@ -52,6 +58,11 @@ public class GeneratingMapState : MapBaseState
         {
             foreach (Room roomB in totalRooms)
             {
+                if (roomA.Equals(roomB))
+                {
+                    continue;
+                }
+                
                 if (RoomIntersects(manager, roomA, roomB))
                 {
                     canMoveRoom = true;
@@ -71,8 +82,7 @@ public class GeneratingMapState : MapBaseState
         }
         else
         {
-            GenerateDelaunayTriangulation(manager, totalRooms);
-            GenerateShortestSpanningTree();
+            GenerateShortestSpanningTree(GenerateDelaunayTriangulation(manager, totalRooms), 10);
             GenerateCorridors(3);
             PlaceWalls();
 
@@ -88,13 +98,6 @@ public class GeneratingMapState : MapBaseState
         }
         else
         {
-            mainRooms.Clear();
-
-            for (int i = 0; i < manager.AmountOfMainRooms; i++)
-            {
-                mainRooms.Add(heap.RemoveFirst());
-            }
-
             PlaceRooms(manager, mainRooms);
         }
     }
@@ -202,8 +205,14 @@ public class GeneratingMapState : MapBaseState
     }
     #endregion
 
-    private void GenerateDelaunayTriangulation(MapGenerationManager manager, List<Room> rooms)
+    #region Delaunay triangulation
+    private List<Triangle> GenerateDelaunayTriangulation(MapGenerationManager manager, List<Room> rooms)
     {
+        if (rooms.Count <= 3)
+        {
+            return new List<Triangle>();
+        }
+
         Vector2[] points = new Vector2[rooms.Count];
 
         for (int i = 0; i < points.Length; i++)
@@ -211,7 +220,7 @@ public class GeneratingMapState : MapBaseState
             points[i] = rooms[i].WorldPosition;
         }
 
-        List<Triangle> triangles = new();
+        List<Triangle> triangulation = new();
 
         #region Super Triangle
         Vector2 a, b, c;
@@ -253,274 +262,160 @@ public class GeneratingMapState : MapBaseState
             }
         }
 
-        triangles.Add(superTriangle);
+        triangulation.Add(superTriangle);
         #endregion
 
-        //triangles.Add(new Triangle(points[0], superTriangle.left, superTriangle.right));
-        //triangles.Add(new Triangle(points[0], superTriangle.top, superTriangle.right));
-        //triangles.Add(new Triangle(points[0], superTriangle.left, superTriangle.top));
+        List<Triangle> newTriangles = new();
+        List<Triangle> badTriangles = new();
 
-        Triangle[] tempArray = new Triangle[3];
-
-        List<Triangle> effectedTriangles = new();
-
-        for (int i = 0; i < points.Length; i++)
+        foreach (Vector2 point in points)
         {
-            effectedTriangles.Clear();
+            newTriangles.Clear();
+            badTriangles.Clear();
 
-            foreach (Triangle triangle in triangles)
+            foreach (Triangle triangle in triangulation)
             {
-                if (triangle.PointInTriangle(points[i]))
+                if (triangle.PointInTriangle(point))
                 {
                     // Split triangle into 3 triangles
-                    tempArray[0] = new Triangle(points[i], triangle.left, triangle.right);
-                    tempArray[1] = new Triangle(points[i], triangle.top, triangle.left);
-                    tempArray[2] = new Triangle(points[i], triangle.top, triangle.right);
-
-                    effectedTriangles.AddRange(tempArray);
+                    newTriangles.Add(new Triangle(point, triangle.left, triangle.right));
+                    newTriangles.Add(new Triangle(point, triangle.top, triangle.left));
+                    newTriangles.Add(new Triangle(point, triangle.top, triangle.right));
 
                     // Remove the original triangle that was split
-                    triangles.Remove(triangle);
+                    triangulation.Remove(triangle);
 
                     break;
                 }
             }
-
-            //for (int j = 0; j < triangles.Count; j++)
-            //{
-            //    Vector2 circumCirclePosition = triangles[j].CircumCenter();
-
-            //    float r = Vector2.Distance(circumCirclePosition, triangles[j].vertices[0]);
-
-            //    Circle circumCircle = new(circumCirclePosition, r);
-
-            //    #region Debug
-            //    GameObject test1 = GameObject.Instantiate(manager.debugLineObject);
-            //    GameObject test2 = GameObject.Instantiate(manager.debugLineObject);
-
-            //    LineRenderer lnTest1 = test1.GetComponent<LineRenderer>();
-            //    LineRenderer lnTest2 = test2.GetComponent<LineRenderer>();
-
-            //    lnTest1.positionCount = 2;
-            //    lnTest2.positionCount = 2;
-
-            //    lnTest1.SetPosition(0, new Vector3(circumCirclePosition.x - r, circumCirclePosition.y, -1));
-            //    lnTest1.SetPosition(1, new Vector3(circumCirclePosition.x + r, circumCirclePosition.y, -1));
-
-            //    lnTest2.SetPosition(0, new Vector3(circumCirclePosition.x, circumCirclePosition.y + r, -1));
-            //    lnTest2.SetPosition(1, new Vector3(circumCirclePosition.x, circumCirclePosition.y - r, -1));
-            //    #endregion
-            //}
-
-            List<Triangle> badTriangles = new();
             // Change triangles that don't meat condition
 
-            
-            for (int j = 0; j < effectedTriangles.Count; j++)
+            for (int i = 0; i < newTriangles.Count; i++)
             {
-                Triangle effected = effectedTriangles[j];
-
-                List<Triangle> neighbors = GetNeighbors(triangles, effected);
-                Debug.Log(neighbors.Count);
-
-                for (int k = 0; k < neighbors.Count; k++)
+                foreach (Triangle neighbor in GetNeighbors(triangulation, newTriangles[i]))
                 {
-                    Vector2 circumCirclePosition = effected.CircumCenter();
+                    Vector2 position = newTriangles[i].CircumCenter();
+                    float radius = Vector2.Distance(position, newTriangles[i].vertices[0]);
 
-                    float r = Vector2.Distance(circumCirclePosition, effected.vertices[0]);
+                    Circle circumCircle = new(position, radius);
 
-                    Circle circumCircle = new(circumCirclePosition, r);
-
-                    #region Debug
-                    //GameObject test1 = GameObject.Instantiate(manager.debugLineObject);
-                    //GameObject test2 = GameObject.Instantiate(manager.debugLineObject);
-
-                    //LineRenderer lnTest1 = test1.GetComponent<LineRenderer>();
-                    //LineRenderer lnTest2 = test2.GetComponent<LineRenderer>();
-
-                    //lnTest1.positionCount = 2;
-                    //lnTest2.positionCount = 2;
-
-                    //lnTest1.SetPosition(0, new Vector3(circumCirclePosition.x - r, circumCirclePosition.y, -1));
-                    //lnTest1.SetPosition(1, new Vector3(circumCirclePosition.x + r, circumCirclePosition.y, -1));
-
-                    //lnTest2.SetPosition(0, new Vector3(circumCirclePosition.x, circumCirclePosition.y + r, -1));
-                    //lnTest2.SetPosition(1, new Vector3(circumCirclePosition.x, circumCirclePosition.y - r, -1));
-                    #endregion
-
-                    foreach (Vector2 vertice in neighbors[k].vertices)
+                    foreach (Vector2 vertice in neighbor.vertices)
                     {
-                        if (effected.vertices.Contains(vertice) && neighbors[k].vertices.Contains(vertice))
+                        if (newTriangles[i].vertices.Contains(vertice))
                         {
                             continue;
                         }
 
                         if (circumCircle.Intersects(vertice))
                         {
-                            GameObject parent = new();
-                            GameObject t1 = new(), t2 = new();
-
-                            t1.transform.parent = parent.transform;
-                            t2.transform.parent = parent.transform;
-
-                            t1.transform.position = effected.Center();
-                            t2.transform.position = neighbors[k].Center();
-
                             #region Get vertices
                             List<Vector2> vertices = new();
-                            vertices.AddRange(effected.vertices);
-                            vertices.AddRange(neighbors[k].vertices);
+                            vertices.AddRange(newTriangles[i].vertices);
+                            vertices.AddRange(neighbor.vertices);
 
                             Vector2? pointA = null, pointB = null, pointC = null, pointD = null;
 
-                            for (int l = vertices.Count - 1; l >= 0; l--)
+                            for (int j = vertices.Count - 1; j >= 0; j--)
                             {
-                                if (effected.vertices.Contains(vertices[l]) && neighbors[k].vertices.Contains(vertices[l]))
+                                if (newTriangles[i].vertices.Contains(vertices[j]) && neighbor.vertices.Contains(vertices[j]))
                                 {
                                     if (pointA == null)
                                     {
-                                        pointA = vertices[l];
+                                        pointA = vertices[j];
                                     }
-                                    else if (pointB == null && vertices[l] != pointA)
+                                    else if (pointB == null && vertices[j] != pointA)
                                     {
-                                        pointB = vertices[l];
+                                        pointB = vertices[j];
                                     }
                                 }
                                 else
                                 {
                                     if (pointC == null)
                                     {
-                                        pointC = vertices[l];
+                                        pointC = vertices[j];
                                     }
-                                    else if (pointD == null && vertices[l] != pointC)
+                                    else if (pointD == null && vertices[j] != pointC)
                                     {
-                                        pointD = vertices[l];
+                                        pointD = vertices[j];
                                     }
                                 }
                             }
                             #endregion
 
-                            #region Debug
-                            GameObject g1 = new();
-                            g1.transform.position = pointA.Value;
-                            GameObject g2 = new();
-                            g2.transform.position = pointC.Value;
-                            GameObject g3 = new();
-                            g3.transform.position = pointD.Value;
-
-                            g1.transform.parent = t1.transform;
-                            g2.transform.parent = t1.transform;
-                            g3.transform.parent = t1.transform;
-
-                            GameObject g4 = new();
-                            g4.transform.position = pointB.Value;
-                            GameObject g5 = new();
-                            g5.transform.position = pointC.Value;
-                            GameObject g6 = new();
-                            g6.transform.position = pointD.Value;
-
-                            g4.transform.parent = t2.transform;
-                            g5.transform.parent = t2.transform;
-                            g6.transform.parent = t2.transform;
-                            #endregion
-
-                            triangles.Remove(neighbors[k]);
-                            badTriangles.Add(effected);
+                            triangulation.Remove(neighbor);
+                            badTriangles.Add(newTriangles[i]);
 
                             Triangle newTriangle1 = new(pointA.Value, pointC.Value, pointD.Value);
                             Triangle newTriangle2 = new(pointB.Value, pointC.Value, pointD.Value);
 
-                            effectedTriangles.Add(newTriangle1);
-                            effectedTriangles.Add(newTriangle2);
+                            newTriangles.Add(newTriangle1);
+                            newTriangles.Add(newTriangle2);
                         }
                     }
                 }
             }
 
-            for (int j = effectedTriangles.Count - 1; j >= 0; j--)
+            foreach (Triangle badTriangle in badTriangles)
             {
-                if (badTriangles.Contains(effectedTriangles[j]))
+                newTriangles.Remove(badTriangle);
+            }
+
+            triangulation.AddRange(newTriangles);
+        }
+
+        #region Remove super triangel from triangulation
+        for (int i = triangulation.Count - 1; i >= 0; i--)
+        {
+            foreach (Vector2 vertice in superTriangle.vertices)
+            {
+                if (triangulation[i].ContainsPoint(vertice))
                 {
-                    effectedTriangles.RemoveAt(j);
+                    triangulation.Remove(triangulation[i]);
                 }
             }
-
-            triangles.AddRange(effectedTriangles);
-
-        }
-
-        #region Remove super triangel
-        for (int i = triangles.Count - 1; i >= 0; i--)
-        {
-            if (triangles[i].ContainsPoint(superTriangle.top) ||
-                triangles[i].ContainsPoint(superTriangle.right) ||
-                triangles[i].ContainsPoint(superTriangle.left))
-            {
-                triangles.Remove(triangles[i]);
-            }
         }
         #endregion
 
-        #region Debug
-        for (int i = 0; i < triangles.Count; i++)
+        #region Debug for triangulation
+        GameObject triangulationGameObject = new()
         {
-            GameObject debug = GameObject.Instantiate(manager.debugLineObject);
+            name = "Triangulation"
+        };
 
-            LineRenderer ln = debug.GetComponent<LineRenderer>();
+        for (int i = 0; i < triangulation.Count; i++)
+        {
+            GameObject debug = new()
+            {
+                name = "Triangle " + i
+            };
+            debug.transform.SetParent(triangulationGameObject.transform);
 
+            LineRenderer ln = debug.AddComponent<LineRenderer>();
             ln.positionCount = 4;
 
-            ln.SetPosition(0, new Vector3(triangles[i].left.x, triangles[i].left.y, -1));
-            ln.SetPosition(1, new Vector3(triangles[i].right.x, triangles[i].right.y, -1));
-            ln.SetPosition(2, new Vector3(triangles[i].top.x, triangles[i].top.y, -1));
-            ln.SetPosition(3, new Vector3(triangles[i].left.x, triangles[i].left.y, -1));
+            ln.SetPosition(0, new Vector3(triangulation[i].left.x, triangulation[i].left.y, -1));
+            ln.SetPosition(1, new Vector3(triangulation[i].right.x, triangulation[i].right.y, -1));
+            ln.SetPosition(2, new Vector3(triangulation[i].top.x, triangulation[i].top.y, -1));
+            ln.SetPosition(3, new Vector3(triangulation[i].left.x, triangulation[i].left.y, -1));
         }
         #endregion
 
-        #region Debug super triangle
-        //GameObject debugSuperTriangle = GameObject.Instantiate(manager.debugLineObject);
-
-        //LineRenderer lnTemp = debugSuperTriangle.GetComponent<LineRenderer>();
-
-        //lnTemp.positionCount = 4;
-
-        //lnTemp.SetPosition(0, new Vector3(superTriangle.left.x, superTriangle.left.y, -1));
-        //lnTemp.SetPosition(1, new Vector3(superTriangle.right.x, superTriangle.right.y, -1));
-        //lnTemp.SetPosition(2, new Vector3(superTriangle.top.x, superTriangle.top.y, -1));
-        //lnTemp.SetPosition(3, new Vector3(superTriangle.left.x, superTriangle.left.y, -1));
-
-        //GameObject test1 = GameObject.Instantiate(manager.debugLineObject);
-        //GameObject test2 = GameObject.Instantiate(manager.debugLineObject);
-
-        //LineRenderer lnTest1 = test1.GetComponent<LineRenderer>();
-        //LineRenderer lnTest2 = test2.GetComponent<LineRenderer>();
-
-        //Vector2 cir = superTriangle.Center();
-        //float rad = Vector2.Distance(cir, superTriangle.vertices[0]);
-
-        //lnTest1.positionCount = 2;
-        //lnTest2.positionCount = 2;
-
-        //lnTest1.SetPosition(0, new Vector3(cir.x - rad, cir.y, -1));
-        //lnTest1.SetPosition(1, new Vector3(cir.x + rad, cir.y, -1));
-
-        //lnTest2.SetPosition(0, new Vector3(cir.x, cir.y + rad, -1));
-        //lnTest2.SetPosition(1, new Vector3(cir.x, cir.y - rad, -1));
-        #endregion
+        return triangulation;
     }
 
-    private List<Triangle> GetNeighbors(List<Triangle> triangles, Triangle currentTriangle)
+    private List<Triangle> GetNeighbors(List<Triangle> list, Triangle currentTriangle)
     {
         List<Triangle> neighbors = new();
+        int sharedVertices;
 
-        foreach (Triangle triangle in triangles)
+        foreach (Triangle triangle in list)
         {
-            if (triangle == currentTriangle)
+            if (triangle.Equals(currentTriangle))
             {
                 continue;
             }
 
-            int sharedVertices = 0;
+            sharedVertices = 0;
 
             foreach (Vector2 vertice in triangle.vertices)
             {
@@ -539,9 +434,18 @@ public class GeneratingMapState : MapBaseState
 
         return neighbors;
     }
+    #endregion
 
-    private void GenerateShortestSpanningTree()
+    private void GenerateShortestSpanningTree(List<Triangle> triangulation, float percentageOfLoops)
     {
+        if (percentageOfLoops < 0)
+        {
+            percentageOfLoops = 0;
+        }
+        else if (percentageOfLoops > 100)
+        {
+            percentageOfLoops = 100;
+        }
 
     }
 
@@ -577,9 +481,6 @@ public class GeneratingMapState : MapBaseState
                     manager.tileMap.SetTile((Vector3Int)rooms[i].tiles[x, y].gridPosition, tileTexture);
                 }
             }
-
-            GameObject g = new();
-            g.transform.position = rooms[i].WorldPosition;
         }
     }
 }

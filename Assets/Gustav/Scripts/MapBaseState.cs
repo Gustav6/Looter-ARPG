@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Drawing;
@@ -251,17 +252,19 @@ public class GeneratingMapState : MapBaseState
                 break;
             }
         }
+
+        triangles.Add(superTriangle);
         #endregion
 
-        triangles.Add(new Triangle(points.First(), superTriangle.left, superTriangle.right));
-        triangles.Add(new Triangle(points.First(), superTriangle.top, superTriangle.right));
-        triangles.Add(new Triangle(points.First(), superTriangle.left, superTriangle.top));
+        //triangles.Add(new Triangle(points[0], superTriangle.left, superTriangle.right));
+        //triangles.Add(new Triangle(points[0], superTriangle.top, superTriangle.right));
+        //triangles.Add(new Triangle(points[0], superTriangle.left, superTriangle.top));
 
         Triangle[] tempArray = new Triangle[3];
 
         List<Triangle> effectedTriangles = new();
 
-        for (int i = 1; i < points.Length; i++)
+        for (int i = 0; i < points.Length; i++)
         {
             effectedTriangles.Clear();
 
@@ -283,24 +286,71 @@ public class GeneratingMapState : MapBaseState
                 }
             }
 
+            //for (int j = 0; j < triangles.Count; j++)
+            //{
+            //    Vector2 circumCirclePosition = triangles[j].CircumCenter();
+
+            //    float r = Vector2.Distance(circumCirclePosition, triangles[j].vertices[0]);
+
+            //    Circle circumCircle = new(circumCirclePosition, r);
+
+            //    #region Debug
+            //    GameObject test1 = GameObject.Instantiate(manager.debugLineObject);
+            //    GameObject test2 = GameObject.Instantiate(manager.debugLineObject);
+
+            //    LineRenderer lnTest1 = test1.GetComponent<LineRenderer>();
+            //    LineRenderer lnTest2 = test2.GetComponent<LineRenderer>();
+
+            //    lnTest1.positionCount = 2;
+            //    lnTest2.positionCount = 2;
+
+            //    lnTest1.SetPosition(0, new Vector3(circumCirclePosition.x - r, circumCirclePosition.y, -1));
+            //    lnTest1.SetPosition(1, new Vector3(circumCirclePosition.x + r, circumCirclePosition.y, -1));
+
+            //    lnTest2.SetPosition(0, new Vector3(circumCirclePosition.x, circumCirclePosition.y + r, -1));
+            //    lnTest2.SetPosition(1, new Vector3(circumCirclePosition.x, circumCirclePosition.y - r, -1));
+            //    #endregion
+            //}
+
+            List<Triangle> badTriangles = new();
             // Change triangles that don't meat condition
 
+            
             for (int j = 0; j < effectedTriangles.Count; j++)
             {
                 Triangle effected = effectedTriangles[j];
 
-                triangles.Add(effected);
+                List<Triangle> neighbors = GetNeighbors(triangles, effected);
+                Debug.Log(neighbors.Count);
 
-                foreach (Triangle neighbor in GetNeighbor(triangles, effected))
+                for (int k = 0; k < neighbors.Count; k++)
                 {
-                    Vector2 circumCirclePosition = effected.Center();
-                    float r = Vector2.Distance(circumCirclePosition, neighbor.vertices[0]);
+                    Vector2 circumCirclePosition = effected.CircumCenter();
+
+                    float r = Vector2.Distance(circumCirclePosition, effected.vertices[0]);
 
                     Circle circumCircle = new(circumCirclePosition, r);
 
-                    foreach (Vector2 vertice in neighbor.vertices)
+                    #region Debug
+                    //GameObject test1 = GameObject.Instantiate(manager.debugLineObject);
+                    //GameObject test2 = GameObject.Instantiate(manager.debugLineObject);
+
+                    //LineRenderer lnTest1 = test1.GetComponent<LineRenderer>();
+                    //LineRenderer lnTest2 = test2.GetComponent<LineRenderer>();
+
+                    //lnTest1.positionCount = 2;
+                    //lnTest2.positionCount = 2;
+
+                    //lnTest1.SetPosition(0, new Vector3(circumCirclePosition.x - r, circumCirclePosition.y, -1));
+                    //lnTest1.SetPosition(1, new Vector3(circumCirclePosition.x + r, circumCirclePosition.y, -1));
+
+                    //lnTest2.SetPosition(0, new Vector3(circumCirclePosition.x, circumCirclePosition.y + r, -1));
+                    //lnTest2.SetPosition(1, new Vector3(circumCirclePosition.x, circumCirclePosition.y - r, -1));
+                    #endregion
+
+                    foreach (Vector2 vertice in neighbors[k].vertices)
                     {
-                        if (effected.vertices.Contains(vertice))
+                        if (effected.vertices.Contains(vertice) && neighbors[k].vertices.Contains(vertice))
                         {
                             continue;
                         }
@@ -309,40 +359,42 @@ public class GeneratingMapState : MapBaseState
                         {
                             GameObject parent = new();
                             GameObject t1 = new(), t2 = new();
+
                             t1.transform.parent = parent.transform;
                             t2.transform.parent = parent.transform;
 
-                            parent.transform.position = effected.Center();
+                            t1.transform.position = effected.Center();
+                            t2.transform.position = neighbors[k].Center();
 
                             #region Get vertices
                             List<Vector2> vertices = new();
                             vertices.AddRange(effected.vertices);
-                            vertices.AddRange(neighbor.vertices);
+                            vertices.AddRange(neighbors[k].vertices);
 
                             Vector2? pointA = null, pointB = null, pointC = null, pointD = null;
 
-                            for (int k = vertices.Count - 1; k >= 0; k--)
+                            for (int l = vertices.Count - 1; l >= 0; l--)
                             {
-                                if (effected.vertices.Contains(vertices[k]) && neighbor.vertices.Contains(vertices[k]))
+                                if (effected.vertices.Contains(vertices[l]) && neighbors[k].vertices.Contains(vertices[l]))
                                 {
                                     if (pointA == null)
                                     {
-                                        pointA = vertices[k];
+                                        pointA = vertices[l];
                                     }
-                                    else if (pointB == null && vertices[k] != pointA)
+                                    else if (pointB == null && vertices[l] != pointA)
                                     {
-                                        pointB = vertices[k];
+                                        pointB = vertices[l];
                                     }
                                 }
                                 else
                                 {
                                     if (pointC == null)
                                     {
-                                        pointC = vertices[k];
+                                        pointC = vertices[l];
                                     }
-                                    else if (pointD == null && vertices[k] != pointC)
+                                    else if (pointD == null && vertices[l] != pointC)
                                     {
-                                        pointD = vertices[k];
+                                        pointD = vertices[l];
                                     }
                                 }
                             }
@@ -372,143 +424,41 @@ public class GeneratingMapState : MapBaseState
                             g6.transform.parent = t2.transform;
                             #endregion
 
-                            triangles.Remove(effected);
-                            triangles.Remove(neighbor);
+                            triangles.Remove(neighbors[k]);
+                            badTriangles.Add(effected);
 
                             Triangle newTriangle1 = new(pointA.Value, pointC.Value, pointD.Value);
                             Triangle newTriangle2 = new(pointB.Value, pointC.Value, pointD.Value);
 
-                            triangles.Add(newTriangle1);
-                            triangles.Add(newTriangle2);
-
-                            //Vector2 tempCircumCirclePosition = effected.Center();
-                            //float tempR = Vector2.Distance(circumCirclePosition, neighbor.vertices[0]);
-
-                            //Circle tempCircumCircle = new(tempCircumCirclePosition, tempR);
-
-                            //foreach (Vector2 tempVertice in newTriangle2.vertices)
-                            //{
-                            //    if (newTriangle1.vertices.Contains(vertice))
-                            //    {
-                            //        continue;
-                            //    }
-
-                            //    if (tempCircumCircle.Intersects(tempVertice))
-                            //    {
-                            //        triangles.Remove(newTriangle1);
-                            //        triangles.Remove(newTriangle2);
-                            //    }
-                            //}
-
-                            break;
+                            effectedTriangles.Add(newTriangle1);
+                            effectedTriangles.Add(newTriangle2);
                         }
                     }
                 }
             }
 
-            #region Works kinda
-            //for (int j = 0; j < tempArray.Length; j++)
-            //{
-            //    Triangle neighbor = null;
+            for (int j = effectedTriangles.Count - 1; j >= 0; j--)
+            {
+                if (badTriangles.Contains(effectedTriangles[j]))
+                {
+                    effectedTriangles.RemoveAt(j);
+                }
+            }
 
-            //    foreach (Triangle tempNeighbor in GetNeighbor(triangles, tempArray[j]))
-            //    {
-            //        if (!tempArray.Contains(tempNeighbor))
-            //        {
-            //            neighbor = tempNeighbor;
-            //        }
-            //    }
+            triangles.AddRange(effectedTriangles);
 
-            //    if (neighbor == null)
-            //    {
-            //        continue;
-            //    }
-
-            //    bool isValidTriangulation = true;
-
-            //    Vector2 circumCirclePosition = tempArray[j].Center();
-            //    float r = Vector2.Distance(circumCirclePosition, neighbor.vertices[0]);
-
-            //    Circle circumCircle = new(circumCirclePosition, r);
-
-            //    foreach (Vector2 vertice in neighbor.vertices)
-            //    {
-            //        if (tempArray[j].vertices.Contains(vertice))
-            //        {
-            //            continue;
-            //        }
-
-            //        if (circumCircle.Intersects(vertice))
-            //        {
-            //            isValidTriangulation = false;
-            //            break;
-            //        }
-            //    }
-
-            //    if (!isValidTriangulation)
-            //    {
-            //        List<Vector2> list = new();
-            //        List<Vector2> list2 = new();
-
-            //        GameObject parent = new();
-            //        parent.transform.position = tempArray[j].Center();
-
-            //        for (int k = 0; k < tempArray[j].vertices.Count; k++)
-            //        {
-            //            if (neighbor.vertices.Contains(tempArray[j].vertices[k]))
-            //            {
-            //                list.Add(tempArray[j].vertices[k]);
-            //                GameObject g = new();
-            //                g.transform.position = tempArray[j].vertices[k];
-
-            //                g.transform.parent = parent.transform;
-            //            }
-            //            else
-            //            {
-            //                list2.Add(tempArray[j].vertices[k]);
-
-            //                GameObject g = new();
-            //                g.transform.position = tempArray[j].vertices[k];
-
-            //                g.transform.parent = parent.transform;
-            //            }
-            //        }
-
-            //        for (int k = 0; k < neighbor.vertices.Count; k++)
-            //        {
-            //            if (!tempArray[j].vertices.Contains(neighbor.vertices[k]))
-            //            {
-            //                list2.Add(neighbor.vertices[k]);
-
-            //                GameObject g = new();
-            //                g.transform.position = neighbor.vertices[k];
-
-            //                g.transform.parent = parent.transform;
-            //            }
-            //        }
-
-            //        Debug.Log("list 1: " + list.Count);
-            //        Debug.Log("list 2: " + list2.Count);
-
-            //        tempArray[j] = new Triangle(list.ElementAt(0), list2.ElementAt(0), list2.ElementAt(1));
-
-            //        triangles.Remove(neighbor);
-            //        triangles.Add(new Triangle(list.ElementAt(1), list2.ElementAt(0), list2.ElementAt(1)));
-            //    }
-            //}
-            #endregion
         }
 
         #region Remove super triangel
-        //for (int i = triangles.Count - 1; i >= 0; i--)
-        //{
-        //    if (triangles[i].ContainsPoint(superTriangle.top) ||
-        //        triangles[i].ContainsPoint(superTriangle.right) ||
-        //        triangles[i].ContainsPoint(superTriangle.left))
-        //    {
-        //        triangles.Remove(triangles[i]);
-        //    }
-        //}
+        for (int i = triangles.Count - 1; i >= 0; i--)
+        {
+            if (triangles[i].ContainsPoint(superTriangle.top) ||
+                triangles[i].ContainsPoint(superTriangle.right) ||
+                triangles[i].ContainsPoint(superTriangle.left))
+            {
+                triangles.Remove(triangles[i]);
+            }
+        }
         #endregion
 
         #region Debug
@@ -559,7 +509,7 @@ public class GeneratingMapState : MapBaseState
         #endregion
     }
 
-    private List<Triangle> GetNeighbor(List<Triangle> triangles, Triangle currentTriangle)
+    private List<Triangle> GetNeighbors(List<Triangle> triangles, Triangle currentTriangle)
     {
         List<Triangle> neighbors = new();
 
@@ -773,14 +723,12 @@ public class Circle
 public class Triangle
 {
     public Vector2 left, right, top;
-    public readonly List<Vector2> vertices = new();
+    public readonly Vector2[] vertices = new Vector2[3];
     public Triangle(Vector2 a, Vector2 b, Vector2 c)
     {
-        vertices.Clear();
-
-        vertices.Add(a);
-        vertices.Add(b);
-        vertices.Add(c);
+        vertices[0] = a;
+        vertices[1] = b;
+        vertices[2] = c;
 
         SetPointVariables(a, b, c);
     }
@@ -806,6 +754,105 @@ public class Triangle
     public Vector2 Center()
     {
         return new Vector2((left.x + right.x + top.x) / 3, (left.y + right.y + top.y) / 3);
+    }
+
+    public Vector2 CircumCenter()
+    {
+        List<double> a = new()
+        {
+            top.x,
+            top.y
+        };
+        List<double> b = new()
+        {
+            left.x,
+            left.y
+        };
+        List<double> c = new()
+        {
+            right.x,
+            right.y
+        };
+
+        List<double> center = FindCircumCenter(a, b, c);
+
+        return new Vector2((float)center[0], (float)center[1]);
+    }
+
+    public static void LineFromPoints(List<double> P, List<double> Q, ref double a, ref double b, ref double c)
+    {
+        a = Q[1] - P[1];
+        b = P[0] - Q[0];
+        c = a * (P[0]) + b * (P[1]);
+    }
+
+    // Function which converts the input line to its
+    // perpendicular bisector. It also inputs the points
+    // whose mid-point lies on the bisector
+    public static void PerpendicularBisectorFromLine(List<double> P, List<double> Q, ref double a, ref double b, ref double c)
+    {
+        List<double> mid_point = new List<double>();
+        mid_point.Add((P[0] + Q[0]) / 2);
+
+        mid_point.Add((P[1] + Q[1]) / 2);
+
+        // c = -bx + ay
+        c = -b * (mid_point[0]) + a * (mid_point[1]);
+
+        double temp = a;
+        a = -b;
+        b = temp;
+    }
+
+    // Returns the intersection point of two lines
+    public static List<double> LineLineIntersection(double a1, double b1, double c1, double a2, double b2, double c2)
+    {
+        List<double> ans = new List<double>();
+        double determinant = a1 * b2 - a2 * b1;
+        if (determinant == 0)
+        {
+            // The lines are parallel. This is simplified
+            // by returning a pair of FLT_MAX
+            ans.Add(double.MaxValue);
+            ans.Add(double.MaxValue);
+        }
+
+        else
+        {
+            double x = (b2 * c1 - b1 * c2) / determinant;
+            double y = (a1 * c2 - a2 * c1) / determinant;
+            ans.Add(x);
+            ans.Add(y);
+        }
+
+        return ans;
+    }
+
+    public static List<double> FindCircumCenter(List<double> P, List<double> Q, List<double> R)
+    {
+        // Line PQ is represented as ax + by = c
+        double a = 0;
+        double b = 0;
+        double c = 0;
+        LineFromPoints(P, Q, ref a, ref b, ref c);
+
+        // Line QR is represented as ex + fy = g
+        double e = 0;
+        double f = 0;
+        double g = 0;
+        LineFromPoints(Q, R, ref e, ref f, ref g);
+
+        // Converting lines PQ and QR to perpendicular
+        // vbisectors. After this, L = ax + by = c
+        // M = ex + fy = g
+        PerpendicularBisectorFromLine(P, Q, ref a, ref b, ref c);
+        PerpendicularBisectorFromLine(Q, R, ref e, ref f, ref g);
+
+        // The point of intersection of L and M gives
+        // the circumcenter
+        List<double> circumcenter = LineLineIntersection(a, b, c, e, f, g);
+
+        return circumcenter;
     }
 
     private void SetPointVariables(Vector2 pointA, Vector2 pointB, Vector2 pointC)

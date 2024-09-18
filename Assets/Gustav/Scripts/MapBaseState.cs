@@ -1,10 +1,10 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
 using Unity.Mathematics;
 using Unity.VisualScripting;
+using UnityEditor;
 using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -25,6 +25,8 @@ public class GeneratingMapState : MapBaseState
 {
     public List<Room> totalRooms = new();
     public List<Room> mainRooms = new();
+    public List<Vector2> roomPositions = new();
+    private List<TileChangeData> tileChanges = new();
     private Heap<Room> heap;
 
     private bool canMoveRoom = false;
@@ -32,18 +34,21 @@ public class GeneratingMapState : MapBaseState
     public override void EnterState(MapGenerationManager manager)
     {
         heap = new(manager.totalRoomsAmount);
-        manager.AmountOfMainRooms = manager.totalRoomsAmount / 5;
+        manager.AmountOfMainRooms = 5;
 
         totalRooms.Clear();
         mainRooms.Clear();
 
+        // Generate x amount of rooms
         for (int i = 0; i < manager.totalRoomsAmount; i++)
         {
-            totalRooms.Add(GenerateRoom(manager));
+            Room newRoom = GenerateRoom(manager);
 
-            heap.Add(totalRooms[i]);
+            totalRooms.Add(newRoom);
+            heap.Add(newRoom);
         }
 
+        // Add x amount (Amount of main rooms) with the largest area
         for (int i = 0; i < manager.AmountOfMainRooms; i++)
         {
             mainRooms.Add(heap.RemoveFirst());
@@ -82,7 +87,16 @@ public class GeneratingMapState : MapBaseState
         }
         else
         {
-            GenerateShortestSpanningTree(GenerateDelaunayTriangulation(manager, totalRooms), 10);
+            if (manager.showEveryRoom)
+            {
+                SetData(manager, totalRooms);
+            }
+            else
+            {
+                SetData(manager, mainRooms);
+            }
+
+            GenerateShortestSpanningTree(GenerateDelaunayTriangulation(manager, roomPositions), 10);
             GenerateCorridors(3);
             PlaceWalls();
 
@@ -92,13 +106,10 @@ public class GeneratingMapState : MapBaseState
 
     public override void ExitState(MapGenerationManager manager)
     {
-        if (manager.showEveryRoom)
+        for (int i = 0; i < tileChanges.Count; i++)
         {
-            PlaceRooms(manager, totalRooms);
-        }
-        else
-        {
-            PlaceRooms(manager, mainRooms);
+            // Might need to change to false
+            manager.tileMap.SetTile(tileChanges[i], true);
         }
     }
 
@@ -120,7 +131,6 @@ public class GeneratingMapState : MapBaseState
         float theta = UnityEngine.Random.Range(0.0001f, 1) * 2 * Mathf.PI;
 
         return new Vector2(r * Mathf.Cos(theta), r * Mathf.Sin(theta));
-        //return new Vector2(RoundM(r * Mathf.Cos(theta), MapGenerationManager.tileSize), RoundM(r * Mathf.Sin(theta), MapGenerationManager.tileSize));
     }
     #endregion
 
@@ -206,18 +216,11 @@ public class GeneratingMapState : MapBaseState
     #endregion
 
     #region Delaunay triangulation
-    private List<Triangle> GenerateDelaunayTriangulation(MapGenerationManager manager, List<Room> rooms)
+    private List<Triangle> GenerateDelaunayTriangulation(MapGenerationManager manager, List<Vector2> pointsList)
     {
-        if (rooms.Count <= 3)
+        if (pointsList.Count <= 3)
         {
             return new List<Triangle>();
-        }
-
-        Vector2[] points = new Vector2[rooms.Count];
-
-        for (int i = 0; i < points.Length; i++)
-        {
-            points[i] = rooms[i].WorldPosition;
         }
 
         List<Triangle> triangulation = new();
@@ -242,7 +245,7 @@ public class GeneratingMapState : MapBaseState
 
             bool triangleContainsAllPoints = true;
 
-            foreach (Vector2 point in points)
+            foreach (Vector2 point in pointsList)
             {
                 if (!superTriangle.PointInTriangle(point))
                 {
@@ -268,7 +271,7 @@ public class GeneratingMapState : MapBaseState
         List<Triangle> newTriangles = new();
         List<Triangle> badTriangles = new();
 
-        foreach (Vector2 point in points)
+        foreach (Vector2 point in pointsList)
         {
             newTriangles.Clear();
             badTriangles.Clear();
@@ -438,14 +441,12 @@ public class GeneratingMapState : MapBaseState
 
     private void GenerateShortestSpanningTree(List<Triangle> triangulation, float percentageOfLoops)
     {
-        if (percentageOfLoops < 0)
+        // Check for valid triangulation 
+        if (triangulation.Count == 0 || percentageOfLoops !>= 0 && percentageOfLoops !<= 100)
         {
-            percentageOfLoops = 0;
+            return;
         }
-        else if (percentageOfLoops > 100)
-        {
-            percentageOfLoops = 100;
-        }
+
 
     }
 
@@ -459,30 +460,34 @@ public class GeneratingMapState : MapBaseState
 
     }
 
-    private void PlaceRooms(MapGenerationManager manager, List<Room> rooms)
+    #region Set position and tile lists
+    private void SetData(MapGenerationManager manager, List<Room> rooms)
     {
         for (int i = 0; i < rooms.Count; i++)
         {
+            roomPositions.Add(rooms[i].WorldPosition);
+
             for (int x = 0; x < rooms[i].tiles.GetLength(0); x++)
             {
                 for (int y = 0; y < rooms[i].tiles.GetLength(1); y++)
                 {
-                    TileBase tileTexture = manager.tileTexture;
+                    TileChangeData data;
 
-                    if (x == 0 && y == 0)
+                    if (x == 0 && y == 0 || x == rooms[i].tiles.GetLength(0) - 1 && y == rooms[i].tiles.GetLength(1) - 1)
                     {
-                        tileTexture = manager.debugTexture;
+                        data = new((Vector3Int)rooms[i].tiles[x, y].gridPosition, manager.tileTexture, Color.black, Matrix4x4.identity);
                     }
-                    else if (x == rooms[i].tiles.GetLength(0) - 1 && y == rooms[i].tiles.GetLength(1) - 1)
+                    else
                     {
-                        tileTexture = manager.debugTexture;
+                        data = new((Vector3Int)rooms[i].tiles[x, y].gridPosition, manager.tileTexture, Color.white, Matrix4x4.identity);
                     }
 
-                    manager.tileMap.SetTile((Vector3Int)rooms[i].tiles[x, y].gridPosition, tileTexture);
+                    tileChanges.Add(data);
                 }
             }
         }
     }
+    #endregion
 }
 #endregion
 
@@ -544,13 +549,13 @@ public class Room : IHeapItem<Room>
     }
     #endregion
 
-    public RoomTile[,] tiles;
+    public MapTile[,] tiles;
 
     public Room(int width, int height, Vector2 position)
     {
         this.width = width;
         this.height = height;
-        tiles = new RoomTile[width, height];
+        tiles = new MapTile[width, height];
 
         for (int x = 0; x < width; x++)
         {
@@ -559,7 +564,7 @@ public class Room : IHeapItem<Room>
                 int xPosition = x + (int)position.x;
                 int yPosition = y + (int)position.y;
 
-                tiles[x, y] = new RoomTile(new Vector2Int(xPosition, yPosition));
+                tiles[x, y] = new MapTile(new Vector2Int(xPosition, yPosition));
             }
         }
     }
@@ -583,11 +588,11 @@ public class Room : IHeapItem<Room>
     }
 }
 
-public struct RoomTile
+public struct MapTile
 {
     public Vector2Int gridPosition;
 
-    public RoomTile(Vector2Int gridPosition)
+    public MapTile(Vector2Int gridPosition)
     {
         this.gridPosition = gridPosition;
     }

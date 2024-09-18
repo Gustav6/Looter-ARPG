@@ -34,7 +34,7 @@ public class GeneratingMapState : MapBaseState
     public override void EnterState(MapGenerationManager manager)
     {
         heap = new(manager.totalRoomsAmount);
-        manager.AmountOfMainRooms = 5;
+        manager.AmountOfMainRooms = 8;
 
         totalRooms.Clear();
         mainRooms.Clear();
@@ -95,8 +95,7 @@ public class GeneratingMapState : MapBaseState
             {
                 SetData(manager, mainRooms);
             }
-
-            GenerateShortestSpanningTree(GenerateDelaunayTriangulation(manager, roomPositions), 10);
+            GenerateShortestSpanningTree(GenerateDelaunayTriangulation(manager, roomPositions), roomPositions, 10);
             GenerateCorridors(3);
             PlaceWalls();
 
@@ -233,9 +232,9 @@ public class GeneratingMapState : MapBaseState
             manager.generationRadius = 1;
         }
 
-        a = new Vector2(-manager.generationRadius, -manager.generationRadius) * 10;
-        b = new Vector2(manager.generationRadius, -manager.generationRadius) * 10;
-        c = new Vector2(0, manager.generationRadius) * 10;
+        a = new Vector2(-manager.generationRadius, -manager.generationRadius) * 100;
+        b = new Vector2(manager.generationRadius, -manager.generationRadius) * 100;
+        c = new Vector2(0, manager.generationRadius) * 100;
 
         Triangle superTriangle;
 
@@ -318,7 +317,9 @@ public class GeneratingMapState : MapBaseState
 
                             Vector2? pointA = null, pointB = null, pointC = null, pointD = null;
 
-                            for (int j = vertices.Count - 1; j >= 0; j--)
+                            Debug.Log(vertices.Count);
+
+                            for (int j = 0; j < vertices.Count; j++)
                             {
                                 if (newTriangles[i].vertices.Contains(vertices[j]) && neighbor.vertices.Contains(vertices[j]))
                                 {
@@ -348,6 +349,11 @@ public class GeneratingMapState : MapBaseState
                             triangulation.Remove(neighbor);
                             badTriangles.Add(newTriangles[i]);
 
+                            if (pointD == null || pointC == null || pointB == null || pointA == null)
+                            {
+                                Debug.Log("WRONG");
+                            }
+
                             Triangle newTriangle1 = new(pointA.Value, pointC.Value, pointD.Value);
                             Triangle newTriangle2 = new(pointB.Value, pointC.Value, pointD.Value);
 
@@ -374,12 +380,13 @@ public class GeneratingMapState : MapBaseState
                 if (triangulation[i].ContainsPoint(vertice))
                 {
                     triangulation.Remove(triangulation[i]);
+                    break;
                 }
             }
         }
         #endregion
 
-        #region Debug for triangulation
+        #region Debug
         GameObject triangulationGameObject = new()
         {
             name = "Triangulation"
@@ -439,15 +446,83 @@ public class GeneratingMapState : MapBaseState
     }
     #endregion
 
-    private void GenerateShortestSpanningTree(List<Triangle> triangulation, float percentageOfLoops)
+    private void GenerateShortestSpanningTree(List<Triangle> triangulation, List<Vector2> pointList, float percentageOfLoops)
     {
         // Check for valid triangulation 
-        if (triangulation.Count == 0 || percentageOfLoops !>= 0 && percentageOfLoops !<= 100)
+        if (triangulation.Count == 0 || percentageOfLoops < 0 || percentageOfLoops > 100)
         {
             return;
         }
 
+        List<Edge> edges = new();
 
+        foreach (Triangle triangle in triangulation)
+        {
+            foreach (Edge triangleEdge in triangle.edges)
+            {
+                bool canAdd = true;
+
+                foreach (Edge edge in edges)
+                {
+                    if (edge.Equals(triangleEdge))
+                    {
+                        canAdd = false;
+                    }
+                }
+
+                if (canAdd)
+                {
+                    edges.Add(triangleEdge);
+                }
+            }
+        }
+
+        // Check each point and get the next closest point  
+        // *Important* use closed points list to avoid loops
+        List<Edge> minimumSpanningTree = new();
+        List<Vector2> pointsVisited = new();
+        Heap<Edge> heap = new(edges.Count);
+
+        for (int i = 0; i < edges.Count; i++)
+        {
+            heap.Add(edges[i]);
+        }
+
+        while (true)
+        {
+            Edge newEdge = heap.RemoveFirst();
+
+            minimumSpanningTree.Add(newEdge);
+
+            if (pointList.Count == minimumSpanningTree.Count + 1)
+            {
+                break;
+            }
+        }
+
+        #region Debug
+        GameObject DebugGameObject = new()
+        {
+            name = "MinimumSpanningTree"
+        };
+
+        for (int i = 0; i < minimumSpanningTree.Count; i++)
+        {
+            GameObject debug = new()
+            {
+                name = "Edge " + i
+            };
+            debug.transform.SetParent(DebugGameObject.transform);
+
+            LineRenderer ln = debug.AddComponent<LineRenderer>();
+            ln.positionCount = 2;
+
+            //ln.SetPosition(0, new Vector3(edges[i].pointA.x, edges[i].pointA.y, -1));
+            //ln.SetPosition(1, new Vector3(edges[i].pointB.x, edges[i].pointB.y, -1));
+            ln.SetPosition(0, new Vector3(minimumSpanningTree[i].pointA.x, minimumSpanningTree[i].pointA.y, -1));
+            ln.SetPosition(1, new Vector3(minimumSpanningTree[i].pointB.x, minimumSpanningTree[i].pointB.y, -1));
+        }
+        #endregion
     }
 
     private void GenerateCorridors(float width)
@@ -599,6 +674,47 @@ public struct MapTile
 }
 #endregion
 
+#region Edge class
+public class Edge : IHeapItem<Edge>
+{
+    public Vector2 pointA, pointB;
+
+    private int heapIndex;
+    public int HeapIndex
+    {
+        get { return heapIndex; }
+        set { heapIndex = value; }
+    }
+
+    public Edge(Vector2 pointA, Vector2 pointB)
+    {
+        this.pointA = pointA;
+        this.pointB = pointB;
+    }
+
+    public bool Equals(Edge other)
+    {
+        if (other.pointA == pointA && other.pointB == pointB || other.pointB == pointA && other.pointA == pointB)
+        {
+            return true;
+        }
+
+        return false;
+    }
+
+    public int CompareTo(Edge other)
+    {
+        float distance = Vector2.Distance(pointA, pointB);
+
+        float othersDistance = Vector2.Distance(other.pointA, other.pointB);
+
+        int compare = othersDistance.CompareTo(distance);
+
+        return compare;
+    }
+}
+#endregion
+
 #region Circle class
 public class Circle
 {
@@ -630,11 +746,23 @@ public class Triangle
 {
     public Vector2 left, right, top;
     public readonly Vector2[] vertices = new Vector2[3];
+
+    public readonly Edge edgeAB, edgeBC, edgeCA;
+    public readonly Edge[] edges = new Edge[3];
+
     public Triangle(Vector2 a, Vector2 b, Vector2 c)
     {
         vertices[0] = a;
         vertices[1] = b;
         vertices[2] = c;
+
+        edgeAB = new Edge(a, b);
+        edgeBC = new Edge(b, c);
+        edgeCA = new Edge(c, a);
+
+        edges[0] = edgeAB;
+        edges[1] = edgeBC;
+        edges[2] = edgeCA;
 
         SetPointVariables(a, b, c);
     }
@@ -662,6 +790,7 @@ public class Triangle
         return new Vector2((left.x + right.x + top.x) / 3, (left.y + right.y + top.y) / 3);
     }
 
+    #region Circum cricle related methods
     public Vector2 CircumCenter()
     {
         List<double> a = new()
@@ -760,6 +889,7 @@ public class Triangle
 
         return circumcenter;
     }
+    #endregion
 
     private void SetPointVariables(Vector2 pointA, Vector2 pointB, Vector2 pointC)
     {

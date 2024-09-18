@@ -290,7 +290,7 @@ MonoBehaviour:
   roomMaxSize: {x: 20, y: 20}
   tileTexture: {fileID: 11400000, guid: 83d28c1bac103fb46810f1236af6bb19, type: 2}
   tileMap: {fileID: 28663809}
-  totalRoomsAmount: 35
+  totalRoomsAmount: 50
   showEveryRoom: 0
   debugTexture: {fileID: 11400000, guid: b202616569177954f8f554196d4d9332, type: 2}
 --- !u!1 &178355442

@@ -34,7 +34,7 @@ public class GeneratingMapState : MapBaseState
     public override void EnterState(MapGenerationManager manager)
     {
         heap = new(manager.totalRoomsAmount);
-        manager.AmountOfMainRooms = 8;
+        manager.AmountOfMainRooms = 15;
 
         totalRooms.Clear();
         mainRooms.Clear();
@@ -317,8 +317,6 @@ public class GeneratingMapState : MapBaseState
 
                             Vector2? pointA = null, pointB = null, pointC = null, pointD = null;
 
-                            Debug.Log(vertices.Count);
-
                             for (int j = 0; j < vertices.Count; j++)
                             {
                                 if (newTriangles[i].vertices.Contains(vertices[j]) && neighbor.vertices.Contains(vertices[j]))
@@ -348,11 +346,6 @@ public class GeneratingMapState : MapBaseState
 
                             triangulation.Remove(neighbor);
                             badTriangles.Add(newTriangles[i]);
-
-                            if (pointD == null || pointC == null || pointB == null || pointA == null)
-                            {
-                                Debug.Log("WRONG");
-                            }
 
                             Triangle newTriangle1 = new(pointA.Value, pointC.Value, pointD.Value);
                             Triangle newTriangle2 = new(pointB.Value, pointC.Value, pointD.Value);
@@ -481,6 +474,7 @@ public class GeneratingMapState : MapBaseState
         // *Important* use closed points list to avoid loops
         List<Edge> minimumSpanningTree = new();
         List<Vector2> pointsVisited = new();
+
         Heap<Edge> heap = new(edges.Count);
 
         for (int i = 0; i < edges.Count; i++)
@@ -490,9 +484,85 @@ public class GeneratingMapState : MapBaseState
 
         while (true)
         {
-            Edge newEdge = heap.RemoveFirst();
+            Edge shortestEdge = heap.RemoveFirst();
+            bool canAdd = true;
 
-            minimumSpanningTree.Add(newEdge);
+            if (pointsVisited.Contains(shortestEdge.pointA) && pointsVisited.Contains(shortestEdge.pointB))
+            {
+                #region Check for loop
+                List<Edge> openEdges = new();
+                List<Vector2> closedPoints = new()
+                {
+                    shortestEdge.pointA
+                };
+
+                foreach (Edge edge in minimumSpanningTree)
+                {
+                    if (edge.points.Contains(shortestEdge.pointA))
+                    {
+                        openEdges.Add(edge);
+                    }
+                }
+
+                while (openEdges.Count > 0)
+                {
+                    for (int i = openEdges.Count - 1; i >= 0; i--)
+                    {
+                        if (!closedPoints.Contains(openEdges[i].pointA))
+                        {
+                            foreach (Edge edge in minimumSpanningTree)
+                            {
+                                if (edge.points.Contains(openEdges[i].pointA))
+                                {
+                                    if (edge.points.Contains(shortestEdge.pointB))
+                                    {
+                                        canAdd = false;
+                                        break;
+                                    }
+
+                                    openEdges.Add(edge);
+                                }
+                            }
+
+                            closedPoints.Add(openEdges[i].pointA);
+                        }
+
+                        if (!closedPoints.Contains(openEdges[i].pointB))
+                        {
+                            foreach (Edge edge in minimumSpanningTree)
+                            {
+                                if (edge.points.Contains(openEdges[i].pointB))
+                                {
+                                    if (edge.points.Contains(shortestEdge.pointB))
+                                    {
+                                        canAdd = false;
+                                        break;
+                                    }
+
+                                    openEdges.Add(edge);
+                                }
+                            }
+
+                            closedPoints.Add(openEdges[i].pointB);
+                        }
+
+                        openEdges.Remove(openEdges[i]);
+                    }
+
+                    if (!canAdd)
+                    {
+                        break;
+                    }
+                }
+                #endregion
+            }
+
+            if (canAdd)
+            {
+                edges.Remove(shortestEdge);
+                pointsVisited.AddRange(shortestEdge.points);
+                minimumSpanningTree.Add(shortestEdge);
+            }
 
             if (pointList.Count == minimumSpanningTree.Count + 1)
             {
@@ -678,6 +748,7 @@ public struct MapTile
 public class Edge : IHeapItem<Edge>
 {
     public Vector2 pointA, pointB;
+    public readonly Vector2[] points = new Vector2[2];
 
     private int heapIndex;
     public int HeapIndex
@@ -690,6 +761,9 @@ public class Edge : IHeapItem<Edge>
     {
         this.pointA = pointA;
         this.pointB = pointB;
+
+        points[0] = pointA;
+        points[1] = pointB;
     }
 
     public bool Equals(Edge other)

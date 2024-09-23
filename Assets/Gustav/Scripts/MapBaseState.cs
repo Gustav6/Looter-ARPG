@@ -23,80 +23,73 @@ public abstract class MapBaseState
 #region Generation State
 public class GeneratingMapState : MapBaseState
 {
-    public List<Room> totalRooms = new();
+    public List<Room> rooms = new();
     public List<Room> mainRooms = new();
     public List<Vector2> roomPositions = new();
+
+    private List<Triangle> triangulation = new();
+    private List<Edge> minimumSpanningTree = new();
+
     private List<TileChangeData> tileChanges = new();
-    private Heap<Room> heap;
+
+    private GameObject triangulationDebug, minimumSpanningTreeDebug;
 
     private bool canMoveRoom = false;
 
     public override void EnterState(MapGenerationManager manager)
     {
-        heap = new(manager.totalRoomsAmount);
-        manager.AmountOfMainRooms = 15;
+        manager.AmountOfMainRooms = 10;
+        Heap<Room> heap = new(manager.totalRoomsAmount);
 
-        totalRooms.Clear();
+        manager.tileMap.ClearAllTiles();
+        GameObject.Destroy(triangulationDebug);
+        GameObject.Destroy(minimumSpanningTreeDebug);
+
+        #region Reset lists
+        rooms.Clear();
         mainRooms.Clear();
+        roomPositions.Clear();
+        triangulation.Clear();
+        minimumSpanningTree.Clear();
+        tileChanges.Clear();
+        #endregion
 
         // Generate x amount of rooms
         for (int i = 0; i < manager.totalRoomsAmount; i++)
         {
             Room newRoom = GenerateRoom(manager);
 
-            totalRooms.Add(newRoom);
+            rooms.Add(newRoom);
             heap.Add(newRoom);
         }
 
         // Add x amount (Amount of main rooms) with the largest area
         for (int i = 0; i < manager.AmountOfMainRooms; i++)
         {
-            mainRooms.Add(heap.RemoveFirst());
+            Room mainRoom = heap.RemoveFirst();
+
+            mainRooms.Add(mainRoom);
         }
     }
 
     public override void UpdateState(MapGenerationManager manager)
     {
-        canMoveRoom = false;
+        SeparateRooms(manager);
 
-        foreach (Room roomA in totalRooms)
-        {
-            foreach (Room roomB in totalRooms)
-            {
-                if (roomA.Equals(roomB))
-                {
-                    continue;
-                }
-                
-                if (RoomIntersects(manager, roomA, roomB))
-                {
-                    canMoveRoom = true;
-                    break;
-                }
-            }
-
-            if (canMoveRoom)
-            {
-                break;
-            }
-        }
-
-        if (canMoveRoom)
-        {
-            SeparateRooms(manager);
-        }
-        else
+        if(!canMoveRoom)
         {
             if (manager.showEveryRoom)
             {
-                SetData(manager, totalRooms);
+                SetData(manager, rooms);
             }
             else
             {
                 SetData(manager, mainRooms);
             }
-            GenerateShortestSpanningTree(GenerateDelaunayTriangulation(manager, roomPositions), roomPositions, 10);
-            GenerateCorridors(3);
+
+            triangulation = GenerateDelaunayTriangulation(manager, roomPositions);
+            minimumSpanningTree = GetMinimumSpanningTree(triangulation, roomPositions, 10);
+            GenerateHallways(minimumSpanningTree, 3);
             PlaceWalls();
 
             manager.SwitchState(manager.loadingState);
@@ -137,9 +130,18 @@ public class GeneratingMapState : MapBaseState
 
     private void SeparateRooms(MapGenerationManager manager)
     {
-        for (int i = 0; i < totalRooms.Count; i++)
+        canMoveRoom = false;
+
+        for (int i = 0; i < rooms.Count; i++)
         {
-            totalRooms[i].MoveRoom(GetDirection(manager, totalRooms[i]));
+            Vector2Int direction = GetDirection(manager, rooms[i]);
+
+            rooms[i].MoveRoom(direction);
+
+            if (direction != Vector2.zero)
+            {
+                canMoveRoom = true;
+            }
         }
     }
 
@@ -168,22 +170,20 @@ public class GeneratingMapState : MapBaseState
     public Vector2Int GetDirection(MapGenerationManager manager, Room room)
     {
         Vector2 separationVelocity = Vector2.zero;
-        float numberOfAgentsToAvoid = 0;
 
-        for (int i = 0; i < totalRooms.Count; i++)
+        for (int i = 0; i < rooms.Count; i++)
         {
-            if (ReferenceEquals(totalRooms[i], room) || !RoomIntersects(manager, room, totalRooms[i]))
+            if (Equals(rooms[i], room) || !RoomIntersects(manager, room, rooms[i]))
             {
                 continue;
             }
 
-            Vector2 otherPosition = totalRooms[i].WorldPosition;
+            Vector2 otherPosition = rooms[i].WorldPosition;
 
             Vector2 otherAgentToCurrent = room.WorldPosition - otherPosition;
             Vector2 directionToTravel = otherAgentToCurrent.normalized;
 
             separationVelocity += directionToTravel;
-            numberOfAgentsToAvoid++;
         }
 
         if (separationVelocity != Vector2.zero)
@@ -200,6 +200,7 @@ public class GeneratingMapState : MapBaseState
         {
             separationVelocity.x = -1;
         }
+
         if (separationVelocity.y > 0)
         {
             separationVelocity.y = 1;
@@ -290,8 +291,8 @@ public class GeneratingMapState : MapBaseState
                     break;
                 }
             }
-            // Change triangles that don't meat condition
 
+            // Change triangles that don't meat condition
             for (int i = 0; i < newTriangles.Count; i++)
             {
                 foreach (Triangle neighbor in GetNeighbors(triangulation, newTriangles[i]))
@@ -301,7 +302,30 @@ public class GeneratingMapState : MapBaseState
 
                     Circle circumCircle = new(position, radius);
 
+                    List<Vector2> sharedVertices = new();
+                    List<Vector2> notSharedVertices = new();
+
+                    foreach (Vector2 vertice in newTriangles[i].vertices)
+                    {
+                        if (neighbor.vertices.Contains(vertice))
+                        {
+                            sharedVertices.Add(vertice);
+                        }
+                        else
+                        {
+                            notSharedVertices.Add(vertice); 
+                        }
+                    }
+
                     foreach (Vector2 vertice in neighbor.vertices)
+                    {
+                        if (!newTriangles[i].vertices.Contains(vertice))
+                        {
+                            notSharedVertices.Add(vertice);
+                        }
+                    }
+
+                    foreach (Vector2 vertice in notSharedVertices)
                     {
                         if (newTriangles[i].vertices.Contains(vertice))
                         {
@@ -310,45 +334,11 @@ public class GeneratingMapState : MapBaseState
 
                         if (circumCircle.Intersects(vertice))
                         {
-                            #region Get vertices
-                            List<Vector2> vertices = new();
-                            vertices.AddRange(newTriangles[i].vertices);
-                            vertices.AddRange(neighbor.vertices);
-
-                            Vector2? pointA = null, pointB = null, pointC = null, pointD = null;
-
-                            for (int j = 0; j < vertices.Count; j++)
-                            {
-                                if (newTriangles[i].vertices.Contains(vertices[j]) && neighbor.vertices.Contains(vertices[j]))
-                                {
-                                    if (pointA == null)
-                                    {
-                                        pointA = vertices[j];
-                                    }
-                                    else if (pointB == null && vertices[j] != pointA)
-                                    {
-                                        pointB = vertices[j];
-                                    }
-                                }
-                                else
-                                {
-                                    if (pointC == null)
-                                    {
-                                        pointC = vertices[j];
-                                    }
-                                    else if (pointD == null && vertices[j] != pointC)
-                                    {
-                                        pointD = vertices[j];
-                                    }
-                                }
-                            }
-                            #endregion
-
                             triangulation.Remove(neighbor);
                             badTriangles.Add(newTriangles[i]);
 
-                            Triangle newTriangle1 = new(pointA.Value, pointC.Value, pointD.Value);
-                            Triangle newTriangle2 = new(pointB.Value, pointC.Value, pointD.Value);
+                            Triangle newTriangle1 = new(sharedVertices[0], notSharedVertices[0], notSharedVertices[1]);
+                            Triangle newTriangle2 = new(sharedVertices[1], notSharedVertices[0], notSharedVertices[1]);
 
                             newTriangles.Add(newTriangle1);
                             newTriangles.Add(newTriangle2);
@@ -380,7 +370,7 @@ public class GeneratingMapState : MapBaseState
         #endregion
 
         #region Debug
-        GameObject triangulationGameObject = new()
+        triangulationDebug = new()
         {
             name = "Triangulation"
         };
@@ -391,7 +381,7 @@ public class GeneratingMapState : MapBaseState
             {
                 name = "Triangle " + i
             };
-            debug.transform.SetParent(triangulationGameObject.transform);
+            debug.transform.SetParent(triangulationDebug.transform);
 
             LineRenderer ln = debug.AddComponent<LineRenderer>();
             ln.positionCount = 4;
@@ -439,15 +429,16 @@ public class GeneratingMapState : MapBaseState
     }
     #endregion
 
-    private void GenerateShortestSpanningTree(List<Triangle> triangulation, List<Vector2> pointList, float percentageOfLoops)
+    #region Minimum spanning tree
+    private List<Edge> GetMinimumSpanningTree(List<Triangle> triangulation, List<Vector2> pointList, float percentageOfLoops)
     {
         // Check for valid triangulation 
         if (triangulation.Count == 0 || percentageOfLoops < 0 || percentageOfLoops > 100)
         {
-            return;
+            return new List<Edge>();
         }
 
-        List<Edge> edges = new();
+        List<Edge> edgeList = new();
 
         foreach (Triangle triangle in triangulation)
         {
@@ -455,7 +446,7 @@ public class GeneratingMapState : MapBaseState
             {
                 bool canAdd = true;
 
-                foreach (Edge edge in edges)
+                foreach (Edge edge in edgeList)
                 {
                     if (edge.Equals(triangleEdge))
                     {
@@ -465,7 +456,7 @@ public class GeneratingMapState : MapBaseState
 
                 if (canAdd)
                 {
-                    edges.Add(triangleEdge);
+                    edgeList.Add(triangleEdge);
                 }
             }
         }
@@ -475,11 +466,14 @@ public class GeneratingMapState : MapBaseState
         List<Edge> minimumSpanningTree = new();
         List<Vector2> pointsVisited = new();
 
-        Heap<Edge> heap = new(edges.Count);
+        List<Edge> openEdges = new();
+        List<Vector2> closedPoints = new();
 
-        for (int i = 0; i < edges.Count; i++)
+        Heap<Edge> heap = new(edgeList.Count);
+
+        for (int i = 0; i < edgeList.Count; i++)
         {
-            heap.Add(edges[i]);
+            heap.Add(edgeList[i]);
         }
 
         while (true)
@@ -490,11 +484,11 @@ public class GeneratingMapState : MapBaseState
             if (pointsVisited.Contains(shortestEdge.pointA) && pointsVisited.Contains(shortestEdge.pointB))
             {
                 #region Check for loop
-                List<Edge> openEdges = new();
-                List<Vector2> closedPoints = new()
-                {
-                    shortestEdge.pointA
-                };
+
+                openEdges.Clear();
+                closedPoints.Clear();
+
+                closedPoints.Add(shortestEdge.pointA);
 
                 foreach (Edge edge in minimumSpanningTree)
                 {
@@ -559,7 +553,6 @@ public class GeneratingMapState : MapBaseState
 
             if (canAdd)
             {
-                edges.Remove(shortestEdge);
                 pointsVisited.AddRange(shortestEdge.points);
                 minimumSpanningTree.Add(shortestEdge);
             }
@@ -571,7 +564,7 @@ public class GeneratingMapState : MapBaseState
         }
 
         #region Debug
-        GameObject DebugGameObject = new()
+        minimumSpanningTreeDebug = new()
         {
             name = "MinimumSpanningTree"
         };
@@ -582,7 +575,7 @@ public class GeneratingMapState : MapBaseState
             {
                 name = "Edge " + i
             };
-            debug.transform.SetParent(DebugGameObject.transform);
+            debug.transform.SetParent(minimumSpanningTreeDebug.transform);
 
             LineRenderer ln = debug.AddComponent<LineRenderer>();
             ln.positionCount = 2;
@@ -593,14 +586,55 @@ public class GeneratingMapState : MapBaseState
             ln.SetPosition(1, new Vector3(minimumSpanningTree[i].pointB.x, minimumSpanningTree[i].pointB.y, -1));
         }
         #endregion
+
+        return minimumSpanningTree;
+    }
+    #endregion
+
+    private void GenerateHallways(List<Edge> connections, float width)
+    {
+        List<Edge> test = new()
+        {
+            connections[0]
+        };
+
+        foreach (Edge connection in connections)
+        {
+            List<Room> rooms = new();
+
+            foreach (Room room in mainRooms)
+            {
+                if (room.WorldPosition == connection.pointA || room.WorldPosition == connection.pointB)
+                {
+                    rooms.Add(room);
+
+                    if (rooms.Count == 2)
+                    {
+                        break;
+                    }
+                }
+            }
+
+
+        }
+
+        foreach (Room room in rooms)
+        {
+            if (mainRooms.Contains(room))
+            {
+                continue;
+            }   
+
+            // Add rooms that collide with the hallways
+        }
     }
 
-    private void GenerateCorridors(float width)
+    private void PlaceWalls()
     {
 
     }
 
-    private void PlaceWalls()
+    private void Decorate()
     {
 
     }
@@ -618,7 +652,7 @@ public class GeneratingMapState : MapBaseState
                 {
                     TileChangeData data;
 
-                    if (x == 0 && y == 0 || x == rooms[i].tiles.GetLength(0) - 1 && y == rooms[i].tiles.GetLength(1) - 1)
+                    if (x == 0 && y == 0 || x == rooms[i].tiles.GetLength(0) - 1 && y == 0 || x == 0 && y == rooms[i].tiles.GetLength(1) - 1 || x == rooms[i].tiles.GetLength(0) - 1 && y == rooms[i].tiles.GetLength(1) - 1)
                     {
                         data = new((Vector3Int)rooms[i].tiles[x, y].gridPosition, manager.tileTexture, Color.black, Matrix4x4.identity);
                     }

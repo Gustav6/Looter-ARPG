@@ -7,15 +7,17 @@ using UnityEngine;
 public class WeaponController : MonoBehaviour
 {
     [SerializeField] public ScriptableObjectsWeapons weapon;
-
-    public LayerMask enemyLayers;
-
     public Transform attackPoint;
-    private int attackTimer;
+    public SpriteRenderer sprite;
+    public LayerMask enemyLayers;
+    public static int Damage;
 
-    void Start()
+    private int attackTimer;
+    void Start()        
     {
+        Damage = weapon.damage;
         attackTimer = weapon.attackSpeed;
+        sprite.sprite = weapon.sprite;
     }
 
     void Update()

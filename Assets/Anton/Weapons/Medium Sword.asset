@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Medium Sword
   description: 
-  sprite: {fileID: 0}
+  sprite: {fileID: 1670062547, guid: eb1c37c4efa0d124792ba35f4aa1df47, type: 3}
   damage: 50
   attackSpeed: 350
   staminaCost: 0

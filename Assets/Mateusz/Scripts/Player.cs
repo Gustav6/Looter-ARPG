@@ -7,20 +7,14 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Controller2D))]
 public class Player : MonoBehaviour
 {
-    float walkSpeed = 5;
-    float runSpeed = 25f;
-   public float currentSpeed;
-   public float stamina, staminaMax;
-   public float runCost;
-   public   float chargeRate;
+    public float moveSpeed;
+    [SerializeField]
+    private float stamina;
+    public float maxStamina = 100;
+    public float runCost = 25f;
+    public float rechargeTime = 1f;
 
     bool running;
-
-
-    public Image staminaBar;
-
-    private Coroutine recharge;
-    
 
     Vector3 velocity;
 
@@ -30,22 +24,24 @@ public class Player : MonoBehaviour
 
     private void Start()
     {
+        stamina = maxStamina;
         controller = GetComponent<Controller2D>();
-        Debug.Log(+currentSpeed);
+        Debug.Log(+moveSpeed);
     }
 
     private void Update()
     {
         Vector3 direction = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 
-        currentSpeed = walkSpeed;
 
-        velocity.x = direction.x * currentSpeed;
-        velocity.y = direction.y * currentSpeed;
+        velocity.x = direction.x * moveSpeed;
+        velocity.y = direction.y * moveSpeed;
         controller.Move(velocity * Time.deltaTime);
 
+        
+
         if (Input.GetKeyDown(KeyCode.LeftShift) && stamina > 0)
-        {
+        { 
             running = true;
 
         }else if (Input.GetKeyUp(KeyCode.LeftShift))
@@ -55,34 +51,20 @@ public class Player : MonoBehaviour
 
         if (running)
         {
-            currentSpeed = runSpeed;
+            moveSpeed = 10f;
             stamina -= runCost * Time.deltaTime;
-            if (stamina < 0) 
+            if (stamina < 0)
             {
-                stamina = 0;
-                staminaBar.fillAmount = stamina / staminaMax;
+                running = false;
             }
-            StopCoroutine(recharge);
+
         }
         else if (!running)
         {
-            currentSpeed = walkSpeed;
-            recharge = StartCoroutine(rechargeStamina());
-        }
-    }
-
-    private IEnumerator rechargeStamina()
-    {
-        yield return new WaitForSeconds(1f);
-
-        while (stamina < staminaMax)
-        {
-            stamina += chargeRate / 10f;
-            if (stamina > staminaMax)
+            moveSpeed = 5f;
+            if (stamina < maxStamina && !running)
             {
-                stamina = staminaMax;
-                staminaBar.fillAmount = stamina / staminaMax;
-                yield return new WaitForSeconds(.1f);
+                stamina += Time.deltaTime * rechargeTime;
             }
         }
     }

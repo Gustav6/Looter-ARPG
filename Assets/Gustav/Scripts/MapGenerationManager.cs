@@ -86,7 +86,7 @@ public class MapGenerationManager : MonoBehaviour
 
     public void Update()
     {
-        if (Input.GetKeyUp(KeyCode.Space))
+        if (Input.GetKeyUp(KeyCode.Space) && currentState == loadingState)
         {
             SwitchState(generationState);
         }

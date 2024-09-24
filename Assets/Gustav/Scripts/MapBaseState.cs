@@ -25,30 +25,29 @@ public class GeneratingMapState : MapBaseState
 {
     public List<Room> rooms = new();
     public List<Room> mainRooms = new();
-    public List<Vector2> roomPositions = new();
 
     private List<Triangle> triangulation = new();
     private List<Edge> minimumSpanningTree = new();
 
     private List<TileChangeData> tileChangeData = new();
 
-    private GameObject triangulationDebug, minimumSpanningTreeDebug;
+    private GameObject triangulationDebug, minimumSpanningTreeDebug, pointsDebug;
 
     private bool canMoveRoom = false;
 
     public override void EnterState(MapGenerationManager manager)
     {
-        manager.AmountOfMainRooms = 7;
+        manager.AmountOfMainRooms = 20;
         Heap<Room> heap = new(manager.totalRoomsAmount);
 
         manager.tileMap.ClearAllTiles();
         GameObject.Destroy(triangulationDebug);
         GameObject.Destroy(minimumSpanningTreeDebug);
+        GameObject.Destroy(pointsDebug);
 
         #region Reset lists
         rooms.Clear();
         mainRooms.Clear();
-        roomPositions.Clear();
         triangulation.Clear();
         minimumSpanningTree.Clear();
         tileChangeData.Clear();
@@ -78,17 +77,10 @@ public class GeneratingMapState : MapBaseState
 
         if(!canMoveRoom)
         {
-            if (manager.showEveryRoom)
-            {
-                SetData(manager, rooms);
-            }
-            else
-            {
-                SetData(manager, mainRooms);
-            }
+            SetData(manager, mainRooms);
 
-            triangulation = GenerateDelaunayTriangulation(manager, roomPositions);
-            minimumSpanningTree = GetMinimumSpanningTree(triangulation, roomPositions, 10);
+            triangulation = GenerateDelaunayTriangulation(manager, mainRooms);
+            minimumSpanningTree = GetMinimumSpanningTree(triangulation, mainRooms, 10);
             //GenerateHallways(minimumSpanningTree, 3);
             PlaceWalls();
 
@@ -216,11 +208,27 @@ public class GeneratingMapState : MapBaseState
     #endregion
 
     #region Delaunay triangulation
-    private List<Triangle> GenerateDelaunayTriangulation(MapGenerationManager manager, List<Vector2> pointsList)
+    private List<Triangle> GenerateDelaunayTriangulation(MapGenerationManager manager, List<Room> rooms)
     {
-        if (pointsList.Count <= 3)
+        if (rooms.Count <= 3)
         {
             return new List<Triangle>();
+        }
+
+        List<Vector2> pointsList = new();
+
+        pointsDebug = new()
+        {
+            name = "Points"
+        };
+
+        foreach (Room room in rooms)
+        {
+            GameObject temp = new();
+            temp.transform.parent = pointsDebug.transform;
+            temp.transform.position = room.WorldPosition;
+
+            pointsList.Add(room.WorldPosition);
         }
 
         List<Triangle> triangulation = new();
@@ -430,7 +438,7 @@ public class GeneratingMapState : MapBaseState
     #endregion
 
     #region Minimum spanning tree
-    private List<Edge> GetMinimumSpanningTree(List<Triangle> triangulation, List<Vector2> pointList, float percentageOfLoops)
+    private List<Edge> GetMinimumSpanningTree(List<Triangle> triangulation, List<Room> rooms, float percentageOfLoops)
     {
         // Check for valid triangulation 
         if (triangulation.Count == 0 || percentageOfLoops < 0 || percentageOfLoops > 100)
@@ -466,82 +474,109 @@ public class GeneratingMapState : MapBaseState
         List<Edge> minimumSpanningTree = new();
         List<Vector2> pointsVisited = new();
 
-        Vector2 currentPoint = pointList.First();
-
-        List<Edge> openEdges = new();
+        //List<Edge> openEdges = new();
         //List<Vector2> closedPoints = new();
 
-        //Heap<Edge> heap = new(edgeList.Count);
+        Heap<Edge> heap = new(edgeList.Count);
 
-        //for (int i = 0; i < edgeList.Count; i++)
-        //{
-        //    heap.Add(edgeList[i]);
-        //}
+        for (int i = 0; i < edgeList.Count; i++)
+        {
+            heap.Add(edgeList[i]);
+        }
 
         while (true)
         {
-            Edge shortestEdge = null;
-
-            foreach (Edge edge in edgeList)
+            if (heap.Count == 0)
             {
-                if (minimumSpanningTree.Contains(edge) || !edge.points.Contains(currentPoint))
-                {
-                    continue;
-                }
+                // Error occurs when triangulation misses 1 triangle
+                // This happens because of the in point method in triangle
+                // (When the top two points have the same y value)
 
-                Vector2 connectedPoint;
-
-                if (edge.pointA == currentPoint)
-                {
-                    connectedPoint = edge.pointA;
-                }
-                else
-                {
-                    connectedPoint = edge.pointB;
-                }
-
-                if (!pointsVisited.Contains(connectedPoint))
-                {
-                    if (shortestEdge == null)
-                    {
-                        shortestEdge = edge;
-                    }
-                    else
-                    {
-                        float distance = Vector2.Distance(shortestEdge.pointA, shortestEdge.pointB);
-
-                        float othersDistance = Vector2.Distance(edge.pointA, edge.pointB);
-
-                        if (distance > othersDistance)
-                        {
-                            shortestEdge = edge;
-                        }
-                    }
-                }
-            }
-
-            if (shortestEdge != null)
-            {
-                pointsVisited.Add(currentPoint);
-                minimumSpanningTree.Add(shortestEdge);
-
-                if (currentPoint != shortestEdge.pointA)
-                {
-                    currentPoint = shortestEdge.pointA;
-                }
-                else
-                {
-                    currentPoint = shortestEdge.pointB;
-                }
-
-            }
-            else
-            {
-                Debug.Log("Stuck");
+                Debug.Log("Error");
                 break;
             }
 
-            if (pointList.Count == minimumSpanningTree.Count + 1)
+            Edge shortestEdge = heap.RemoveFirst();
+            bool canAdd = true;
+
+            if (pointsVisited.Contains(shortestEdge.pointA) && pointsVisited.Contains(shortestEdge.pointB))
+            {
+                #region Check for loop
+                List<Edge> openEdges = new();
+                List<Vector2> closedPoints = new()
+                {
+                    shortestEdge.pointA
+                };
+
+                foreach (Edge edge in minimumSpanningTree)
+                {
+                    if (edge.points.Contains(shortestEdge.pointA))
+                    {
+                        openEdges.Add(edge);
+                    }
+                }
+
+                while (openEdges.Count > 0)
+                {
+                    for (int i = openEdges.Count - 1; i >= 0; i--)
+                    {
+                        if (!closedPoints.Contains(openEdges[i].pointA))
+                        {
+                            foreach (Edge edge in minimumSpanningTree)
+                            {
+                                if (edge.points.Contains(openEdges[i].pointA))
+                                {
+                                    if (edge.points.Contains(shortestEdge.pointB))
+                                    {
+                                        canAdd = false;
+                                        break;
+                                    }
+
+                                    openEdges.Add(edge);
+                                }
+                            }
+
+                            closedPoints.Add(openEdges[i].pointA);
+                        }
+
+                        if (!closedPoints.Contains(openEdges[i].pointB))
+                        {
+                            foreach (Edge edge in minimumSpanningTree)
+                            {
+                                if (edge.points.Contains(openEdges[i].pointB))
+                                {
+                                    if (edge.points.Contains(shortestEdge.pointB))
+                                    {
+                                        canAdd = false;
+                                        break;
+                                    }
+
+                                    openEdges.Add(edge);
+                                }
+                            }
+
+                            closedPoints.Add(openEdges[i].pointB);
+                        }
+
+                        openEdges.Remove(openEdges[i]);
+                    }
+
+                    if (!canAdd)
+                    {
+                        break;
+                    }
+                }
+                #endregion
+            }
+
+            if (canAdd)
+            {
+                edgeList.Remove(shortestEdge);
+                pointsVisited.AddRange(shortestEdge.points);
+                minimumSpanningTree.Add(shortestEdge);
+            }
+
+            if (rooms.Count == minimumSpanningTree.Count + 1)
             {
                 break;
             }
@@ -654,25 +689,23 @@ public class GeneratingMapState : MapBaseState
     }
 
     #region Set position and tile lists
-    private void SetData(MapGenerationManager manager, List<Room> rooms)
+    private void SetData(MapGenerationManager manager, List<Room> list)
     {
-        for (int i = 0; i < rooms.Count; i++)
+        for (int i = 0; i < list.Count; i++)
         {
-            roomPositions.Add(rooms[i].WorldPosition);
-
-            for (int x = 0; x < rooms[i].tiles.GetLength(0); x++)
+            for (int x = 0; x < list[i].tiles.GetLength(0); x++)
             {
-                for (int y = 0; y < rooms[i].tiles.GetLength(1); y++)
+                for (int y = 0; y < list[i].tiles.GetLength(1); y++)
                 {
                     TileChangeData data;
 
-                    if (x == 0 && y == 0 || x == rooms[i].tiles.GetLength(0) - 1 && y == 0 || x == 0 && y == rooms[i].tiles.GetLength(1) - 1 || x == rooms[i].tiles.GetLength(0) - 1 && y == rooms[i].tiles.GetLength(1) - 1)
+                    if (x == 0 && y == 0 || x == list[i].tiles.GetLength(0) - 1 && y == 0 || x == 0 && y == list[i].tiles.GetLength(1) - 1 || x == list[i].tiles.GetLength(0) - 1 && y == list[i].tiles.GetLength(1) - 1)
                     {
-                        data = new((Vector3Int)rooms[i].tiles[x, y].gridPosition, manager.tileTexture, Color.black, Matrix4x4.identity);
+                        data = new((Vector3Int)list[i].tiles[x, y].gridPosition, manager.tileTexture, Color.black, Matrix4x4.identity);
                     }
                     else
                     {
-                        data = new((Vector3Int)rooms[i].tiles[x, y].gridPosition, manager.tileTexture, Color.white, Matrix4x4.identity);
+                        data = new((Vector3Int)list[i].tiles[x, y].gridPosition, manager.tileTexture, Color.white, Matrix4x4.identity);
                     }
 
                     tileChangeData.Add(data);

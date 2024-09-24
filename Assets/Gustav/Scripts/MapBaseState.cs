@@ -35,9 +35,11 @@ public class GeneratingMapState : MapBaseState
 
     private bool canMoveRoom = false;
 
+    System.Diagnostics.Stopwatch stopwatch;
+
     public override void EnterState(MapGenerationManager manager)
     {
-        manager.AmountOfMainRooms = 20;
+        manager.AmountOfMainRooms = 75;
         Heap<Room> heap = new(manager.totalRoomsAmount);
 
         manager.tileMap.ClearAllTiles();
@@ -69,6 +71,11 @@ public class GeneratingMapState : MapBaseState
 
             mainRooms.Add(mainRoom);
         }
+
+        #region Diagnostic 
+        stopwatch = new();
+        stopwatch.Start();
+        #endregion
     }
 
     public override void UpdateState(MapGenerationManager manager)
@@ -95,6 +102,10 @@ public class GeneratingMapState : MapBaseState
             // Might need to change to false
             manager.tileMap.SetTile(tileChangeData[i], true);
         }
+
+        stopwatch.Stop();
+
+        Debug.Log("I took: " + stopwatch.ElapsedMilliseconds + " MS");
     }
 
     #region Generate Room methods
@@ -289,9 +300,9 @@ public class GeneratingMapState : MapBaseState
                 if (triangle.PointInTriangle(point))
                 {
                     // Split triangle into 3 triangles
-                    newTriangles.Add(new Triangle(point, triangle.left, triangle.right));
-                    newTriangles.Add(new Triangle(point, triangle.top, triangle.left));
-                    newTriangles.Add(new Triangle(point, triangle.top, triangle.right));
+                    newTriangles.Add(new Triangle(point, triangle.pointA, triangle.pointB));
+                    newTriangles.Add(new Triangle(point, triangle.pointC, triangle.pointA));
+                    newTriangles.Add(new Triangle(point, triangle.pointC, triangle.pointB));
 
                     // Remove the original triangle that was split
                     triangulation.Remove(triangle);
@@ -394,10 +405,10 @@ public class GeneratingMapState : MapBaseState
             LineRenderer ln = debug.AddComponent<LineRenderer>();
             ln.positionCount = 4;
 
-            ln.SetPosition(0, new Vector3(triangulation[i].left.x, triangulation[i].left.y, -1));
-            ln.SetPosition(1, new Vector3(triangulation[i].right.x, triangulation[i].right.y, -1));
-            ln.SetPosition(2, new Vector3(triangulation[i].top.x, triangulation[i].top.y, -1));
-            ln.SetPosition(3, new Vector3(triangulation[i].left.x, triangulation[i].left.y, -1));
+            ln.SetPosition(0, new Vector3(triangulation[i].pointA.x, triangulation[i].pointA.y, -1));
+            ln.SetPosition(1, new Vector3(triangulation[i].pointB.x, triangulation[i].pointB.y, -1));
+            ln.SetPosition(2, new Vector3(triangulation[i].pointC.x, triangulation[i].pointC.y, -1));
+            ln.SetPosition(3, new Vector3(triangulation[i].pointA.x, triangulation[i].pointA.y, -1));
         }
         #endregion
 
@@ -488,10 +499,6 @@ public class GeneratingMapState : MapBaseState
         {
             if (heap.Count == 0)
             {
-                // Error occurs when triangulation misses 1 triangle
-                // This happens because of the in point method in triangle
-                // (When the top two points have the same y value)
-
                 Debug.Log("Error");
                 break;
             }
@@ -899,7 +906,7 @@ public class Circle
 #region Triangle class
 public class Triangle
 {
-    public Vector2 left, right, top;
+    public Vector2 pointA, pointB, pointC;
     public readonly Vector2[] vertices = new Vector2[3];
 
     public readonly Edge edgeAB, edgeBC, edgeCA;
@@ -907,9 +914,13 @@ public class Triangle
 
     public Triangle(Vector2 a, Vector2 b, Vector2 c)
     {
-        vertices[0] = a;
-        vertices[1] = b;
-        vertices[2] = c;
+        pointA = a;
+        pointB = b;
+        pointC = c;
+
+        vertices[0] = pointA;
+        vertices[1] = pointB;
+        vertices[2] = pointC;
 
         edgeAB = new Edge(a, b);
         edgeBC = new Edge(b, c);
@@ -918,8 +929,6 @@ public class Triangle
         edges[0] = edgeAB;
         edges[1] = edgeBC;
         edges[2] = edgeCA;
-
-        SetPointVariables(a, b, c);
     }
 
     public bool ContainsPoint(Vector2 point)
@@ -927,22 +936,28 @@ public class Triangle
         return vertices.Contains(point);
     }
 
-    public bool PointInTriangle(Vector2 p)
+    float Sign(Vector2 p1, Vector2 p2, Vector2 p3)
     {
-        double s1 = top.y - left.y;
-        double s2 = top.x - left.x;
-        double s3 = right.y - left.y;
-        double s4 = p.y - left.y;
-
-        double w1 = (left.x * s1 + s4 * s2 - p.x * s1) / (s3 * s2 - (right.x - left.x) * s1);
-        double w2 = (s4 - w1 * s3) / s1;
-
-        return w1 >= 0 && w2 >= 0 && (w1 + w2) <= 1;
+        return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
     }
 
-    public Vector2 Center()
+    public bool PointInTriangle(Vector2 pt)
     {
-        return new Vector2((left.x + right.x + top.x) / 3, (left.y + right.y + top.y) / 3);
+        Vector2 v1 = pointA;
+        Vector2 v2 = pointB;
+        Vector2 v3 = pointC;
+
+        float d1, d2, d3;
+        bool has_neg, has_pos;
+
+        d1 = Sign(pt, v1, v2);
+        d2 = Sign(pt, v2, v3);
+        d3 = Sign(pt, v3, v1);
+
+        has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
+        has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
+
+        return !(has_neg && has_pos);
     }
 
     #region Circum circle related methods
@@ -950,18 +965,18 @@ public class Triangle
     {
         List<double> a = new()
         {
-            top.x,
-            top.y
+            pointA.x,
+            pointA.y
         };
         List<double> b = new()
         {
-            left.x,
-            left.y
+            pointB.x,
+            pointB.y
         };
         List<double> c = new()
         {
-            right.x,
-            right.y
+            pointC.x,
+            pointC.y
         };
 
         List<double> center = FindCircumCenter(a, b, c);
@@ -1045,41 +1060,5 @@ public class Triangle
         return circumcenter;
     }
     #endregion
-
-    private void SetPointVariables(Vector2 pointA, Vector2 pointB, Vector2 pointC)
-    {
-        if (pointB.y <= pointA.y && pointC.y <= pointA.y)
-        {
-            top = pointA;
-
-            SetLetAndRightPoints(pointB, pointC);
-        }
-        else if (pointA.y <= pointB.y && pointC.y <= pointB.y)
-        {
-            top = pointB;
-
-            SetLetAndRightPoints(pointA, pointC);
-        }
-        else if (pointB.y <= pointC.y && pointA.y <= pointC.y)
-        {
-            top = pointC;
-
-            SetLetAndRightPoints(pointA, pointB);
-        }
-    }
-
-    private void SetLetAndRightPoints(Vector2 pointA, Vector2 pointB)
-    {
-        if (pointA.x < pointB.x)
-        {
-            left = pointA;
-            right = pointB;
-        }
-        else
-        {
-            left = pointB;
-            right = pointA;
-        }
-    }
 }
 #endregion

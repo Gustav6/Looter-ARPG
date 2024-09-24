@@ -290,7 +290,7 @@ MonoBehaviour:
   roomMaxSize: {x: 15, y: 15}
   tileTexture: {fileID: 11400000, guid: 83d28c1bac103fb46810f1236af6bb19, type: 2}
   tileMap: {fileID: 28663809}
-  totalRoomsAmount: 50
+  totalRoomsAmount: 100
   showEveryRoom: 0
   debugTexture: {fileID: 11400000, guid: b202616569177954f8f554196d4d9332, type: 2}
 --- !u!1 &178355442
@@ -395,6 +395,7 @@ GameObject:
   m_Component:
   - component: {fileID: 529258123}
   - component: {fileID: 529258122}
+  - component: {fileID: 529258124}
   m_Layer: 0
   m_Name: Grid
   m_TagString: Untagged
@@ -431,6 +432,18 @@ Transform:
   - {fileID: 837252852}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &529258124
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 529258121}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bd362d751cfac2143ae2f13eadd3ebc6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &837252851
 GameObject:
   m_ObjectHideFlags: 0

@@ -5,11 +5,23 @@ using UnityEngine;
 
 public class DamagePopUpText : MonoBehaviour
 {
-    TextMeshPro textMeshPro;
-    string text;
+    public TextMeshPro textMeshPro;
+    float timer;
+    public float destructTimer;
     void Start()
     {
-        textMeshPro.text = WeaponController.Damage.ToString();
-    } 
+        timer = destructTimer;
+        textMeshPro.SetText(WeaponController.Damage.ToString());
+    }
+
+    private void Update()
+    {
+        timer -= Time.deltaTime;
+
+        if (timer <= 0)
+        {
+            Destroy(gameObject);
+        }
+    }
 }
     

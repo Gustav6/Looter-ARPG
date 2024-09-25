@@ -206,4 +206,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: df1a03a18809f174e9a69670c6a7ac40, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  weapon: {fileID: 0}
+  textMeshPro: {fileID: 3058175354940692265}
+  destructTimer: 1

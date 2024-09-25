@@ -105,7 +105,7 @@ public class GeneratingMapState : MapBaseState
 
         stopwatch.Stop();
 
-        Debug.Log("I took: " + stopwatch.ElapsedMilliseconds + " MS");
+        Debug.Log("It took: " + stopwatch.ElapsedMilliseconds + " MS, to generate map");
     }
 
     #region Generate Room methods
@@ -625,7 +625,7 @@ public class GeneratingMapState : MapBaseState
             connections[0]
         };
 
-        foreach (Edge connection in connections)
+        foreach (Edge connection in test)
         {
             List<Room> rooms = new();
 
@@ -642,14 +642,39 @@ public class GeneratingMapState : MapBaseState
                 }
             }
 
-            Vector2Int startingPosition = new((int)rooms[0].WorldPosition.x, (int)rooms[0].WorldPosition.y);
-            Vector2Int targetPosition = new((int)rooms[1].WorldPosition.x, (int)rooms[1].WorldPosition.y);
+            #region Start and target positions
+            Vector2Int startingPosition = Vector2Int.zero; // From room[0]
+            Vector2Int targetPosition = Vector2Int.zero; // Towards room[1]
+
+            if (rooms[0].WorldPosition.x > rooms[1].WorldPosition.x)
+            {
+                startingPosition.x = rooms[0].tiles[rooms[0].width, 0].gridPosition.x;
+                targetPosition.x = rooms[1].tiles[0, 0].gridPosition.x;
+            }
+            else if (rooms[0].WorldPosition.x < rooms[1].WorldPosition.x)
+            {
+                startingPosition.x = rooms[0].tiles[0, 0].gridPosition.x;
+                targetPosition.x = rooms[1].tiles[rooms[1].width, 0].gridPosition.x;
+            }
+
+            if (rooms[0].WorldPosition.y > rooms[1].WorldPosition.y)
+            {
+                startingPosition.y = rooms[0].tiles[0, rooms[0].height].gridPosition.y;
+                targetPosition.y = rooms[1].tiles[0, 0].gridPosition.y;
+            }
+            else if (rooms[0].WorldPosition.y < rooms[1].WorldPosition.y)
+            {
+                startingPosition.y = rooms[0].tiles[0, 0].gridPosition.y;
+                targetPosition.y = rooms[1].tiles[0, rooms[1].height].gridPosition.y;
+            }
+            #endregion
 
             // Find a path starting from first room in list towards the connected room.
             // Add width to the "path", then add path to tile change data list.
 
             List<Vector2Int> hallwayTilePositions = new();
 
+            #region Room intersection check
             foreach (Room room in rooms)
             {
                 if (mainRooms.Contains(room))
@@ -681,6 +706,7 @@ public class GeneratingMapState : MapBaseState
                     // Add room to a list
                 }
             }
+            #endregion
         }
     }
     #endregion

@@ -252,6 +252,7 @@ GameObject:
   m_Component:
   - component: {fileID: 144320184}
   - component: {fileID: 144320185}
+  - component: {fileID: 144320186}
   m_Layer: 0
   m_Name: MapManager
   m_TagString: Untagged
@@ -286,13 +287,26 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1675e689b4e4b5c4c9c5c07b0dd70e95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generationRadius: 100
-  roomMaxSize: {x: 15, y: 15}
+  generationRadius: 50
+  roomMaxSize: {x: 25, y: 25}
   tileTexture: {fileID: 11400000, guid: 83d28c1bac103fb46810f1236af6bb19, type: 2}
   tileMap: {fileID: 28663809}
-  totalRoomsAmount: 100
+  totalRoomsAmount: 25
   showEveryRoom: 0
   debugTexture: {fileID: 11400000, guid: b202616569177954f8f554196d4d9332, type: 2}
+--- !u!114 &144320186
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 144320183}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 99b071624f114814cb4ec2dd281c6e7e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  amountOfRequests: 0
 --- !u!1 &178355442
 GameObject:
   m_ObjectHideFlags: 0

@@ -2,14 +2,9 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using Unity.Mathematics;
 using Unity.VisualScripting;
-using UnityEditor;
-using UnityEditor.PackageManager;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using UnityEngine.UIElements;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 #region Base State
 public abstract class MapBaseState
@@ -39,7 +34,7 @@ public class GeneratingMapState : MapBaseState
 
     public override void EnterState(MapGenerationManager manager)
     {
-        manager.AmountOfMainRooms = 75;
+        manager.AmountOfMainRooms = 12;
         Heap<Room> heap = new(manager.totalRoomsAmount);
 
         manager.tileMap.ClearAllTiles();
@@ -88,7 +83,7 @@ public class GeneratingMapState : MapBaseState
 
             triangulation = GenerateDelaunayTriangulation(manager, mainRooms);
             minimumSpanningTree = GetMinimumSpanningTree(triangulation, mainRooms, 10);
-            //GenerateHallways(minimumSpanningTree, 3);
+            GenerateHallways(minimumSpanningTree, 4);
             PlaceWalls();
 
             manager.SwitchState(manager.loadingState);
@@ -152,11 +147,11 @@ public class GeneratingMapState : MapBaseState
     {
         if (roomA != roomB)
         {
-            Vector2 roomALowerLeft = manager.tileMap.CellToWorld((Vector3Int)roomA.tiles[0, 0].gridPosition);
-            Vector2 roomATopRight = manager.tileMap.CellToWorld((Vector3Int)roomA.tiles[roomA.width - 1, roomA.height - 1].gridPosition) + Vector3.one;
+            Vector2 roomALowerLeft = manager.tileMap.CellToWorld((Vector3Int)roomA.grid[0, 0].gridPosition);
+            Vector2 roomATopRight = manager.tileMap.CellToWorld((Vector3Int)roomA.grid[roomA.width - 1, roomA.height - 1].gridPosition) + Vector3.one;
 
-            Vector2 roomBLowerLeft = manager.tileMap.CellToWorld((Vector3Int)roomB.tiles[0, 0].gridPosition);
-            Vector2 roomBTopRight = manager.tileMap.CellToWorld((Vector3Int)roomB.tiles[roomB.width - 1, roomB.height - 1].gridPosition) + Vector3.one;
+            Vector2 roomBLowerLeft = manager.tileMap.CellToWorld((Vector3Int)roomB.grid[0, 0].gridPosition);
+            Vector2 roomBTopRight = manager.tileMap.CellToWorld((Vector3Int)roomB.grid[roomB.width - 1, roomB.height - 1].gridPosition) + Vector3.one;
 
             if (roomALowerLeft.x < roomBTopRight.x && roomATopRight.x > roomBLowerLeft.x)
             {
@@ -625,17 +620,17 @@ public class GeneratingMapState : MapBaseState
             connections[0]
         };
 
-        foreach (Edge connection in test)
+        foreach (Edge connection in connections)
         {
-            List<Room> rooms = new();
+            List<Room> roomList = new();
 
             foreach (Room room in mainRooms)
             {
                 if (room.WorldPosition == connection.pointA || room.WorldPosition == connection.pointB)
                 {
-                    rooms.Add(room);
+                    roomList.Add(room);
 
-                    if (rooms.Count == 2)
+                    if (roomList.Count == 2)
                     {
                         break;
                     }
@@ -646,66 +641,121 @@ public class GeneratingMapState : MapBaseState
             Vector2Int startingPosition = Vector2Int.zero; // From room[0]
             Vector2Int targetPosition = Vector2Int.zero; // Towards room[1]
 
-            if (rooms[0].WorldPosition.x > rooms[1].WorldPosition.x)
+            if (roomList[0].WorldPosition.x + roomList[0].width / 2 < roomList[1].WorldPosition.x)
             {
-                startingPosition.x = rooms[0].tiles[rooms[0].width, 0].gridPosition.x;
-                targetPosition.x = rooms[1].tiles[0, 0].gridPosition.x;
+                startingPosition.x = roomList[0].grid[roomList[0].width - 1, 0].gridPosition.x;
+                targetPosition.x = roomList[1].grid[0, 0].gridPosition.x;
             }
-            else if (rooms[0].WorldPosition.x < rooms[1].WorldPosition.x)
+            else if (roomList[0].WorldPosition.x - roomList[0].width / 2 > roomList[1].WorldPosition.x)
             {
-                startingPosition.x = rooms[0].tiles[0, 0].gridPosition.x;
-                targetPosition.x = rooms[1].tiles[rooms[1].width, 0].gridPosition.x;
+                startingPosition.x = roomList[0].grid[0, 0].gridPosition.x;
+                targetPosition.x = roomList[1].grid[roomList[1].width - 1, 0].gridPosition.x;
+            }
+            else
+            {
+                startingPosition.x = roomList[0].grid[roomList[0].width / 2 - 1, 0].gridPosition.x;
+                targetPosition.x = roomList[1].grid[roomList[1].width / 2 - 1, 0].gridPosition.x;
             }
 
-            if (rooms[0].WorldPosition.y > rooms[1].WorldPosition.y)
+            if (roomList[0].WorldPosition.y + roomList[0].height / 2 < roomList[1].WorldPosition.y)
             {
-                startingPosition.y = rooms[0].tiles[0, rooms[0].height].gridPosition.y;
-                targetPosition.y = rooms[1].tiles[0, 0].gridPosition.y;
+                startingPosition.y = roomList[0].grid[0, roomList[0].height - 1].gridPosition.y;
+                targetPosition.y = roomList[1].grid[0, 0].gridPosition.y;
             }
-            else if (rooms[0].WorldPosition.y < rooms[1].WorldPosition.y)
+            else if (roomList[0].WorldPosition.y - roomList[0].height / 2 > roomList[1].WorldPosition.y)
             {
-                startingPosition.y = rooms[0].tiles[0, 0].gridPosition.y;
-                targetPosition.y = rooms[1].tiles[0, rooms[1].height].gridPosition.y;
+                startingPosition.y = roomList[0].grid[0, 0].gridPosition.y;
+                targetPosition.y = roomList[1].grid[0, roomList[1].height - 1].gridPosition.y;
+            }
+            else
+            {
+                startingPosition.y = roomList[0].grid[0, roomList[0].height / 2 - 1].gridPosition.y;
+                targetPosition.y = roomList[1].grid[0, roomList[1].height / 2 - 1].gridPosition.y;
             }
             #endregion
 
             // Find a path starting from first room in list towards the connected room.
+
+            List<Vector2Int> hallwayTilePositions = AStar.instance.FindPath(startingPosition, targetPosition);
+
+            //GameObject path = new()
+            //{
+            //    name = "Path"
+            //};
+
+            //foreach (Vector2Int vector in hallwayTilePositions)
+            //{
+            //    GameObject g = new();
+            //    g.transform.parent = path.transform;
+            //    g.transform.position = (Vector2)vector;
+            //}
+
             // Add width to the "path", then add path to tile change data list.
 
-            List<Vector2Int> hallwayTilePositions = new();
+            List<Vector2Int> widthTiles = new();
 
-            #region Room intersection check
-            foreach (Room room in rooms)
+            foreach (Vector2Int vector in hallwayTilePositions)
             {
-                if (mainRooms.Contains(room))
+                for (int x = (int)-width / 2; x < width; x++)
                 {
-                    continue;
-                }
-
-                // Add rooms that collide with the hallways
-
-                bool canAdd = false;
-
-                for (int x = 0; x < room.width; x++)
-                {
-                    for (int y = 0; y < room.height; y++)
+                    for (int y = (int)-width / 2; y < width; y++)
                     {
-                        hallwayTilePositions.Contains(room.tiles[x, y].gridPosition);
-                        canAdd = true;
-                        break;
-                    }
+                        Vector2Int position = new (vector.x + x, vector.y + y);
 
-                    if (canAdd)
-                    {
-                        break;
+                        if (!hallwayTilePositions.Contains(position))
+                        {
+                            widthTiles.Add(position);
+                        }
                     }
-                }
-
-                if (canAdd)
-                {
-                    // Add room to a list
                 }
             }
+
+            hallwayTilePositions.AddRange(widthTiles);
+
+            foreach (Vector2Int vector in hallwayTilePositions)
+            {
+                TileChangeData data = new((Vector3Int)vector, MapGenerationManager.instance.tileTexture, Color.white, Matrix4x4.identity);
+                tileChangeData.Add(data);
+            }
+
+            #region Room intersection check
+            //foreach (Room room in rooms)
+            //{
+            //    if (mainRooms.Contains(room))
+            //    {
+            //        continue;
+            //    }
+
+            //    // Add rooms that collide with the hallways
+
+            //    bool canAdd = false;
+
+            //    for (int i = 0; i < room.tiles.Count; i++)
+            //    {
+            //        if (hallwayTilePositions.Contains(room.tiles[i].gridPosition))
+            //        {
+            //            // Add room to a list
+
+            //            canAdd = true;
+            //            Debug.Log("True");
+            //            break;
+            //        }
+            //    }
+
+            //    if (canAdd)
+            //    {
+            //        for (int x = 0; x < room.width; x++)
+            //        {
+            //            for (int y = 0; y < room.height; y++)
+            //            {
+            //                Vector2Int vector = room.grid[x, y].gridPosition;
+
+            //                TileChangeData data = new((Vector3Int)vector, MapGenerationManager.instance.tileTexture, Color.white, Matrix4x4.identity);
+            //                tileChangeData.Add(data);
+            //            }
+            //        }
+            //    }
+            //}
             #endregion
         }
     }
@@ -726,19 +776,19 @@ public class GeneratingMapState : MapBaseState
     {
         for (int i = 0; i < list.Count; i++)
         {
-            for (int x = 0; x < list[i].tiles.GetLength(0); x++)
+            for (int x = 0; x < list[i].grid.GetLength(0); x++)
             {
-                for (int y = 0; y < list[i].tiles.GetLength(1); y++)
+                for (int y = 0; y < list[i].grid.GetLength(1); y++)
                 {
                     TileChangeData data;
 
-                    if (x == 0 && y == 0 || x == list[i].tiles.GetLength(0) - 1 && y == 0 || x == 0 && y == list[i].tiles.GetLength(1) - 1 || x == list[i].tiles.GetLength(0) - 1 && y == list[i].tiles.GetLength(1) - 1)
+                    if (x == 0 && y == 0 || x == list[i].grid.GetLength(0) - 1 && y == 0 || x == 0 && y == list[i].grid.GetLength(1) - 1 || x == list[i].grid.GetLength(0) - 1 && y == list[i].grid.GetLength(1) - 1)
                     {
-                        data = new((Vector3Int)list[i].tiles[x, y].gridPosition, manager.tileTexture, Color.black, Matrix4x4.identity);
+                        data = new((Vector3Int)list[i].grid[x, y].gridPosition, manager.tileTexture, Color.black, Matrix4x4.identity);
                     }
                     else
                     {
-                        data = new((Vector3Int)list[i].tiles[x, y].gridPosition, manager.tileTexture, Color.white, Matrix4x4.identity);
+                        data = new((Vector3Int)list[i].grid[x, y].gridPosition, manager.tileTexture, Color.white, Matrix4x4.identity);
                     }
 
                     tileChangeData.Add(data);
@@ -778,7 +828,7 @@ public class Room : IHeapItem<Room>
     {
         get
         {
-            Vector2 worldPosition = MapGenerationManager.instance.tileMap.CellToWorld((Vector3Int)tiles[width - 1, height - 1].gridPosition) + Vector3.one;
+            Vector2 worldPosition = MapGenerationManager.instance.tileMap.CellToWorld((Vector3Int)grid[width - 1, height - 1].gridPosition) + Vector3.one;
 
             worldPosition.x -= width / 2f;
             worldPosition.y -= height / 2f;
@@ -808,13 +858,14 @@ public class Room : IHeapItem<Room>
     }
     #endregion
 
-    public MapTile[,] tiles;
+    public MapTile[,] grid;
+    public readonly List<MapTile> tiles = new();
 
     public Room(int width, int height, Vector2 position)
     {
         this.width = width;
         this.height = height;
-        tiles = new MapTile[width, height];
+        grid = new MapTile[width, height];
 
         for (int x = 0; x < width; x++)
         {
@@ -823,7 +874,8 @@ public class Room : IHeapItem<Room>
                 int xPosition = x + (int)position.x;
                 int yPosition = y + (int)position.y;
 
-                tiles[x, y] = new MapTile(new Vector2Int(xPosition, yPosition));
+                grid[x, y] = new MapTile(new Vector2Int(xPosition, yPosition));
+                tiles.Add(grid[x, y]);
             }
         }
     }
@@ -834,7 +886,7 @@ public class Room : IHeapItem<Room>
         {
             for (int y = 0; y < height; y++)
             {
-                tiles[x, y].gridPosition += direction;
+                grid[x, y].gridPosition += direction;
             }
         }
     }

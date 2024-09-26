@@ -6,6 +6,8 @@ TagManager:
   tags:
   - Flock
   - Obstacle
+  - Enemy
+  - Bullet
   layers:
   - Default
   - TransparentFX

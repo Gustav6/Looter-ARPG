@@ -13,6 +13,14 @@ public class AntonsTemporaryEnemyScript : MonoBehaviour
         currenthealth = maxhealth;
     }
 
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.tag == "Bullet")
+        {
+            TakeDamage(GunController.Damage);          
+        }
+    }
+
     public void TakeDamage(int damage)
     {
         currenthealth -= damage;
@@ -20,7 +28,6 @@ public class AntonsTemporaryEnemyScript : MonoBehaviour
 
         if (currenthealth <= 0)
         {
-            Debug.Log("Died");
             Destroy(gameObject);
         }
     }

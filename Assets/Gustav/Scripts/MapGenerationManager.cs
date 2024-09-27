@@ -63,13 +63,10 @@ public class MapGenerationManager : MonoBehaviour
     }
     #endregion
 
-    public TileBase tileTexture;
     public Tilemap tileMap;
     public int totalRoomsAmount;
 
-    public bool showEveryRoom = false;
-
-    public TileBase debugTexture;
+    public TileBase ruleTile;
 
     private void Start()
     {

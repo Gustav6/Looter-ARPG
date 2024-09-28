@@ -10,19 +10,20 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 07a6e6191270e3543a15c2d55d45d2ab, type: 3}
-  m_Name: Pistol
+  m_Name: 50.Cal Sniper
   m_EditorClassIdentifier: 
   name: 
   description: 
-  sprite: {fileID: 1862675393, guid: e89a104cc74b80444afa07fa92cd8e81, type: 3}
-  bulletPrefab: {fileID: 4550873575046521524, guid: 6dad99b5a107b0c4b864d8bbc31059aa, type: 3}
-  damage: 50
-  Ammo: 5
+  sprite: {fileID: -1557311052, guid: e89a104cc74b80444afa07fa92cd8e81, type: 3}
+  bulletPrefab: {fileID: 4550873575046521524, guid: 52885066d60a601459c7e7f756e8c059, type: 3}
+  damage: 150
+  Ammo: 3
   critChanse: 0
-  fireRate: 0.3
-  fireForce: 50
+  fireRate: 2
+  fireForce: 400
   reloadTime: 0
   dubbelShot: 0
   bigBullet: 0
-  piercingShot: 0
+  piercingShot: 1
+  amountOfPircableEnemies: 0
   explosiveBullet: 0

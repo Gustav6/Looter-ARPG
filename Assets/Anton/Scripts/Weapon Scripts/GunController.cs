@@ -10,38 +10,51 @@ public class GunController : MonoBehaviour
     public Transform firePoint2;
     public SpriteRenderer sprite;
     public LayerMask enemyLayers;
+    int ammo;
+    float timer;
+    #region Public Static Variables
     public static int Damage;
+    public static int pierceAmount;
     public static bool pierce;
+    public static float fireForce;
+    #endregion
 
-    private int attackTimer;
+    private float attackTimer;
     void Start()
     {
         Damage = gun.damage;
         attackTimer = gun.fireRate;
         sprite.sprite = gun.sprite;
         pierce = gun.piercingShot;
-
-        if (gun.bigBullet)
-        {
-            firePoint.transform.position -= new Vector3(0, 3, 0);
-            firePoint2.transform.position += new Vector3(0, 3, 0);
-        }
+        ammo = gun.Ammo;
+        pierceAmount = gun.amountOfPircableEnemies;
+        fireForce = gun.fireForce;
     }
 
     void Update()
     {
+        #region Input
         if (attackTimer >= gun.fireRate)
         {
             if (Input.GetMouseButtonDown(0))
             {
-                Attack();
-                attackTimer = 0;
+                if (ammo > 0)
+                {
+                    Attack();
+                    attackTimer = 0;
+                }              
             }
         }
 
+        if (Input.GetKeyDown(KeyCode.R))
+        {
+            Reload();
+        }
+        #endregion
+
         if (attackTimer < gun.fireRate)
         {
-            attackTimer += 1;
+            attackTimer += Time.deltaTime;
         }
     }
 
@@ -55,6 +68,13 @@ public class GunController : MonoBehaviour
             GameObject bullet2 = Instantiate(gun.bulletPrefab, firePoint2.transform.position, Quaternion.identity);
             bullet2.GetComponent<Rigidbody2D>().AddForce(firePoint.right * gun.fireForce, ForceMode2D.Impulse);
         }
+
+        ammo -= 1;
     }
 
+    void Reload()
+    {       
+        ammo = gun.Ammo;        
+        Debug.Log("Reloaded Gun");       
+    }
 }

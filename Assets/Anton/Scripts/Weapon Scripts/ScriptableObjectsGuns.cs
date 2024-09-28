@@ -14,18 +14,18 @@ public class ScriptableObjectsGuns : ScriptableObject
 
     [Header("Stats")]
     #region Stats 
-    public int damage;
-    public int fireRate;
+    public int damage;  
     public int Ammo;
     public int critChanse;
+    public float fireRate;
     public float fireForce;
+    public float reloadTime;
     #endregion
 
     [Header("Effects")]
     #region Effects 
     public bool dubbelShot;
-    public bool bigBullet;
     public bool piercingShot;
-    public bool explosiveBullet;
+    public int amountOfPircableEnemies;
     #endregion
 }

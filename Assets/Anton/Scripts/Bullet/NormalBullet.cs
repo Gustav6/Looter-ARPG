@@ -13,7 +13,6 @@ public class NormalBullet : MonoBehaviour
         if (destroyBulletTimer <= 0)
         {
             Destroy(gameObject);
-            destroyBulletTimer = 2;
         }
     }
 
@@ -24,7 +23,7 @@ public class NormalBullet : MonoBehaviour
             amountOfEnemiesHit += 1;
             if (GunController.pierce)
             {
-                if (amountOfEnemiesHit >= 3)
+                if (amountOfEnemiesHit >= GunController.pierceAmount)
                 {
                     Destroy(gameObject);
                 }

@@ -25,7 +25,7 @@ public class MapGenerationManager : MonoBehaviour
     [Header("Room Variables")]
 
     #region Squared room variables
-    public bool generateSquareRoom = true;
+    public bool generateSquareRooms = true;
     public Vector2Int squaredRoomMaxSize = new(10, 10);
 
     [SerializeField]
@@ -54,23 +54,23 @@ public class MapGenerationManager : MonoBehaviour
     }
     #endregion
 
-    #region Rounded room variables
-    public bool generateRoundedRoom = false;
-    public int roundedRoomMaxSize = 15;
+    #region Circle room variables
+    public bool generateCircleRooms = false;
+    public int circleRoomMaxSize = 15;
     [SerializeField]
-    private int roundedRoomMinSize = 5;
-    public int RoundedRoomMinSize
+    private int circleRoomMinSize = 5;
+    public int CircleRoomMinSize
     {
-        get { return roundedRoomMinSize; }
+        get { return circleRoomMinSize; }
         set
         {
-            if (value <= roundedRoomMinSize)
+            if (value <= circleRoomMinSize)
             {
-                roundedRoomMinSize = value;
+                circleRoomMinSize = value;
             }
             else
             {
-                roundedRoomMinSize = roundedRoomMaxSize;
+                circleRoomMinSize = circleRoomMaxSize;
             }
         }
     }

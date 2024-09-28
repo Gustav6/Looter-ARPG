@@ -32,6 +32,8 @@ public class GeneratingMapState : MapBaseState
 
     private bool canMoveRoom;
 
+    private Room startingRoom;
+
     System.Diagnostics.Stopwatch stopwatch;
 
     public override void EnterState(MapGenerationManager manager)
@@ -73,7 +75,9 @@ public class GeneratingMapState : MapBaseState
             mainRooms.Add(mainRoom);
         }
 
-        #region Diagnostic 
+        startingRoom = mainRooms.First();
+
+        #region Diagnostic Start
         stopwatch = new();
         stopwatch.Start();
         #endregion
@@ -103,9 +107,18 @@ public class GeneratingMapState : MapBaseState
             manager.tileMap.SetTile(tileChangeData[i], true);
         }
 
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+        if (player != null)
+        {
+            player.transform.position = startingRoom.WorldPosition;
+        }
+
+        #region Diagnostic End
         stopwatch.Stop();
 
         Debug.Log("It took: " + stopwatch.ElapsedMilliseconds + " MS, to generate map");
+        #endregion
     }
 
     #region Generate Room methods
@@ -115,7 +128,7 @@ public class GeneratingMapState : MapBaseState
         Vector2Int offset = Vector2Int.zero;
         Vector2 position = Vector2.zero;
 
-        if (manager.generateSquareRoom)
+        if (manager.generateSquareRooms)
         {
             int roomWidth = UnityEngine.Random.Range(5, manager.squaredRoomMaxSize.x + 1);
             int roomHeight = UnityEngine.Random.Range(5, manager.squaredRoomMaxSize.y + 1);
@@ -132,9 +145,9 @@ public class GeneratingMapState : MapBaseState
 
             room = new Room(roomWidth, roomHeight, new Vector2(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y)));
         }
-        else if (manager.generateRoundedRoom)
+        else if (manager.generateCircleRooms)
         {
-            int radius = UnityEngine.Random.Range(manager.RoundedRoomMinSize, manager.roundedRoomMaxSize + 1);
+            int radius = UnityEngine.Random.Range(manager.CircleRoomMinSize, manager.circleRoomMaxSize + 1);
             offset = new(radius, radius);
 
             if (manager.generateInCircle)
@@ -706,137 +719,8 @@ public class GeneratingMapState : MapBaseState
                 }
             }
 
-            #region Start and target positions
             Vector2Int startingPosition = new ((int)roomList[0].WorldPosition.x, (int)roomList[0].WorldPosition.y); // From roomList[0]
             Vector2Int targetPosition = new((int)roomList[1].WorldPosition.x, (int)roomList[1].WorldPosition.y); // Towards roomList[1]
-
-            //if (roomList[0].WorldPosition.x < roomList[1].WorldPosition.x)
-            //{
-            //    if (roomList[0].WorldPosition.x + roomList[0].width / 2 > roomList[1].WorldPosition.x)
-            //    {
-            //        startingPosition.x = roomList[0].grid[roomList[0].width / 2, 0].gridPosition.x;
-            //        targetPosition.x = roomList[1].grid[0, 0].gridPosition.x;
-            //    }
-            //    else
-            //    {
-            //        if (roomList[0].WorldPosition.y + roomList[0].height / 2 < roomList[1].WorldPosition.y && roomList[0].WorldPosition.y - roomList[0].height / 2 > roomList[1].WorldPosition.y)
-            //        {
-            //            startingPosition.x = roomList[0].grid[roomList[0].width - 1, 0].gridPosition.x;
-            //            targetPosition.x = roomList[1].grid[roomList[1].width / 2, 0].gridPosition.x;
-            //        }
-            //        else
-            //        {
-            //            startingPosition.x = roomList[0].grid[roomList[0].width - 1, 0].gridPosition.x;
-            //            targetPosition.x = roomList[1].grid[0, 0].gridPosition.x;
-            //        }
-            //    }
-
-            //    //if (roomList[0].WorldPosition.y + roomList[0].height < roomList[1].WorldPosition.y && roomList[0].WorldPosition.y - roomList[0].height > roomList[1].WorldPosition.y)
-            //    //{
-            //    //    startingPosition.x = roomList[0].grid[roomList[0].width / 2, 0].gridPosition.x;
-            //    //    targetPosition.x = roomList[1].grid[0, 0].gridPosition.x;
-            //    //}
-            //    //else
-            //    //{
-            //    //    startingPosition.x = roomList[0].grid[roomList[0].width - 1, 0].gridPosition.x;
-            //    //    targetPosition.x = roomList[1].grid[0, 0].gridPosition.x;
-            //    //}
-            //}
-            //else if (roomList[0].WorldPosition.x > roomList[1].WorldPosition.x)
-            //{
-            //    if (roomList[0].WorldPosition.x - roomList[0].width / 2 < roomList[1].WorldPosition.x)
-            //    {
-            //        startingPosition.x = roomList[0].grid[roomList[0].width / 2, 0].gridPosition.x;
-            //        targetPosition.x = roomList[1].grid[0, 0].gridPosition.x;
-            //    }
-            //    else
-            //    {
-            //        if (roomList[0].WorldPosition.y + roomList[0].height / 2 < roomList[1].WorldPosition.y && roomList[0].WorldPosition.y - roomList[0].height / 2 > roomList[1].WorldPosition.y)
-            //        {
-            //            startingPosition.x = roomList[0].grid[roomList[0].width - 1, 0].gridPosition.x;
-            //            targetPosition.x = roomList[1].grid[roomList[1].width / 2, 0].gridPosition.x;
-            //        }
-            //        else
-            //        {
-            //            startingPosition.x = roomList[0].grid[roomList[0].width - 1, 0].gridPosition.x;
-            //            targetPosition.x = roomList[1].grid[0, 0].gridPosition.x;
-            //        }
-            //    }
-            //}
-            //else
-            //{
-            //    startingPosition.x = roomList[0].grid[roomList[0].width / 2, 0].gridPosition.x;
-            //    targetPosition.x = roomList[1].grid[roomList[1].width / 2, 0].gridPosition.x;
-            //}
-
-            //if (roomList[0].WorldPosition.y < roomList[1].WorldPosition.y)
-            //{
-            //    if (roomList[0].WorldPosition.x + roomList[0].width < roomList[1].WorldPosition.x || roomList[0].WorldPosition.x - roomList[0].width > roomList[1].WorldPosition.x)
-            //    {
-            //        startingPosition.y = roomList[0].grid[0, roomList[0].height - 1].gridPosition.y;
-            //        targetPosition.y = roomList[1].grid[0, roomList[1].height / 2].gridPosition.y;
-            //    }
-            //    else
-            //    {
-            //        startingPosition.y = roomList[0].grid[0, roomList[0].height - 1].gridPosition.y;
-            //        targetPosition.y = roomList[1].grid[0, 0].gridPosition.y;
-            //    }
-            //}
-            //else if (roomList[0].WorldPosition.y > roomList[1].WorldPosition.y)
-            //{
-            //    if (roomList[0].WorldPosition.x + roomList[0].width < roomList[1].WorldPosition.x || roomList[0].WorldPosition.x - roomList[0].width > roomList[1].WorldPosition.x)
-            //    {
-            //        startingPosition.y = roomList[0].grid[0, 0].gridPosition.y;
-            //        targetPosition.y = roomList[1].grid[0, roomList[1].height / 2].gridPosition.y;
-            //    }
-            //    else
-            //    {
-            //        startingPosition.y = roomList[0].grid[0, 0].gridPosition.y;
-            //        targetPosition.y = roomList[1].grid[0, roomList[1].height - 1].gridPosition.y;
-            //    }
-            //}
-            //else
-            //{
-            //    startingPosition.y = roomList[0].grid[0, roomList[0].height / 2].gridPosition.y;
-            //    targetPosition.y = roomList[1].grid[0, roomList[1].height / 2].gridPosition.y;
-            //}
-
-            #region Debug
-
-            //GameObject hallwayParent = new()
-            //{
-            //    name = "Hallway"
-            //};
-
-            //GameObject t1 = new()
-            //{
-            //    name = "Start"
-            //};
-            //t1.transform.position = (Vector2)startingPosition;
-            //t1.transform.parent = hallwayParent.transform;
-
-            //GameObject t2 = new()
-            //{
-            //    name = "Target"
-            //};
-            //t2.transform.position = (Vector2)targetPosition;
-            //t2.transform.parent = hallwayParent.transform;
-
-            //GameObject t3 = new()
-            //{
-            //    name = "Room Start"
-            //};
-            //t3.transform.position = roomList[0].WorldPosition;
-            //t3.transform.parent = hallwayParent.transform;
-
-            //GameObject t4 = new()
-            //{
-            //    name = "Room Target"
-            //};
-            //t4.transform.position = roomList[1].WorldPosition;
-            //t4.transform.parent = hallwayParent.transform;
-            #endregion
-            #endregion
 
             // Find a path starting from first room in list towards the connected room.
 

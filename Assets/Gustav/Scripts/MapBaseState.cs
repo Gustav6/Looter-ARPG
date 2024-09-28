@@ -2,8 +2,10 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 using UnityEngine.Tilemaps;
 
 #region Base State
@@ -34,8 +36,7 @@ public class GeneratingMapState : MapBaseState
 
     public override void EnterState(MapGenerationManager manager)
     {
-        manager.AmountOfMainRooms = 15;
-        Heap<Room> heap = new(manager.totalRoomsAmount);
+        Heap<Room> heap = new(manager.totalRoomsCount);
 
         manager.tileMap.ClearAllTiles();
         GameObject.Destroy(triangulationDebug);
@@ -53,12 +54,15 @@ public class GeneratingMapState : MapBaseState
         canMoveRoom = false;
 
         // Generate x amount of rooms
-        for (int i = 0; i < manager.totalRoomsAmount; i++)
+        for (int i = 0; i < manager.totalRoomsCount; i++)
         {
             Room newRoom = GenerateRoom(manager);
 
-            rooms.Add(newRoom);
-            heap.Add(newRoom);
+            if (newRoom != null)
+            {
+                rooms.Add(newRoom);
+                heap.Add(newRoom);
+            }
         }
 
         // Add x amount (Amount of main rooms) with the largest area
@@ -79,12 +83,11 @@ public class GeneratingMapState : MapBaseState
     {
         SeparateRooms(manager);
 
-        if(!canMoveRoom)
+        if (!canMoveRoom)
         {
             triangulation = GenerateDelaunayTriangulation(manager, mainRooms);
             minimumSpanningTree = GetMinimumSpanningTree(triangulation, mainRooms, 15);
-            GenerateHallways(manager, minimumSpanningTree, 8);
-            PlaceWalls();
+            GenerateHallways(manager, minimumSpanningTree, 13);
 
             SetData(manager, mainRooms);
 
@@ -108,21 +111,61 @@ public class GeneratingMapState : MapBaseState
     #region Generate Room methods
     private Room GenerateRoom(MapGenerationManager manager)
     {
-        int roomWidth = UnityEngine.Random.Range(5, manager.roomMaxSize.x + 1);
-        int roomHeight = UnityEngine.Random.Range(5, manager.roomMaxSize.y + 1);
-        
-        Vector2Int offset = new(roomWidth / 2, roomHeight / 2);
-        Vector2 position = RandomPosition(manager.generationRadius) - offset;
+        Room room = null;
+        Vector2Int offset = Vector2Int.zero;
+        Vector2 position = Vector2.zero;
 
-        return new Room(roomWidth, roomHeight, new Vector2(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y)));
+        if (manager.generateSquareRoom)
+        {
+            int roomWidth = UnityEngine.Random.Range(5, manager.squaredRoomMaxSize.x + 1);
+            int roomHeight = UnityEngine.Random.Range(5, manager.squaredRoomMaxSize.y + 1);
+            offset = new(roomWidth / 2, roomHeight / 2);
+
+            if (manager.generateInCircle)
+            {
+                position = RandomPositionInCircle(manager.generationRadius) - offset;
+            }
+            else if (manager.generateInStrip)
+            {
+                position = RandomPositionInStrip(manager.stripSize.x, manager.stripSize.y) - offset;
+            }
+
+            room = new Room(roomWidth, roomHeight, new Vector2(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y)));
+        }
+        else if (manager.generateRoundedRoom)
+        {
+            int radius = UnityEngine.Random.Range(manager.RoundedRoomMinSize, manager.roundedRoomMaxSize + 1);
+            offset = new(radius, radius);
+
+            if (manager.generateInCircle)
+            {
+                position = RandomPositionInCircle(manager.generationRadius) - offset;
+            }
+            else if (manager.generateInStrip)
+            {
+                position = RandomPositionInStrip(manager.stripSize.x, manager.stripSize.y) - offset;
+            }
+
+            room = new Room(radius, new Vector2(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y)));
+        }
+
+        return room;
     }
 
-    public Vector2 RandomPosition(float radius)
+    public Vector2 RandomPositionInCircle(float radius)
     {
         float r = radius * Mathf.Sqrt(UnityEngine.Random.Range(0.0001f, 1));
         float theta = UnityEngine.Random.Range(0.0001f, 1) * 2 * Mathf.PI;
 
         return new Vector2(r * Mathf.Cos(theta), r * Mathf.Sin(theta));
+    }
+
+    public Vector2 RandomPositionInStrip(float width, float height)
+    {
+        float x = UnityEngine.Random.Range(-width / 2, width / 2);
+        float y = UnityEngine.Random.Range(-height / 2, height / 2);
+
+        return new Vector2(x, y);
     }
     #endregion
 
@@ -138,7 +181,7 @@ public class GeneratingMapState : MapBaseState
 
             rooms[i].MoveRoom(direction);
 
-            if (direction != Vector2.zero)
+            if (!canMoveRoom && direction != Vector2.zero)
             {
                 canMoveRoom = true;
             }
@@ -149,11 +192,17 @@ public class GeneratingMapState : MapBaseState
     {
         if (roomA != roomB)
         {
-            Vector2 roomALowerLeft = manager.tileMap.CellToWorld((Vector3Int)roomA.grid[0, 0].gridPosition);
-            Vector2 roomATopRight = manager.tileMap.CellToWorld((Vector3Int)roomA.grid[roomA.width - 1, roomA.height - 1].gridPosition) + Vector3.one;
+            //Vector2 roomALowerLeft = manager.tileMap.CellToWorld((Vector3Int)roomA.grid[0, 0].gridPosition);
+            //Vector2 roomATopRight = manager.tileMap.CellToWorld((Vector3Int)roomA.grid[roomA.width - 1, roomA.height - 1].gridPosition) + Vector3.one;
 
-            Vector2 roomBLowerLeft = manager.tileMap.CellToWorld((Vector3Int)roomB.grid[0, 0].gridPosition);
-            Vector2 roomBTopRight = manager.tileMap.CellToWorld((Vector3Int)roomB.grid[roomB.width - 1, roomB.height - 1].gridPosition) + Vector3.one;
+            //Vector2 roomBLowerLeft = manager.tileMap.CellToWorld((Vector3Int)roomB.grid[0, 0].gridPosition);
+            //Vector2 roomBTopRight = manager.tileMap.CellToWorld((Vector3Int)roomB.grid[roomB.width - 1, roomB.height - 1].gridPosition) + Vector3.one;
+
+            Vector2 roomALowerLeft = new (roomA.WorldPosition.x - roomA.width / 2, roomA.WorldPosition.y - roomA.height / 2);
+            Vector2 roomATopRight = new (roomA.WorldPosition.x + roomA.width / 2 + 1, roomA.WorldPosition.y + roomA.height / 2 + 1);
+
+            Vector2 roomBLowerLeft = new (roomB.WorldPosition.x - roomB.width / 2, roomB.WorldPosition.y - roomB.height / 2);
+            Vector2 roomBTopRight = new (roomB.WorldPosition.x + roomB.width / 2 + 1, roomB.WorldPosition.y + roomB.height / 2 + 1);
 
             if (roomALowerLeft.x < roomBTopRight.x && roomATopRight.x > roomBLowerLeft.x)
             {
@@ -184,11 +233,6 @@ public class GeneratingMapState : MapBaseState
             Vector2 directionToTravel = otherAgentToCurrent.normalized;
 
             separationVelocity += directionToTravel;
-        }
-
-        if (separationVelocity != Vector2.zero)
-        {
-            separationVelocity.Normalize();
         }
 
         #region Set velocity
@@ -858,11 +902,6 @@ public class GeneratingMapState : MapBaseState
     }
     #endregion
 
-    private void PlaceWalls()
-    {
-
-    }
-
     private void Decorate()
     {
 
@@ -871,13 +910,36 @@ public class GeneratingMapState : MapBaseState
     #region Set position and tile lists
     private void SetData(MapGenerationManager manager, List<Room> list)
     {
-        for (int i = 0; i < list.Count; i++)
+        foreach (Room room in list)
         {
-            for (int x = 0; x < list[i].grid.GetLength(0); x++)
+            for (int x = 0; x < room.grid.GetLength(0); x++)
             {
-                for (int y = 0; y < list[i].grid.GetLength(1); y++)
+                for (int y = 0; y < room.grid.GetLength(1); y++)
                 {
-                    tileChangeData.Add(new((Vector3Int)list[i].grid[x, y].gridPosition, manager.ruleTile, Color.white, Matrix4x4.identity));
+                    if (room.grid[x, y].gridPosition == null)
+                    {
+                        continue;
+                    }
+
+                    TileChangeData data;
+
+                    if (manager.debugRoom)
+                    {
+                        if (x == 0 && y == 0 || x == room.grid.GetLength(0) - 1 && y == room.grid.GetLength(1) - 1 || x == 0 && y == room.grid.GetLength(1) - 1 || x == room.grid.GetLength(0) - 1 && y == 0)
+                        {
+                            data = new((Vector3Int)room.grid[x, y].gridPosition, manager.debugTile, Color.black, Matrix4x4.identity);
+                        }
+                        else
+                        {
+                            data = new((Vector3Int)room.grid[x, y].gridPosition, manager.debugTile, Color.white, Matrix4x4.identity);
+                        }
+                    }
+                    else
+                    {
+                        data = new((Vector3Int)room.grid[x, y].gridPosition, manager.ruleTile, Color.white, Matrix4x4.identity);
+                    }
+
+                    tileChangeData.Add(data);
                 }
             }
         }
@@ -914,25 +976,16 @@ public class Room : IHeapItem<Room>
     {
         get
         {
-            Vector2 worldPosition = MapGenerationManager.instance.tileMap.CellToWorld((Vector3Int)grid[width - 1, height - 1].gridPosition) + Vector3.one;
-
-            worldPosition.x -= width / 2f;
-            worldPosition.y -= height / 2f;
-
-            return worldPosition;
+            return center;
         }
     }
+
+    public Vector2 center;
     #endregion
 
     #region Size of room
+    public readonly int radius;
     public readonly int width, height;
-    public int Size
-    {
-        get
-        {
-            return width * height;
-        }
-    }
     #endregion
 
     #region Heap variables
@@ -947,6 +1000,7 @@ public class Room : IHeapItem<Room>
     public MapTile[,] grid;
     public readonly List<MapTile> tiles = new();
 
+    #region Square Room
     public Room(int width, int height, Vector2 position)
     {
         this.width = width;
@@ -964,7 +1018,45 @@ public class Room : IHeapItem<Room>
                 tiles.Add(grid[x, y]);
             }
         }
+
+        center = MapGenerationManager.instance.tileMap.CellToWorld((Vector3Int)grid[width - 1, height - 1].gridPosition) + Vector3.one;
+
+        center.x -= width / 2f;
+        center.y -= height / 2f;
+
     }
+    #endregion
+
+    #region Round Room
+    public Room(int radius, Vector2 position)
+    {
+        width = radius * 2;
+        height = radius * 2;
+        this.radius = radius;
+        grid = new MapTile[width, height];
+
+        Circle temp = new(position, radius);
+
+        for (int x = -radius + 1; x < radius; x++)
+        {
+            for (int y = -radius + 1; y < radius; y++)
+            {
+                int xPosition = x + (int)position.x;
+                int yPosition = y + (int)position.y;
+
+                if (temp.Intersects(new Vector2(xPosition, yPosition)))
+                {
+                    grid[x + radius, y + radius] = new MapTile(new Vector2Int(xPosition, yPosition));
+                    tiles.Add(grid[x + radius, y + radius]);
+                }
+            }
+        }
+
+        center = position;
+        center.x += 0.5f;
+        center.y += 0.5f;
+    }
+    #endregion
 
     public void MoveRoom(Vector2Int direction)
     {
@@ -972,14 +1064,19 @@ public class Room : IHeapItem<Room>
         {
             for (int y = 0; y < height; y++)
             {
-                grid[x, y].gridPosition += direction;
+                if (grid[x, y].gridPosition != null)
+                {
+                    grid[x, y].gridPosition += direction;
+                }
             }
         }
+
+        center += direction;
     }
 
     public int CompareTo(Room other)
     {
-        int compare = Size.CompareTo(other.Size);
+        int compare = tiles.Count.CompareTo(other.tiles.Count);
 
         return compare;
     }
@@ -987,7 +1084,7 @@ public class Room : IHeapItem<Room>
 
 public struct MapTile
 {
-    public Vector2Int gridPosition;
+    public Vector2Int? gridPosition;
 
     public MapTile(Vector2Int gridPosition)
     {

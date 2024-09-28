@@ -15,45 +15,81 @@ public class MapGenerationManager : MonoBehaviour
 
     public static MapGenerationManager instance;
 
-    public int generationRadius;
+    [Header("Spawn Variables")]
+    public bool generateInCircle = false;
+    public int generationRadius = 50;
 
-    #region Room size variables
-    public Vector2Int roomMaxSize;
-    private Vector2Int roomMinSize;
-    public Vector2Int RoomMinSize
+    public bool generateInStrip = true;
+    public Vector2 stripSize = new Vector2Int(100, 20);
+
+    [Header("Room Variables")]
+
+    #region Squared room variables
+    public bool generateSquareRoom = true;
+    public Vector2Int squaredRoomMaxSize = new(10, 10);
+
+    [SerializeField]
+    private Vector2Int squaredRoomMinSize = new(5, 5);
+    public Vector2Int SquaredRoomMinSize
     {
-        get { return roomMinSize; }
+        get { return squaredRoomMinSize; }
         set
         {
-            if (value.x <= roomMaxSize.x && value.y <= roomMaxSize.y)
+            if (value.x <= squaredRoomMaxSize.x && value.y <= squaredRoomMaxSize.y)
             {
-                roomMinSize = value;
+                squaredRoomMinSize = value;
             }
             else
             {
-                if (value.x > roomMaxSize.x)
+                if (value.x > squaredRoomMaxSize.x)
                 {
-                    roomMinSize.x = roomMaxSize.x;
+                    squaredRoomMinSize.x = squaredRoomMaxSize.x;
                 }
-                if (value.y > roomMaxSize.y)
+                if (value.y > squaredRoomMaxSize.y)
                 {
-                    roomMinSize.y = roomMaxSize.y;
+                    squaredRoomMinSize.y = squaredRoomMaxSize.y;
                 }
             }
         }
     }
     #endregion
 
+    #region Rounded room variables
+    public bool generateRoundedRoom = false;
+    public int roundedRoomMaxSize = 15;
+    [SerializeField]
+    private int roundedRoomMinSize = 5;
+    public int RoundedRoomMinSize
+    {
+        get { return roundedRoomMinSize; }
+        set
+        {
+            if (value <= roundedRoomMinSize)
+            {
+                roundedRoomMinSize = value;
+            }
+            else
+            {
+                roundedRoomMinSize = roundedRoomMaxSize;
+            }
+        }
+    }
+    #endregion
+
+    [Header("Room count variables")]
+    public int totalRoomsCount = 10;
+
     #region Main room variable
-    private int amountOfMainRooms;
+    [SerializeField]
+    private int amountOfMainRooms = 5;
     public int AmountOfMainRooms
     {
         get { return amountOfMainRooms; }
         set
         {
-            if (value > totalRoomsAmount)
+            if (value > totalRoomsCount)
             {
-                amountOfMainRooms = totalRoomsAmount;
+                amountOfMainRooms = totalRoomsCount;
             }
             else
             {
@@ -63,10 +99,14 @@ public class MapGenerationManager : MonoBehaviour
     }
     #endregion
 
+    [Header("Needed to run")]
     public Tilemap tileMap;
-    public int totalRoomsAmount;
 
     public TileBase ruleTile;
+
+    [Header("Debug Variables")]
+    public bool debugRoom = false;
+    public TileBase debugTile;
 
     private void Start()
     {

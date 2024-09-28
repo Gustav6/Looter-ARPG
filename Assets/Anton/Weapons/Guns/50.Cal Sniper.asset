@@ -23,7 +23,5 @@ MonoBehaviour:
   fireForce: 400
   reloadTime: 0
   dubbelShot: 0
-  bigBullet: 0
   piercingShot: 1
-  amountOfPircableEnemies: 0
-  explosiveBullet: 0
+  amountOfPircableEnemies: 4

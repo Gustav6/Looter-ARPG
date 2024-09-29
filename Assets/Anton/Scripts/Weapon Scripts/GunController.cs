@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
 
@@ -10,6 +12,7 @@ public class GunController : MonoBehaviour
     public Transform firePoint2;
     public SpriteRenderer sprite;
     public LayerMask enemyLayers;
+    public TextMeshPro ammoCount;
     int ammo;
     float timer;
     #region Public Static Variables
@@ -25,14 +28,23 @@ public class GunController : MonoBehaviour
         Damage = gun.damage;
         attackTimer = gun.fireRate;
         sprite.sprite = gun.sprite;
-        pierce = gun.piercingShot;
         ammo = gun.Ammo;
         pierceAmount = gun.amountOfPircableEnemies;
         fireForce = gun.fireForce;
+
+        pierce = false;
+        if (gun.effects != null && gun.effects.Length != 0)
+        {
+            if (gun.effects.Contains(WeaponEffect.piecreShot))
+            {
+                pierce = true;
+            }
+        }
     }
 
     void Update()
     {
+        ammoCount.SetText(ammo.ToString());
         #region Input
         if (attackTimer >= gun.fireRate)
         {
@@ -41,7 +53,7 @@ public class GunController : MonoBehaviour
                 if (ammo > 0)
                 {
                     Attack();
-                    attackTimer = 0;
+                    attackTimer = 0;                 
                 }              
             }
         }
@@ -63,12 +75,14 @@ public class GunController : MonoBehaviour
         GameObject bullet = Instantiate(gun.bulletPrefab, firePoint.transform.position, Quaternion.identity);
         bullet.GetComponent<Rigidbody2D>().AddForce(firePoint.right * gun.fireForce, ForceMode2D.Impulse);
 
-        if (gun.dubbelShot)
+        if (gun.effects != null && gun.effects.Length != 0)
         {
-            GameObject bullet2 = Instantiate(gun.bulletPrefab, firePoint2.transform.position, Quaternion.identity);
-            bullet2.GetComponent<Rigidbody2D>().AddForce(firePoint.right * gun.fireForce, ForceMode2D.Impulse);
+            if (gun.effects.Contains(WeaponEffect.dubbelShot))
+            {
+                GameObject bullet2 = Instantiate(gun.bulletPrefab, firePoint2.transform.position, Quaternion.identity);
+                bullet2.GetComponent<Rigidbody2D>().AddForce(firePoint.right * gun.fireForce, ForceMode2D.Impulse);
+            }
         }
-
         ammo -= 1;
     }
 

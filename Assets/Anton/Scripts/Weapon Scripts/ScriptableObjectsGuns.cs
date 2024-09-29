@@ -24,8 +24,30 @@ public class ScriptableObjectsGuns : ScriptableObject
 
     [Header("Effects")]
     #region Effects 
-    public bool dubbelShot;
-    public bool piercingShot;
+    public WeaponEffect[] effects;
     public int amountOfPircableEnemies;
     #endregion
+
+    [Header("Type Of Damage")]
+    #region Damage Type
+    public DmgType[] damageTypes;
+    #endregion
+}
+
+public enum DmgType
+{
+    piecre,
+    expolsive,
+    fire,
+    ice,
+    kinetic,
+    poison,
+}
+
+public enum WeaponEffect
+{
+    expolsiveOnImpact,
+    dmgOverTime,
+    dubbelShot,
+    piecreShot,
 }

@@ -32,6 +32,7 @@ public class Player : MonoBehaviour
     private void Start()
     {
         stamina = maxStamina;
+        moveSpeed = 5;
         controller = GetComponent<Controller2D>();
         Debug.Log(+moveSpeed);
     }
@@ -64,15 +65,13 @@ public class Player : MonoBehaviour
             {
                 running = false;
             }
-
+            UpdateStamina(1);
         }
-        else if (!running)
+        else if (!running && stamina < maxStamina)
         {
             moveSpeed = 5f;
-            if (stamina < maxStamina && !running)
-            {
-                stamina += Time.deltaTime * rechargeTime;
-            }
+            stamina += Time.deltaTime * rechargeTime;
+            UpdateStamina(1);
         }
     }
 
@@ -87,6 +86,16 @@ public class Player : MonoBehaviour
         else
         {
             sliderCanvasGroup.alpha = 1;
+        }
+    }
+
+    public void OnTriggerEnter2D(Collider2D collision)
+    {
+        var item = GetComponent<Item>();
+        if (item)
+        {
+            inventory.AddItem(item.item, 1);
+            Destroy(collision.gameObject);
         }
     }
 }

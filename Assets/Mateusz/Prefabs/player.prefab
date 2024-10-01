@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4432005165935021020}
   - component: {fileID: 8146332157051368663}
-  - component: {fileID: 4322277591996559897}
   - component: {fileID: 6208955808344946615}
   - component: {fileID: 2550612651143373822}
   - component: {fileID: 4939972271045843890}
@@ -88,41 +87,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!70 &4322277591996559897
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8060619667817851746}
-  m_Enabled: 1
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_ForceSendLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ForceReceiveLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_ContactCaptureLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_CallbackLayers:
-    serializedVersion: 2
-    m_Bits: 4294967295
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0, y: 0}
-  m_Size: {x: 1, y: 1}
-  m_Direction: 0
 --- !u!114 &6208955808344946615
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,6 +121,9 @@ MonoBehaviour:
   maxStamina: 100
   runCost: 25
   rechargeTime: 15
+  inventory: {fileID: 0}
+  staminaProgressUI: {fileID: 0}
+  sliderCanvasGroup: {fileID: 0}
 --- !u!61 &4939972271045843890
 BoxCollider2D:
   m_ObjectHideFlags: 0

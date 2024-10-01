@@ -49,5 +49,5 @@ public enum WeaponEffect
     expolsiveOnImpact,
     dmgOverTime,
     dubbelShot,
-    piecreShot,
+    pierceShot,
 }

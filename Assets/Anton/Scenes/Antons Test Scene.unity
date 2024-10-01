@@ -1055,7 +1055,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac5104ccd9543a94f8ebe50159834ede, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gun: {fileID: 11400000, guid: 9dcf49aaf94415b44971313920b4e13f, type: 2}
+  gun: {fileID: 11400000, guid: a7231b58d57e5a946a2d4ff163fc0827, type: 2}
   firePoint: {fileID: 1468096973}
   firePoint2: {fileID: 939792213}
   sprite: {fileID: 2127833820}

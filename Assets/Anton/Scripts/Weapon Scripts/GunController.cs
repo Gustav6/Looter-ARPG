@@ -35,7 +35,7 @@ public class GunController : MonoBehaviour
         pierce = false;
         if (gun.effects != null && gun.effects.Length != 0)
         {
-            if (gun.effects.Contains(WeaponEffect.piecreShot))
+            if (gun.effects.Contains(WeaponEffect.pierceShot))
             {
                 pierce = true;
             }

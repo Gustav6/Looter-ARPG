@@ -100,6 +100,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54a76121e9869a54ea154cfdd02acda2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rigidbody: {fileID: 0}
 --- !u!50 &3637908344632344400
 Rigidbody2D:
   serializedVersion: 4
@@ -213,8 +214,8 @@ TrailRenderer:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0.013965607
-        value: 0.16352272
+        time: 0.020511627
+        value: 0.32038307
         inSlope: 0
         outSlope: 0
         tangentMode: 0

@@ -17,7 +17,6 @@ public class DamagePopUpText : MonoBehaviour
     private void Update()
     {
         timer -= Time.deltaTime;
-
         if (timer <= 0)
         {
             Destroy(gameObject);

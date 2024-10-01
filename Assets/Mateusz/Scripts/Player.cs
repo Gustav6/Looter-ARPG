@@ -89,8 +89,9 @@ public class Player : MonoBehaviour
         }
     }
 
-    public void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter2D(Collider2D collision)
     {
+        Debug.Log("BIG BLACK FUCKING BAKLKS");
         var item = GetComponent<Item>();
         if (item)
         {

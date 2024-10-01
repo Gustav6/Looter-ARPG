@@ -5,9 +5,4 @@ using UnityEngine;
 public class Item : MonoBehaviour
 {
     public ItemObject item;
-
-    public void OnRayHit()
-    {
-        Destroy(this);
-    }
 }

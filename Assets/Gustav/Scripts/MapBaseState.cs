@@ -89,9 +89,22 @@ public class GeneratingMapState : MapBaseState
 
         if (!canMoveRoom)
         {
+            //foreach (Room room in mainRooms)
+            //{
+            //    GameObject g = new();
+            //    g.transform.position = room.WorldPosition;
+            //}
+
+            Debug.Log("It took: " + stopwatch.ElapsedMilliseconds + " MS, to seperate rooms");
+
             triangulation = GenerateDelaunayTriangulation(manager, mainRooms);
-            minimumSpanningTree = GetMinimumSpanningTree(triangulation, mainRooms, 15);
-            GenerateHallways(manager, minimumSpanningTree, 13);
+            Debug.Log("It took: " + stopwatch.ElapsedMilliseconds + " MS, to triangluate points");
+
+            minimumSpanningTree = GetMinimumSpanningTree(triangulation, mainRooms, manager.amountOfLoops);
+            Debug.Log("It took: " + stopwatch.ElapsedMilliseconds + " MS, to get minimum spanning tree");
+
+            GenerateHallways(manager, minimumSpanningTree, manager.hallwayWidth);
+            Debug.Log("It took: " + stopwatch.ElapsedMilliseconds + " MS, to generate hallways");
 
             SetData(manager, mainRooms);
 
@@ -101,11 +114,14 @@ public class GeneratingMapState : MapBaseState
 
     public override void ExitState(MapGenerationManager manager)
     {
+        Debug.Log("It took: " + stopwatch.ElapsedMilliseconds + " MS, to switch state");
         for (int i = 0; i < tileChangeData.Count; i++)
         {
             // Might need to change to false
-            manager.tileMap.SetTile(tileChangeData[i], true);
+            manager.tileMap.SetTile(tileChangeData[i], false);
         }
+
+        Debug.Log("It took: " + stopwatch.ElapsedMilliseconds + " MS, to set data");
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
 
@@ -128,10 +144,17 @@ public class GeneratingMapState : MapBaseState
         Vector2Int offset = Vector2Int.zero;
         Vector2 position = Vector2.zero;
 
-        if (manager.generateSquareRooms)
+        float randomNumber = 0;
+
+        if (manager.generateSquareRooms && manager.generateCircleRooms)
         {
-            int roomWidth = UnityEngine.Random.Range(5, manager.squaredRoomMaxSize.x + 1);
-            int roomHeight = UnityEngine.Random.Range(5, manager.squaredRoomMaxSize.y + 1);
+            randomNumber = UnityEngine.Random.Range(0f, 1f);
+        }
+
+        if (manager.generateSquareRooms && !manager.generateCircleRooms || manager.generateSquareRooms && manager.generateCircleRooms && randomNumber >= 0.5f)
+        {
+            int roomWidth = UnityEngine.Random.Range(manager.SquaredRoomMinSize.x, manager.squaredRoomMaxSize.x + 1);
+            int roomHeight = UnityEngine.Random.Range(manager.SquaredRoomMinSize.y, manager.squaredRoomMaxSize.y + 1);
             offset = new(roomWidth / 2, roomHeight / 2);
 
             if (manager.generateInCircle)
@@ -143,9 +166,9 @@ public class GeneratingMapState : MapBaseState
                 position = RandomPositionInStrip(manager.stripSize.x, manager.stripSize.y) - offset;
             }
 
-            room = new Room(roomWidth, roomHeight, new Vector2(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y)));
+            room = new Room(roomWidth, roomHeight, position, manager.roundCornors);
         }
-        else if (manager.generateCircleRooms)
+        else if (manager.generateCircleRooms && !manager.generateSquareRooms || manager.generateSquareRooms && manager.generateCircleRooms && randomNumber <= 0.5f)
         {
             int radius = UnityEngine.Random.Range(manager.CircleRoomMinSize, manager.circleRoomMaxSize + 1);
             offset = new(radius, radius);
@@ -885,11 +908,34 @@ public class Room : IHeapItem<Room>
     public readonly List<MapTile> tiles = new();
 
     #region Square Room
-    public Room(int width, int height, Vector2 position)
+    public Room(int width, int height, Vector2 position, bool roundCorners = false)
     {
         this.width = width;
         this.height = height;
         grid = new MapTile[width, height];
+
+        Circle c1 = null, c2 = null;
+        if (roundCorners)
+        {
+            float r = 0;
+            Vector2 temp1 = Vector2.zero, temp2 = Vector2.zero;
+
+            if (width < height)
+            {
+                r = width / 2f;
+                temp1 = new Vector2((int)position.x + width / 2f, (int)position.y + height - height / 3f);
+                temp2 = new Vector2((int)position.x + width / 2f, (int)position.y + height / 3f);
+            }
+            else if (width >= height)
+            {
+                r = height / 2f;
+                temp1 = new Vector2((int)position.x + width - width / 3f, (int)position.y + height / 2f);
+                temp2 = new Vector2((int)position.x + width / 3f, (int)position.y + height / 2f);
+            }
+
+            c1 = new Circle(temp1, r);
+            c2 = new Circle(temp2, r);
+        }
 
         for (int x = 0; x < width; x++)
         {
@@ -898,16 +944,51 @@ public class Room : IHeapItem<Room>
                 int xPosition = x + (int)position.x;
                 int yPosition = y + (int)position.y;
 
-                grid[x, y] = new MapTile(new Vector2Int(xPosition, yPosition));
-                tiles.Add(grid[x, y]);
+                if (roundCorners)
+                {
+                    bool isBetweenPoints = false;
+                    if (c1.position.y == c2.position.y)
+                    {
+                        if (xPosition <= c1.position.x && xPosition >= c2.position.x)
+                        {
+                            grid[x, y] = new MapTile(new Vector2Int(xPosition, yPosition));
+                            tiles.Add(grid[x, y]);
+                            isBetweenPoints = true;
+                        }
+                    }
+                    else if (c1.position.x == c2.position.x)
+                    {
+                        if (yPosition <= c1.position.y && yPosition >= c2.position.y)
+                        {
+                            grid[x, y] = new MapTile(new Vector2Int(xPosition, yPosition));
+                            tiles.Add(grid[x, y]);
+                            isBetweenPoints = true;
+                        }
+                    }
+
+                    if (!isBetweenPoints)
+                    {
+                        if (c1.Intersects(new Vector2(xPosition + 0.5f, yPosition + 0.5f)))
+                        {
+                            grid[x, y] = new MapTile(new Vector2Int(xPosition, yPosition));
+                            tiles.Add(grid[x, y]);
+                        }
+                        else if (c2.Intersects(new Vector2(xPosition + 0.5f, yPosition + 0.5f)))
+                        {
+                            grid[x, y] = new MapTile(new Vector2Int(xPosition, yPosition));
+                            tiles.Add(grid[x, y]);
+                        }
+                    }
+                }
+                else
+                {
+                    grid[x, y] = new MapTile(new Vector2Int(xPosition, yPosition));
+                    tiles.Add(grid[x, y]);
+                }
             }
         }
 
-        center = MapGenerationManager.instance.tileMap.CellToWorld((Vector3Int)grid[width - 1, height - 1].gridPosition) + Vector3.one;
-
-        center.x -= width / 2f;
-        center.y -= height / 2f;
-
+        center = new Vector2((int)position.x + width / 2f, (int)position.y + height / 2f);
     }
     #endregion
 

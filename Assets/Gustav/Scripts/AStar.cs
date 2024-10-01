@@ -43,8 +43,8 @@ public class AStar : MonoBehaviour
     public List<Vector2Int> FindPath(Vector2Int _start, Vector2Int _target)
     {
         #region Diagnostic
-        System.Diagnostics.Stopwatch sw = new();
-        sw.Start();
+        //System.Diagnostics.Stopwatch sw = new();
+        //sw.Start();
         #endregion
 
         amountOfRequests++;
@@ -117,8 +117,8 @@ public class AStar : MonoBehaviour
             {
                 path = RetracePath();
 
-                sw.Stop();
-                Debug.Log("Time taken to find path: " + sw.ElapsedMilliseconds + " MS");
+                //sw.Stop();
+                //Debug.Log("Time taken to find path: " + sw.ElapsedMilliseconds + " MS");
 
                 break;
             }

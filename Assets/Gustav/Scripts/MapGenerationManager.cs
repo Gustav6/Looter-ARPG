@@ -22,10 +22,11 @@ public class MapGenerationManager : MonoBehaviour
     public bool generateInStrip = true;
     public Vector2 stripSize = new Vector2Int(100, 20);
 
-    [Header("Room Variables")]
-
     #region Squared room variables
+    [Header("Square room")]
     public bool generateSquareRooms = true;
+    public bool roundCornors = true;
+
     public Vector2Int squaredRoomMaxSize = new(10, 10);
 
     [SerializeField]
@@ -55,6 +56,7 @@ public class MapGenerationManager : MonoBehaviour
     #endregion
 
     #region Circle room variables
+    [Header("Circle room")]
     public bool generateCircleRooms = false;
     public int circleRoomMaxSize = 15;
     [SerializeField]
@@ -75,6 +77,11 @@ public class MapGenerationManager : MonoBehaviour
         }
     }
     #endregion
+
+    [Header("Hallway")]
+    [Range(0, 100)]
+    public float amountOfLoops = 15;
+    public int hallwayWidth = 10;
 
     [Header("Room count variables")]
     public int totalRoomsCount = 10;

@@ -14,6 +14,13 @@ public class Player : MonoBehaviour
     public float runCost = 25f;
     public float rechargeTime = 1f;
 
+    public InventoryObject inventory;
+
+    [SerializeField]
+    private Image staminaProgressUI = null;
+    [SerializeField]
+    private CanvasGroup sliderCanvasGroup = null;
+    
     bool running;
 
     Vector3 velocity;
@@ -66,6 +73,20 @@ public class Player : MonoBehaviour
             {
                 stamina += Time.deltaTime * rechargeTime;
             }
+        }
+    }
+
+
+    void UpdateStamina(int value)
+    {
+        staminaProgressUI.fillAmount = stamina / maxStamina;
+        if (value == 0)
+        {
+            sliderCanvasGroup.alpha = 0;
+        }
+        else
+        {
+            sliderCanvasGroup.alpha = 1;
         }
     }
 }

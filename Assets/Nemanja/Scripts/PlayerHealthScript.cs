@@ -1,77 +1,52 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class PlayerHealthScript : MonoBehaviour
 {
-
-    public int maxHealth = 100;
-    public int currentHealth;
-    public float healthAmount = 100f;
+    public FloatVariable health, maxHealth;
 
 
-    public HealthBar healthBar;
-
-    private void Start()
+    public void Start()
     {
-        currentHealth = maxHealth;
-        healthBar.SetMaxHealth(maxHealth);
+        health.value = 100f;
     }
-
-    private void Update()
+    public void TakeDamage(float amount)
     {
-        if (Input.GetKeyDown(KeyCode.Space))
+        health.value -= amount;
+        if (health.value <= 0)
         {
-            TakeDamage(20);
+            health.value = 0;
+            Debug.Log("You're dead");
         }
-
-           
-       if (Input.GetKeyDown(KeyCode.Delete))
-            {
-                HealPlayer(10);
-            }
-
-        
-
+    }
+    public void Update()
+    {
+        if (health.value >= 100)
+        {
+            health.value = 100;
+            Debug.Log("Full Health");
+        }
     }
 
-   
-
+    public void Heal(float amount)
+    {
+        health.value += amount;
+        if (health.value <= 100)
+        {
+            health.value = 100;
+            Debug.Log("Full HP");
+        }
+    }
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.tag == "Spikes")
         {
-            TakeDamage(25);
+            TakeDamage(12);
         }
     }
-
-
-
-    void TakeDamage(int damage)
-    {
-        currentHealth -= damage;
-
-        healthBar.SetHealth(currentHealth);
-    }
-    void HealPlayer(int heal)
-    {
-        {
-            currentHealth += heal;
-
-            healthBar.SetHealth(currentHealth);
-        }
-    }
- public void Respawn()
-    {
-        if (currentHealth <= 0)
-        {
-            SceneManager.LoadScene("My Test Scene");
-        }
-    }
- 
-
-
-
+    
 }

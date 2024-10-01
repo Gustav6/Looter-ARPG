@@ -7,18 +7,18 @@ using UnityEngine.UI;
 public class HealthBar : MonoBehaviour
 
 {
+    public FloatReference playerHealth, playerMaxHealth;
+    Slider slider;
 
-    public Slider slider; 
-
-   public void SetMaxHealth(int health)
+    private void Start()
     {
-        slider.maxValue = health; 
+        slider = GetComponent<Slider>();
     }
 
-    public void SetHealth(int health)
+    private void Update()
     {
-        slider.value = health;
-       
+        float fillValue = playerHealth.Value / playerMaxHealth.Value;
+        slider.value = fillValue;
     }
-  
+
 }

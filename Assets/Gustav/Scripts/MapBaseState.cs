@@ -26,7 +26,7 @@ public class GeneratingMapState : MapBaseState
     private List<Triangle> triangulation = new();
     private List<Edge> minimumSpanningTree = new();
 
-    private List<TileChangeData> tileChangeData = new();
+    private HashSet<Vector2Int> groundTilePositions = new();
 
     private GameObject triangulationDebug, minimumSpanningTreeDebug, pointsDebug;
 
@@ -35,23 +35,25 @@ public class GeneratingMapState : MapBaseState
     private Room startingRoom;
 
     System.Diagnostics.Stopwatch stopwatch;
+    float diagnosticTime;
+
 
     public override void EnterState(MapGenerationManager manager)
     {
-        Heap<Room> heap = new(manager.totalRoomsCount);
+        #region Diagnostic Start
+        stopwatch = new();
+        stopwatch.Start();
+        #endregion
 
-        manager.tileMap.ClearAllTiles();
+        #region Debug game objects
         GameObject.Destroy(triangulationDebug);
         GameObject.Destroy(minimumSpanningTreeDebug);
         GameObject.Destroy(pointsDebug);
-
-        #region Reset lists
-        rooms.Clear();
-        mainRooms.Clear();
-        triangulation.Clear();
-        minimumSpanningTree.Clear();
-        tileChangeData.Clear();
         #endregion
+
+        Reset(manager);
+
+        Heap<Room> heap = new(manager.totalRoomsCount);
 
         canMoveRoom = false;
 
@@ -60,11 +62,8 @@ public class GeneratingMapState : MapBaseState
         {
             Room newRoom = GenerateRoom(manager);
 
-            if (newRoom != null)
-            {
-                rooms.Add(newRoom);
-                heap.Add(newRoom);
-            }
+            rooms.Add(newRoom);
+            heap.Add(newRoom);
         }
 
         // Add x amount (Amount of main rooms) with the largest area
@@ -76,11 +75,7 @@ public class GeneratingMapState : MapBaseState
         }
 
         startingRoom = mainRooms.First();
-
-        #region Diagnostic Start
-        stopwatch = new();
-        stopwatch.Start();
-        #endregion
+        diagnosticTime = stopwatch.ElapsedMilliseconds;
     }
 
     public override void UpdateState(MapGenerationManager manager)
@@ -89,24 +84,29 @@ public class GeneratingMapState : MapBaseState
 
         if (!canMoveRoom)
         {
-            //foreach (Room room in mainRooms)
-            //{
-            //    GameObject g = new();
-            //    g.transform.position = room.WorldPosition;
-            //}
+            Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to separate rooms");
 
-            Debug.Log("It took: " + stopwatch.ElapsedMilliseconds + " MS, to seperate rooms");
-
+            diagnosticTime = stopwatch.ElapsedMilliseconds;
             triangulation = GenerateDelaunayTriangulation(manager, mainRooms);
-            Debug.Log("It took: " + stopwatch.ElapsedMilliseconds + " MS, to triangluate points");
+            Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to triangulate points");
 
+            diagnosticTime = stopwatch.ElapsedMilliseconds;
             minimumSpanningTree = GetMinimumSpanningTree(triangulation, mainRooms, manager.amountOfLoops);
-            Debug.Log("It took: " + stopwatch.ElapsedMilliseconds + " MS, to get minimum spanning tree");
+            Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to get minimum spanning tree");
 
+            diagnosticTime = stopwatch.ElapsedMilliseconds;
             GenerateHallways(manager, minimumSpanningTree, manager.hallwayWidth);
-            Debug.Log("It took: " + stopwatch.ElapsedMilliseconds + " MS, to generate hallways");
+            Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to generate hallways");
 
-            SetData(manager, mainRooms);
+            diagnosticTime = stopwatch.ElapsedMilliseconds;
+            foreach (Room room in mainRooms)
+            {
+                groundTilePositions.UnionWith(room.tilePositions);
+            }
+            Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to set data");
+
+            //SetWalls();
+            //Debug.Log("It took: " + stopwatch.ElapsedMilliseconds + " MS, to set walls");
 
             manager.SwitchState(manager.loadingState);
         }
@@ -114,14 +114,13 @@ public class GeneratingMapState : MapBaseState
 
     public override void ExitState(MapGenerationManager manager)
     {
-        Debug.Log("It took: " + stopwatch.ElapsedMilliseconds + " MS, to switch state");
-        for (int i = 0; i < tileChangeData.Count; i++)
+        diagnosticTime = stopwatch.ElapsedMilliseconds;
+        foreach (Vector3Int vector in groundTilePositions.Select(v => (Vector3Int)v))
         {
-            // Might need to change to false
-            manager.tileMap.SetTile(tileChangeData[i], false);
+            manager.tileMap.SetTile(new TileChangeData(vector, MapGenerationManager.instance.ruleTile, Color.white, Matrix4x4.identity), false);
         }
 
-        Debug.Log("It took: " + stopwatch.ElapsedMilliseconds + " MS, to set data");
+        Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to set tiles");
 
         GameObject player = GameObject.FindGameObjectWithTag("Player");
 
@@ -133,7 +132,7 @@ public class GeneratingMapState : MapBaseState
         #region Diagnostic End
         stopwatch.Stop();
 
-        Debug.Log("It took: " + stopwatch.ElapsedMilliseconds + " MS, to generate map");
+        Debug.Log("It took a total of: " + stopwatch.ElapsedMilliseconds + " MS, to generate map");
         #endregion
     }
 
@@ -211,29 +210,26 @@ public class GeneratingMapState : MapBaseState
     {
         canMoveRoom = false;
 
-        for (int i = 0; i < rooms.Count; i++)
+        foreach (Room room in rooms)
         {
-            Vector2Int direction = GetDirection(manager, rooms[i]);
+            Vector2Int direction = GetDirection(manager, room);
 
-            rooms[i].MoveRoom(direction);
-
-            if (!canMoveRoom && direction != Vector2.zero)
+            if (direction != Vector2.zero)
             {
-                canMoveRoom = true;
+                room.MoveRoom(direction);
+
+                if (!canMoveRoom)
+                {
+                    canMoveRoom = true;
+                }
             }
         }
     }
 
-    private bool RoomIntersects(MapGenerationManager manager, Room roomA, Room roomB)
+    private bool RoomIntersects(Room roomA, Room roomB)
     {
         if (roomA != roomB)
         {
-            //Vector2 roomALowerLeft = manager.tileMap.CellToWorld((Vector3Int)roomA.grid[0, 0].gridPosition);
-            //Vector2 roomATopRight = manager.tileMap.CellToWorld((Vector3Int)roomA.grid[roomA.width - 1, roomA.height - 1].gridPosition) + Vector3.one;
-
-            //Vector2 roomBLowerLeft = manager.tileMap.CellToWorld((Vector3Int)roomB.grid[0, 0].gridPosition);
-            //Vector2 roomBTopRight = manager.tileMap.CellToWorld((Vector3Int)roomB.grid[roomB.width - 1, roomB.height - 1].gridPosition) + Vector3.one;
-
             Vector2 roomALowerLeft = new (roomA.WorldPosition.x - roomA.width / 2, roomA.WorldPosition.y - roomA.height / 2);
             Vector2 roomATopRight = new (roomA.WorldPosition.x + roomA.width / 2 + 1, roomA.WorldPosition.y + roomA.height / 2 + 1);
 
@@ -252,46 +248,51 @@ public class GeneratingMapState : MapBaseState
         return false;
     }
 
-    public Vector2Int GetDirection(MapGenerationManager manager, Room room)
+    public Vector2Int GetDirection(MapGenerationManager manager, Room currentRoom)
     {
         Vector2 separationVelocity = Vector2.zero;
 
-        for (int i = 0; i < rooms.Count; i++)
+        foreach (Room room in rooms)
         {
-            if (Equals(rooms[i], room) || !RoomIntersects(manager, room, rooms[i]))
+            if (!RoomIntersects(currentRoom, room))
             {
                 continue;
             }
 
-            Vector2 otherPosition = rooms[i].WorldPosition;
+            Vector2 otherPosition = room.WorldPosition;
 
-            Vector2 otherAgentToCurrent = room.WorldPosition - otherPosition;
+            Vector2 otherAgentToCurrent = currentRoom.WorldPosition - otherPosition;
             Vector2 directionToTravel = otherAgentToCurrent.normalized;
 
             separationVelocity += directionToTravel;
         }
 
-        #region Set velocity
-        if (separationVelocity.x > 0)
+        if (separationVelocity == Vector2Int.zero)
         {
-            separationVelocity.x = 1;
+            return Vector2Int.zero;
         }
-        else if (separationVelocity.x < 0)
+        else
         {
-            separationVelocity.x = -1;
-        }
+            if (separationVelocity.x > 0 && separationVelocity.x < 1)
+            {
+                separationVelocity.x = 1;
+            }
+            else if (separationVelocity.x < 0 && separationVelocity.x > -1)
+            {
+                separationVelocity.x = -1;
+            }
 
-        if (separationVelocity.y > 0)
-        {
-            separationVelocity.y = 1;
-        }
-        else if (separationVelocity.y < 0)
-        {
-            separationVelocity.y = -1;
-        }
-        #endregion
+            if (separationVelocity.y > 0 && separationVelocity.y < 1)
+            {
+                separationVelocity.y = 1;
+            }
+            else if (separationVelocity.y < 0 && separationVelocity.y > -1)
+            {
+                separationVelocity.y = -1;
+            }
 
-        return new Vector2Int((int)separationVelocity.x, (int)separationVelocity.y);
+            return new Vector2Int((int)separationVelocity.x, (int)separationVelocity.y);
+        }
     }
     #endregion
 
@@ -749,6 +750,7 @@ public class GeneratingMapState : MapBaseState
 
             List<Vector2Int> hallwayTilePositions = AStar.instance.FindPath(startingPosition, targetPosition);
 
+            // *Working*s but not very good looking
             #region Room intersection check
             //foreach (Room room in rooms)
             //{
@@ -759,19 +761,28 @@ public class GeneratingMapState : MapBaseState
 
             //    // Add rooms that collide with the hallways
 
-            //    for (int i = 0; i < room.tiles.Count; i++)
+            //    bool canAdd = false;
+
+            //    for (int x = 0; x < room.grid.GetLength(0); x++)
             //    {
-            //        if (hallwayTilePositions.Contains(room.tiles[i].gridPosition))
+            //        for (int y = 0; y < room.grid.GetLength(1); y++)
             //        {
-            //            // Add room to a list
+            //            if (room.grid[x, y].gridPosition != null && hallwayTilePositions.Contains(room.grid[x, y].gridPosition.Value))
+            //            {
+            //                canAdd = true;
+            //                break;
+            //            }
+            //        }
 
-            //            GameObject g = new();
-
-            //            g.transform.position = (Vector2)room.tiles[i].gridPosition;
-
-            //            mainRooms.Add(room);
+            //        if (canAdd)
+            //        {
             //            break;
             //        }
+            //    }
+
+            //    if (canAdd)
+            //    {
+            //        mainRooms.Add(room);
             //    }
             //}
             #endregion
@@ -800,11 +811,18 @@ public class GeneratingMapState : MapBaseState
             hallwayTilePositions.AddRange(widthTiles);
             #endregion
 
-            foreach (Vector2Int vector in hallwayTilePositions)
-            {
-                TileChangeData data = new((Vector3Int)vector, MapGenerationManager.instance.ruleTile, Color.white, Matrix4x4.identity);
-                tileChangeData.Add(data);
-            }
+            //foreach (Vector2Int vector in hallwayTilePositions)
+            //{
+            //    //TileChangeData data = new((Vector3Int)vector, MapGenerationManager.instance.ruleTile, Color.white, Matrix4x4.identity);
+            //    if (groundTilesTest.Contains(vector))
+            //    {
+            //        continue;
+            //    }
+
+            //    groundTilesTest.Add(vector);
+            //}
+
+            groundTilePositions.UnionWith(hallwayTilePositions);
         }
     }
     #endregion
@@ -814,44 +832,28 @@ public class GeneratingMapState : MapBaseState
 
     }
 
-    #region Set position and tile lists
-    private void SetData(MapGenerationManager manager, List<Room> list)
+    private void SetWalls()
     {
-        foreach (Room room in list)
-        {
-            for (int x = 0; x < room.grid.GetLength(0); x++)
-            {
-                for (int y = 0; y < room.grid.GetLength(1); y++)
-                {
-                    if (room.grid[x, y].gridPosition == null)
-                    {
-                        continue;
-                    }
 
-                    TileChangeData data;
-
-                    if (manager.debugRoom)
-                    {
-                        if (x == 0 && y == 0 || x == room.grid.GetLength(0) - 1 && y == room.grid.GetLength(1) - 1 || x == 0 && y == room.grid.GetLength(1) - 1 || x == room.grid.GetLength(0) - 1 && y == 0)
-                        {
-                            data = new((Vector3Int)room.grid[x, y].gridPosition, manager.debugTile, Color.black, Matrix4x4.identity);
-                        }
-                        else
-                        {
-                            data = new((Vector3Int)room.grid[x, y].gridPosition, manager.debugTile, Color.white, Matrix4x4.identity);
-                        }
-                    }
-                    else
-                    {
-                        data = new((Vector3Int)room.grid[x, y].gridPosition, manager.ruleTile, Color.white, Matrix4x4.identity);
-                    }
-
-                    tileChangeData.Add(data);
-                }
-            }
-        }
     }
-    #endregion
+
+    private void Reset(MapGenerationManager manager)
+    {
+        manager.tileMap.ClearAllTiles();
+        rooms.Clear();
+        mainRooms.Clear();
+        triangulation.Clear();
+        minimumSpanningTree.Clear();
+        groundTilePositions.Clear();
+    }
+
+    // Need to add for optimazation
+    public static MapTile GetTile(Vector2Int position, MapTile[] grid, int width)
+    {
+        int i = position.x + position.y * width;
+
+        return grid[i];
+    }
 }
 #endregion
 
@@ -905,7 +907,8 @@ public class Room : IHeapItem<Room>
     #endregion
 
     public MapTile[,] grid;
-    public readonly List<MapTile> tiles = new();
+    public HashSet<Vector2Int> tilePositions = new();
+    public readonly int tileCount = new();
 
     #region Square Room
     public Room(int width, int height, Vector2 position, bool roundCorners = false)
@@ -914,6 +917,7 @@ public class Room : IHeapItem<Room>
         this.height = height;
         grid = new MapTile[width, height];
 
+        #region Set Circles
         Circle c1 = null, c2 = null;
         if (roundCorners)
         {
@@ -936,54 +940,56 @@ public class Room : IHeapItem<Room>
             c1 = new Circle(temp1, r);
             c2 = new Circle(temp2, r);
         }
+        #endregion
 
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
             {
+                bool canAdd = false;
+
                 int xPosition = x + (int)position.x;
                 int yPosition = y + (int)position.y;
 
                 if (roundCorners)
                 {
-                    bool isBetweenPoints = false;
                     if (c1.position.y == c2.position.y)
                     {
                         if (xPosition <= c1.position.x && xPosition >= c2.position.x)
                         {
-                            grid[x, y] = new MapTile(new Vector2Int(xPosition, yPosition));
-                            tiles.Add(grid[x, y]);
-                            isBetweenPoints = true;
+                            canAdd = true;
                         }
                     }
                     else if (c1.position.x == c2.position.x)
                     {
                         if (yPosition <= c1.position.y && yPosition >= c2.position.y)
                         {
-                            grid[x, y] = new MapTile(new Vector2Int(xPosition, yPosition));
-                            tiles.Add(grid[x, y]);
-                            isBetweenPoints = true;
+                            canAdd = true;
                         }
                     }
 
-                    if (!isBetweenPoints)
+                    if (!canAdd)
                     {
                         if (c1.Intersects(new Vector2(xPosition + 0.5f, yPosition + 0.5f)))
                         {
-                            grid[x, y] = new MapTile(new Vector2Int(xPosition, yPosition));
-                            tiles.Add(grid[x, y]);
+                            canAdd = true;
                         }
                         else if (c2.Intersects(new Vector2(xPosition + 0.5f, yPosition + 0.5f)))
                         {
-                            grid[x, y] = new MapTile(new Vector2Int(xPosition, yPosition));
-                            tiles.Add(grid[x, y]);
+                            canAdd = true;
                         }
                     }
                 }
                 else
                 {
+                    canAdd = true;
+                }
+
+                if (canAdd)
+                {
                     grid[x, y] = new MapTile(new Vector2Int(xPosition, yPosition));
-                    tiles.Add(grid[x, y]);
+                    tileCount++;
+                    tilePositions.Add(grid[x, y].gridPosition.Value);
                 }
             }
         }
@@ -1012,7 +1018,7 @@ public class Room : IHeapItem<Room>
                 if (temp.Intersects(new Vector2(xPosition, yPosition)))
                 {
                     grid[x + radius, y + radius] = new MapTile(new Vector2Int(xPosition, yPosition));
-                    tiles.Add(grid[x + radius, y + radius]);
+                    tileCount++;
                 }
             }
         }
@@ -1025,6 +1031,8 @@ public class Room : IHeapItem<Room>
 
     public void MoveRoom(Vector2Int direction)
     {
+        tilePositions.Clear();
+
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
@@ -1032,6 +1040,7 @@ public class Room : IHeapItem<Room>
                 if (grid[x, y].gridPosition != null)
                 {
                     grid[x, y].gridPosition += direction;
+                    tilePositions.Add(grid[x, y].gridPosition.Value);
                 }
             }
         }
@@ -1041,7 +1050,7 @@ public class Room : IHeapItem<Room>
 
     public int CompareTo(Room other)
     {
-        int compare = tiles.Count.CompareTo(other.tiles.Count);
+        int compare = tileCount.CompareTo(other.tileCount);
 
         return compare;
     }

@@ -1,0 +1,58 @@
+{
+    "items": [
+        {
+            "Name": "Entities",
+            "TextColor": {
+                "r": 1.0,
+                "g": 1.0,
+                "b": 1.0,
+                "a": 1.0
+            },
+            "FontSize": 16,
+            "FontStyle": 1,
+            "ImageColor": {
+                "r": 0.5141509771347046,
+                "g": 0.7362799048423767,
+                "b": 1.0,
+                "a": 1.0
+            },
+            "ImageType": 5
+        },
+        {
+            "Name": "Environment ",
+            "TextColor": {
+                "r": 1.0,
+                "g": 1.0,
+                "b": 1.0,
+                "a": 1.0
+            },
+            "FontSize": 16,
+            "FontStyle": 1,
+            "ImageColor": {
+                "r": 0.6254544258117676,
+                "g": 1.0,
+                "b": 0.49528300762176516,
+                "a": 1.0
+            },
+            "ImageType": 5
+        },
+        {
+            "Name": "Debug",
+            "TextColor": {
+                "r": 1.0,
+                "g": 1.0,
+                "b": 1.0,
+                "a": 1.0
+            },
+            "FontSize": 16,
+            "FontStyle": 1,
+            "ImageColor": {
+                "r": 0.8773584961891174,
+                "g": 0.45109471678733828,
+                "b": 0.45109471678733828,
+                "a": 1.0
+            },
+            "ImageType": 5
+        }
+    ]
+}

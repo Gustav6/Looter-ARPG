@@ -1,53 +1,27 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
-using UnityEditor.Experimental.GraphView;
 using UnityEngine;
 
-public class AStar : MonoBehaviour
+public static class AStar
 {
-    public static AStar instance;
+    private static Node[,] nodes;
 
-    private Node[,] nodes;
+    private static int gridWidth, gridHeight;
+    private static int gridOffsetX, gridOffsetY;
 
-    private int gridWidth, gridHeight;
-    private int gridOffsetX, gridOffsetY;
+    private static Node start, target;
 
-    private Node start, target;
+    private static List<Vector3Int> path = new();
+    private static List<Node> currentNodeNeighbors = new();
+    private static HashSet<Node> closedNodes = new();
+    private static Heap<Node> openNodes;
 
-    private List<Vector3Int> path = new();
-    private List<Node> currentNodeNeighbors = new();
-    private HashSet<Node> closedNodes = new();
-    private Heap<Node> openNodes;
-
-    public int amountOfRequests;
-    public TimeSpan totalTimeTaken;
-
-    public void Start()
-    {
-        if (instance != null && instance != this)
-        {
-            Destroy(this);
-            return;
-        }
-
-        instance = this;
-    }
-
-    public void StartFindPath()
-    {
-
-    }
-
-    public List<Vector3Int> FindPath(Vector3Int _start, Vector3Int _target)
+    public static List<Vector3Int> FindPath(Vector3Int _start, Vector3Int _target)
     {
         #region Diagnostic
         //System.Diagnostics.Stopwatch sw = new();
         //sw.Start();
         #endregion
-
-        amountOfRequests++;
 
         gridWidth = Math.Abs(_start.x - _target.x) + 1;
         gridHeight = Math.Abs(_start.y - _target.y) + 1;
@@ -159,7 +133,7 @@ public class AStar : MonoBehaviour
         return new List<Vector3Int>(path);
     }
 
-    private List<Vector3Int> RetracePath()
+    private static List<Vector3Int> RetracePath()
     {
         path.Clear();
         Node temp = target;
@@ -183,7 +157,7 @@ public class AStar : MonoBehaviour
         return path;
     }
 
-    private int GetDistance(Node NodeA, Node NodeB)
+    private static int GetDistance(Node NodeA, Node NodeB)
     {
         int distanceX = Math.Abs(NodeA.gridPosition.x - NodeB.gridPosition.x);
         int distanceY = Math.Abs(NodeA.gridPosition.y - NodeB.gridPosition.y);
@@ -198,7 +172,7 @@ public class AStar : MonoBehaviour
         }
     }
 
-    private void GetNeighbors(Vector3Int position, List<Node> list)
+    private static void GetNeighbors(Vector3Int position, List<Node> list)
     {
         list.Clear();
         Node NeighboringNode;
@@ -256,7 +230,7 @@ public class AStar : MonoBehaviour
         #endregion
     }
 
-    private bool InBounds(int x, int y)
+    private static bool InBounds(int x, int y)
     {
         return 0 <= y && y < gridHeight && 0 <= x && x < gridWidth;
     }

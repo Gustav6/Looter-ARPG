@@ -51,10 +51,10 @@ public class GeneratingMapState : MapBaseState
 
         Reset(manager);
 
-        Heap<Room> heap = new(manager.totalRoomsCount);
+        Heap<Room> heap = new(manager.Settings.totalRoomsCount);
 
         // Generate x amount of rooms
-        for (int i = 0; i < manager.totalRoomsCount; i++)
+        for (int i = 0; i < manager.Settings.totalRoomsCount; i++)
         {
             Room newRoom = GenerateRoom(manager);
 
@@ -63,7 +63,7 @@ public class GeneratingMapState : MapBaseState
         }
 
         // Add x amount (Amount of main rooms) with the largest area
-        for (int i = 0; i < manager.AmountOfMainRooms; i++)
+        for (int i = 0; i < manager.Settings.AmountOfMainRooms; i++)
         {
             Room mainRoom = heap.RemoveFirst();
 
@@ -87,11 +87,11 @@ public class GeneratingMapState : MapBaseState
             Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to triangulate points");
 
             diagnosticTime = stopwatch.ElapsedMilliseconds;
-            minimumSpanningTree = GetMinimumSpanningTree(triangulation, mainRooms, manager.amountOfLoops);
+            minimumSpanningTree = GetMinimumSpanningTree(manager, triangulation, mainRooms, manager.Settings.amountOfLoops);
             Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to get minimum spanning tree");
 
             diagnosticTime = stopwatch.ElapsedMilliseconds;
-            GenerateHallways(manager, minimumSpanningTree, manager.hallwayWidth);
+            GenerateHallways(manager, minimumSpanningTree, manager.Settings.hallwayWidth);
             Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to generate hallways");
 
             diagnosticTime = stopwatch.ElapsedMilliseconds;
@@ -118,44 +118,11 @@ public class GeneratingMapState : MapBaseState
         diagnosticTime = stopwatch.ElapsedMilliseconds;
 
         TileBase[] tiles = new TileBase[groundTilePositions.Count];
-        Array.Fill(tiles, manager.tilePairs[TileTexture.ground]);
+        Array.Fill(tiles, manager.tilePairs[TileTexture.ruleTile]);
 
-        manager.groundTileMap.SetTiles(groundTilePositions.ToArray(), tiles);
+        manager.Settings.groundTileMap.SetTiles(groundTilePositions.ToArray(), tiles);
 
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to set ground tiles");
-
-        #region Set tiles in loop
-        //foreach (Vector3Int vector in groundTilePositions.Select(v => (Vector3Int)v))
-        //{
-        //manager.groundTileMap.SetTile(new TileChangeData(vector, manager.tilePairs[TileTexture.ground], Color.white, Matrix4x4.identity), false);
-
-        #region Get walls
-        //neighborPosition = new(vector.x + 1, vector.y);
-        //if (!groundTilePositions.Contains((Vector2Int)neighborPosition))
-        //{
-        //    wallTilePositions.Add((Vector2Int)neighborPosition);
-        //}
-
-        //neighborPosition = new Vector3Int(vector.x - 1, vector.y);
-        //if (!groundTilePositions.Contains((Vector2Int)neighborPosition))
-        //{
-        //    wallTilePositions.Add((Vector2Int)neighborPosition);
-        //}
-
-        //neighborPosition = new Vector3Int(vector.x, vector.y + 1);
-        //if (!groundTilePositions.Contains((Vector2Int)neighborPosition))
-        //{
-        //    wallTilePositions.Add((Vector2Int)neighborPosition);
-        //}
-
-        //neighborPosition = new Vector3Int(vector.x, vector.y - 1);
-        //if (!groundTilePositions.Contains((Vector2Int)neighborPosition))
-        //{
-        //    wallTilePositions.Add((Vector2Int)neighborPosition);
-        //}
-        #endregion
-        //}
-        #endregion
 
         Debug.Log("Tile changed: " + groundTilePositions.Count);
 
@@ -177,49 +144,23 @@ public class GeneratingMapState : MapBaseState
     private Room GenerateRoom(MapGenerationManager manager)
     {
         Room room = null;
-        Vector2Int offset = Vector2Int.zero;
+        Vector2Int offset;
         Vector2 position = Vector2.zero;
 
-        float randomNumber = 0;
+        int roomWidth = UnityEngine.Random.Range(manager.Settings.SquaredRoomMinSize.x, manager.Settings.squaredRoomMaxSize.x + 1);
+        int roomHeight = UnityEngine.Random.Range(manager.Settings.SquaredRoomMinSize.y, manager.Settings.squaredRoomMaxSize.y + 1);
+        offset = new(roomWidth / 2, roomHeight / 2);
 
-        if (manager.generateSquareRooms && manager.generateCircleRooms)
+        if (manager.Settings.generateInCircle)
         {
-            randomNumber = UnityEngine.Random.Range(0f, 1f);
+            position = RandomPositionInCircle(manager.Settings.generationRadius) - offset;
+        }
+        else if (manager.Settings.generateInStrip)
+        {
+            position = RandomPositionInStrip(manager.Settings.stripSize.x, manager.Settings.stripSize.y) - offset;
         }
 
-        if (manager.generateSquareRooms && !manager.generateCircleRooms || manager.generateSquareRooms && manager.generateCircleRooms && randomNumber >= 0.5f)
-        {
-            int roomWidth = UnityEngine.Random.Range(manager.SquaredRoomMinSize.x, manager.squaredRoomMaxSize.x + 1);
-            int roomHeight = UnityEngine.Random.Range(manager.SquaredRoomMinSize.y, manager.squaredRoomMaxSize.y + 1);
-            offset = new(roomWidth / 2, roomHeight / 2);
-
-            if (manager.generateInCircle)
-            {
-                position = RandomPositionInCircle(manager.generationRadius) - offset;
-            }
-            else if (manager.generateInStrip)
-            {
-                position = RandomPositionInStrip(manager.stripSize.x, manager.stripSize.y) - offset;
-            }
-
-            room = new Room(roomWidth, roomHeight, position, manager.roundCornors);
-        }
-        else if (manager.generateCircleRooms && !manager.generateSquareRooms || manager.generateSquareRooms && manager.generateCircleRooms && randomNumber <= 0.5f)
-        {
-            int radius = UnityEngine.Random.Range(manager.CircleRoomMinSize, manager.circleRoomMaxSize + 1);
-            offset = new(radius, radius);
-
-            if (manager.generateInCircle)
-            {
-                position = RandomPositionInCircle(manager.generationRadius) - offset;
-            }
-            else if (manager.generateInStrip)
-            {
-                position = RandomPositionInStrip(manager.stripSize.x, manager.stripSize.y) - offset;
-            }
-
-            room = new Room(radius, new Vector2(Mathf.RoundToInt(position.x), Mathf.RoundToInt(position.y)));
-        }
+        room = new Room(roomWidth, roomHeight, position, manager.Settings.roundCorners);
 
         return room;
     }
@@ -336,20 +277,11 @@ public class GeneratingMapState : MapBaseState
             return new List<Triangle>();
         }
 
-        List<Vector2> pointsList = new();
+        Vector2[] points = new Vector2[rooms.Count];
 
-        pointsDebug = new()
+        for (int i = 0; i < rooms.Count; i++)
         {
-            name = "Points"
-        };
-
-        foreach (Room room in rooms)
-        {
-            GameObject temp = new();
-            temp.transform.parent = pointsDebug.transform;
-            temp.transform.position = room.WorldPosition;
-
-            pointsList.Add(room.WorldPosition);
+            points[i] = rooms[i].WorldPosition;
         }
 
         List<Triangle> triangulation = new();
@@ -357,14 +289,14 @@ public class GeneratingMapState : MapBaseState
         #region Super Triangle
         Vector2 a, b, c;
 
-        if (manager.generationRadius <= 0)
+        if (manager.Settings.generationRadius <= 0)
         {
-            manager.generationRadius = 1;
+            manager.Settings.generationRadius = 1;
         }
 
-        a = new Vector2(-manager.generationRadius, -manager.generationRadius) * 100;
-        b = new Vector2(manager.generationRadius, -manager.generationRadius) * 100;
-        c = new Vector2(0, manager.generationRadius) * 100;
+        a = new Vector2(-manager.Settings.generationRadius, -manager.Settings.generationRadius) * 100;
+        b = new Vector2(manager.Settings.generationRadius, -manager.Settings.generationRadius) * 100;
+        c = new Vector2(0, manager.Settings.generationRadius) * 100;
 
         Triangle superTriangle;
 
@@ -374,7 +306,7 @@ public class GeneratingMapState : MapBaseState
 
             bool triangleContainsAllPoints = true;
 
-            foreach (Vector2 point in pointsList)
+            foreach (Vector2 point in points)
             {
                 if (!superTriangle.PointInTriangle(point))
                 {
@@ -400,7 +332,7 @@ public class GeneratingMapState : MapBaseState
         List<Triangle> newTriangles = new();
         List<Triangle> badTriangles = new();
 
-        foreach (Vector2 point in pointsList)
+        foreach (Vector2 point in points)
         {
             newTriangles.Clear();
             badTriangles.Clear();
@@ -499,29 +431,30 @@ public class GeneratingMapState : MapBaseState
         #endregion
 
         #region Debug
-        triangulationDebug = new()
+        if (manager.Settings.debugTriangulation)
         {
-            name = "Triangulation"
-        };
-
-        for (int i = 0; i < triangulation.Count; i++)
-        {
-            GameObject debug = new()
+            triangulationDebug = new()
             {
-                name = "Triangle " + i
+                name = "Triangulation"
             };
-            debug.transform.SetParent(triangulationDebug.transform);
 
-            LineRenderer ln = debug.AddComponent<LineRenderer>();
-            ln.positionCount = 4;
+            for (int i = 0; i < triangulation.Count; i++)
+            {
+                GameObject debug = new()
+                {
+                    name = "Triangle " + i
+                };
+                debug.transform.SetParent(triangulationDebug.transform);
 
-            ln.SetPosition(0, new Vector3(triangulation[i].pointA.x, triangulation[i].pointA.y, -1));
-            ln.SetPosition(1, new Vector3(triangulation[i].pointB.x, triangulation[i].pointB.y, -1));
-            ln.SetPosition(2, new Vector3(triangulation[i].pointC.x, triangulation[i].pointC.y, -1));
-            ln.SetPosition(3, new Vector3(triangulation[i].pointA.x, triangulation[i].pointA.y, -1));
+                LineRenderer ln = debug.AddComponent<LineRenderer>();
+                ln.positionCount = 4;
+
+                ln.SetPosition(0, new Vector3(triangulation[i].pointA.x, triangulation[i].pointA.y, -1));
+                ln.SetPosition(1, new Vector3(triangulation[i].pointB.x, triangulation[i].pointB.y, -1));
+                ln.SetPosition(2, new Vector3(triangulation[i].pointC.x, triangulation[i].pointC.y, -1));
+                ln.SetPosition(3, new Vector3(triangulation[i].pointA.x, triangulation[i].pointA.y, -1));
+            }
         }
-
-        triangulationDebug.SetActive(false);
         #endregion
 
         return triangulation;
@@ -561,7 +494,7 @@ public class GeneratingMapState : MapBaseState
     #endregion
 
     #region Minimum spanning tree
-    private List<Edge> GetMinimumSpanningTree(List<Triangle> triangulation, List<Room> rooms, float percentageOfLoops)
+    private List<Edge> GetMinimumSpanningTree(MapGenerationManager manager, List<Triangle> triangulation, List<Room> rooms, float percentageOfLoops)
     {
         // Check for valid triangulation 
         if (triangulation.Count == 0 || percentageOfLoops < 0 || percentageOfLoops > 100)
@@ -726,29 +659,30 @@ public class GeneratingMapState : MapBaseState
         }
 
         #region Debug
-        minimumSpanningTreeDebug = new()
+        if (manager.Settings.debugSpanningTree)
         {
-            name = "MinimumSpanningTree"
-        };
-
-        for (int i = 0; i < minimumSpanningTree.Count; i++)
-        {
-            GameObject debug = new()
+            minimumSpanningTreeDebug = new()
             {
-                name = "Edge " + i
+                name = "MinimumSpanningTree"
             };
-            debug.transform.SetParent(minimumSpanningTreeDebug.transform);
 
-            LineRenderer ln = debug.AddComponent<LineRenderer>();
-            ln.positionCount = 2;
+            for (int i = 0; i < minimumSpanningTree.Count; i++)
+            {
+                GameObject debug = new()
+                {
+                    name = "Edge " + i
+                };
+                debug.transform.SetParent(minimumSpanningTreeDebug.transform);
 
-            //ln.SetPosition(0, new Vector3(edges[i].pointA.x, edges[i].pointA.y, -1));
-            //ln.SetPosition(1, new Vector3(edges[i].pointB.x, edges[i].pointB.y, -1));
-            ln.SetPosition(0, new Vector3(minimumSpanningTree[i].pointA.x, minimumSpanningTree[i].pointA.y, -1));
-            ln.SetPosition(1, new Vector3(minimumSpanningTree[i].pointB.x, minimumSpanningTree[i].pointB.y, -1));
+                LineRenderer ln = debug.AddComponent<LineRenderer>();
+                ln.positionCount = 2;
+
+                //ln.SetPosition(0, new Vector3(edges[i].pointA.x, edges[i].pointA.y, -1));
+                //ln.SetPosition(1, new Vector3(edges[i].pointB.x, edges[i].pointB.y, -1));
+                ln.SetPosition(0, new Vector3(minimumSpanningTree[i].pointA.x, minimumSpanningTree[i].pointA.y, -1));
+                ln.SetPosition(1, new Vector3(minimumSpanningTree[i].pointB.x, minimumSpanningTree[i].pointB.y, -1));
+            }
         }
-
-        minimumSpanningTreeDebug.SetActive(false);
         #endregion
 
         return minimumSpanningTree;
@@ -780,7 +714,7 @@ public class GeneratingMapState : MapBaseState
 
             // Find a path starting from first room in list towards the connected room.
 
-            HashSet<Vector3Int> hallwayTilePositions = new (AStar.instance.FindPath(startingPosition, targetPosition));
+            HashSet<Vector3Int> hallwayTilePositions = new (AStar.FindPath(startingPosition, targetPosition));
 
             // *Working*s but not very good looking
             #region Room intersection check
@@ -820,7 +754,6 @@ public class GeneratingMapState : MapBaseState
             #endregion
 
             // Add width to the "path", then add path to tile change data list.
-
             #region Hallway width
             HashSet<Vector3Int> widthTiles = new();
 
@@ -850,7 +783,7 @@ public class GeneratingMapState : MapBaseState
 
     private void Reset(MapGenerationManager manager)
     {
-        manager.groundTileMap.ClearAllTiles();
+        manager.Settings.groundTileMap.ClearAllTiles();
         rooms.Clear();
         mainRooms.Clear();
         triangulation.Clear();
@@ -914,7 +847,6 @@ public class Room : IHeapItem<Room>
     #endregion
 
     #region Size of room
-    public readonly int radius;
     public readonly int width, height;
     #endregion
 
@@ -1017,37 +949,6 @@ public class Room : IHeapItem<Room>
         }
 
         center = new Vector2((int)position.x + width / 2f, (int)position.y + height / 2f);
-    }
-    #endregion
-
-    #region Round Room
-    public Room(int radius, Vector2 position)
-    {
-        width = radius * 2;
-        height = radius * 2;
-        this.radius = radius;
-        //tiles = new MapTile[width * height];
-
-        Circle temp = new(position, radius);
-
-        for (int x = -radius + 1; x < radius; x++)
-        {
-            for (int y = -radius + 1; y < radius; y++)
-            {
-                int xPosition = x + (int)position.x;
-                int yPosition = y + (int)position.y;
-
-                if (temp.Intersects(new Vector2(xPosition + 0.5f, yPosition + 0.5f)))
-                {
-                    //grid[x + radius, y + radius] = new MapTile(new Vector2Int(xPosition, yPosition));
-                    tileCount++;
-                }
-            }
-        }
-
-        center = position;
-        center.x += 0.5f;
-        center.y += 0.5f;
     }
     #endregion
 

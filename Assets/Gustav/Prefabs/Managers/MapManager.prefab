@@ -9,8 +9,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3649946842529648313}
+  - component: {fileID: 2847025328454488880}
   - component: {fileID: 3171003164158351417}
-  - component: {fileID: 3916695126806530307}
   m_Layer: 0
   m_Name: MapManager
   m_TagString: Untagged
@@ -33,6 +33,33 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2847025328454488880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4600069235979334545}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6c7e02379639d0944a980187ed13587b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  generateInCircle: 1
+  generationRadius: 75
+  generateInStrip: 0
+  stripSize: {x: 100, y: 20}
+  totalRoomsCount: 15
+  amountOfMainRooms: 15
+  squaredRoomMaxSize: {x: 45, y: 30}
+  squaredRoomMinSize: {x: 32, y: 18}
+  roundCorners: 1
+  amountOfLoops: 12.5
+  hallwayWidth: 11
+  groundTileMap: {fileID: 0}
+  ruleTile: {fileID: 11400000, guid: dedf4b2ab3fe62d408122ba5930317a1, type: 2}
+  debugTriangulation: 0
+  debugSpanningTree: 0
 --- !u!114 &3171003164158351417
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -45,21 +72,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1675e689b4e4b5c4c9c5c07b0dd70e95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generationRadius: 75
-  roomMaxSize: {x: 35, y: 35}
-  tileMap: {fileID: 0}
-  totalRoomsAmount: 50
-  ruleTile: {fileID: 11400000, guid: dedf4b2ab3fe62d408122ba5930317a1, type: 2}
---- !u!114 &3916695126806530307
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4600069235979334545}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 99b071624f114814cb4ec2dd281c6e7e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  amountOfRequests: 0

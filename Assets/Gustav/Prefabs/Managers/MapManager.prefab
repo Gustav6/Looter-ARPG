@@ -45,14 +45,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c7e02379639d0944a980187ed13587b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  generateInCircle: 1
+  seed: 0
+  spawnFunction: 0
   generationRadius: 75
-  generateInStrip: 0
-  stripSize: {x: 100, y: 20}
+  stripSize: {x: 100, y: 50}
   totalRoomsCount: 15
   amountOfMainRooms: 15
-  squaredRoomMaxSize: {x: 45, y: 30}
-  squaredRoomMinSize: {x: 32, y: 18}
+  roomMaxSize: {x: 42, y: 38}
+  roomMinSize: {x: 28, y: 26}
   roundCorners: 1
   amountOfLoops: 12.5
   hallwayWidth: 11
@@ -72,3 +72,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1675e689b4e4b5c4c9c5c07b0dd70e95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  map:
+    seed: 0
+    spawnFunction: 0
+    amountOfRooms: 0
+    amountOfMainRooms: 0
+    roomMinSize: {x: 0, y: 0}
+    roomMaxSize: {x: 0, y: 0}
+    amountOfLoops: 0
+    hallwayWidth: 0

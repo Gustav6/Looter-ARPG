@@ -1,24 +1,37 @@
 using NaughtyAttributes;
-using NaughtyAttributes.Editor;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
 public class MapSettings : MonoBehaviour
 {
+    public static MapSettings Instance { get; private set; }
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            Destroy(this);
+            return;
+        }
+    }
+
     #region Generation
     [BoxGroup("Generation Variables")]
-    public bool generateInCircle = true;
+    public int seed;
 
     [BoxGroup("Generation Variables")]
-    [ShowIf("generateInCircle")] public int generationRadius = 50;
+    public SpawnFunction spawnFunction = SpawnFunction.Circle;
 
     [BoxGroup("Generation Variables")]
-    public bool generateInStrip = false;
+    public int generationRadius = 50;
 
     [BoxGroup("Generation Variables")]
-    [ShowIf("generateInStrip")] public Vector2 stripSize = new Vector2Int(100, 50);
+    public Vector2Int stripSize = new(100, 50);
     #endregion
 
     #region Room
@@ -46,28 +59,28 @@ public class MapSettings : MonoBehaviour
     #endregion
 
     [BoxGroup("Room Variables")]
-    public Vector2Int squaredRoomMaxSize = new(10, 10);
+    public Vector2Int roomMaxSize = new(10, 10);
 
     [BoxGroup("Room Variables")]
-    [SerializeField] private Vector2Int squaredRoomMinSize = new(5, 5);
-    public Vector2Int SquaredRoomMinSize
+    [SerializeField] private Vector2Int roomMinSize = new(5, 5);
+    public Vector2Int RoomMinSize
     {
-        get { return squaredRoomMinSize; }
+        get { return roomMinSize; }
         set
         {
-            if (value.x <= squaredRoomMaxSize.x && value.y <= squaredRoomMaxSize.y)
+            if (value.x <= roomMaxSize.x && value.y <= roomMaxSize.y)
             {
-                squaredRoomMinSize = value;
+                roomMinSize = value;
             }
             else
             {
-                if (value.x > squaredRoomMaxSize.x)
+                if (value.x > roomMaxSize.x)
                 {
-                    squaredRoomMinSize.x = squaredRoomMaxSize.x;
+                    roomMinSize.x = roomMaxSize.x;
                 }
-                if (value.y > squaredRoomMaxSize.y)
+                if (value.y > roomMaxSize.y)
                 {
-                    squaredRoomMinSize.y = squaredRoomMaxSize.y;
+                    roomMinSize.y = roomMaxSize.y;
                 }
             }
         }
@@ -86,15 +99,15 @@ public class MapSettings : MonoBehaviour
 
     #region Tile & TileMap
     [BoxGroup("TileMap Variables")]
-    [Required] public Tilemap groundTileMap;
+    [Required("Reference tile map is needed")] public Tilemap groundTileMap;
     [BoxGroup("TileMap Variables")]
-    [Required] public TileBase ruleTile;
+    [Required("Rule tile is needed for ground")] public TileBase ruleTile;
     #endregion
 
     #region Debug
-    [BoxGroup("Debug Variables")]
+    [Foldout("Debug")]
     public bool debugTriangulation = false;
-    [BoxGroup("Debug Variables")]
+    [Foldout("Debug")]
     public bool debugSpanningTree = false;
     #endregion
 }

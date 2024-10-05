@@ -17,23 +17,22 @@ public abstract class MapBaseState
 #region Generation State
 public class GeneratingMapState : MapBaseState
 {
-    public List<Room> rooms = new();
+    public Room[] rooms;
     public List<Room> mainRooms = new();
 
     private List<Triangle> triangulation = new();
     private List<Edge> minimumSpanningTree = new();
 
     private HashSet<Vector3Int> groundTilePositions = new();
-    private HashSet<Vector2Int> edgeTiles = new();
 
     private GameObject triangulationDebug, minimumSpanningTreeDebug, pointsDebug;
 
     private bool canMoveRoom;
 
-    private Room startingRoom;
-
     System.Diagnostics.Stopwatch stopwatch;
     float diagnosticTime;
+
+    private System.Random rng;
 
 
     public override void EnterState(MapGenerationManager manager)
@@ -49,28 +48,38 @@ public class GeneratingMapState : MapBaseState
         GameObject.Destroy(pointsDebug);
         #endregion
 
-        Reset(manager);
+        rng = new System.Random(MapSettings.Instance.seed);
 
-        Heap<Room> heap = new(manager.Settings.totalRoomsCount);
+        canMoveRoom = false;
+
+        mainRooms.Clear();
+        triangulation.Clear();
+        minimumSpanningTree.Clear();
+        groundTilePositions.Clear();
+
+        rooms = new Room[MapSettings.Instance.totalRoomsCount];
+        Heap<Room> roomHeapForSize = new(MapSettings.Instance.totalRoomsCount);
 
         // Generate x amount of rooms
-        for (int i = 0; i < manager.Settings.totalRoomsCount; i++)
+        for (int i = 0; i < MapSettings.Instance.totalRoomsCount; i++)
         {
             Room newRoom = GenerateRoom(manager);
 
-            rooms.Add(newRoom);
-            heap.Add(newRoom);
+            rooms[i] = newRoom;
+            roomHeapForSize.Add(newRoom);
         }
 
         // Add x amount (Amount of main rooms) with the largest area
-        for (int i = 0; i < manager.Settings.AmountOfMainRooms; i++)
+        for (int i = 0; i < MapSettings.Instance.AmountOfMainRooms; i++)
         {
-            Room mainRoom = heap.RemoveFirst();
-
-            mainRooms.Add(mainRoom);
+            mainRooms.Add(roomHeapForSize.RemoveFirst());
         }
 
-        startingRoom = mainRooms.First();
+        manager.startingRoom = mainRooms.First();
+
+        Debug.Log(rng.NextDouble());
+        Debug.Log(rng.NextDouble());
+
         diagnosticTime = stopwatch.ElapsedMilliseconds;
     }
 
@@ -82,56 +91,49 @@ public class GeneratingMapState : MapBaseState
         {
             Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to separate rooms");
 
-            diagnosticTime = stopwatch.ElapsedMilliseconds;
-            triangulation = GenerateDelaunayTriangulation(manager, mainRooms);
-            Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to triangulate points");
-
-            diagnosticTime = stopwatch.ElapsedMilliseconds;
-            minimumSpanningTree = GetMinimumSpanningTree(manager, triangulation, mainRooms, manager.Settings.amountOfLoops);
-            Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to get minimum spanning tree");
-
-            diagnosticTime = stopwatch.ElapsedMilliseconds;
-            GenerateHallways(manager, minimumSpanningTree, manager.Settings.hallwayWidth);
-            Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to generate hallways");
-
-            diagnosticTime = stopwatch.ElapsedMilliseconds;
-
-            foreach (Room room in mainRooms)
-            {
-                foreach (Vector2Int? position in room.tiles)
-                {
-                    if (position != null)
-                    {
-                        groundTilePositions.Add((Vector3Int)position.Value);
-                    }
-                }
-            }
-
-            Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to add room tiles");
-
-            manager.SwitchState(manager.loadingState);
+            manager.SwitchState(manager.loadedState);
         }
     }
 
     public override void ExitState(MapGenerationManager manager)
     {
         diagnosticTime = stopwatch.ElapsedMilliseconds;
+        triangulation = GenerateDelaunayTriangulation(manager, mainRooms);
+        Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to triangulate points");
+
+        diagnosticTime = stopwatch.ElapsedMilliseconds;
+        minimumSpanningTree = GetMinimumSpanningTree(manager, triangulation, mainRooms, MapSettings.Instance.amountOfLoops);
+        Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to get minimum spanning tree");
+
+        diagnosticTime = stopwatch.ElapsedMilliseconds;
+        GenerateHallways(manager, minimumSpanningTree, MapSettings.Instance.hallwayWidth);
+        Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to generate hallways");
+
+        diagnosticTime = stopwatch.ElapsedMilliseconds;
+
+        foreach (Room room in mainRooms)
+        {
+            foreach (Vector2Int? position in room.tiles)
+            {
+                if (position != null)
+                {
+                    groundTilePositions.Add((Vector3Int)position.Value);
+                }
+            }
+        }
+
+        Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to add room tiles");
+
+        diagnosticTime = stopwatch.ElapsedMilliseconds;
 
         TileBase[] tiles = new TileBase[groundTilePositions.Count];
         Array.Fill(tiles, manager.tilePairs[TileTexture.ruleTile]);
 
-        manager.Settings.groundTileMap.SetTiles(groundTilePositions.ToArray(), tiles);
+        MapSettings.Instance.groundTileMap.SetTiles(groundTilePositions.ToArray(), tiles);
 
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to set ground tiles");
 
         Debug.Log("Tile changed: " + groundTilePositions.Count);
-
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-
-        if (player != null)
-        {
-            player.transform.position = startingRoom.WorldPosition;
-        }
 
         #region Diagnostic End
         stopwatch.Stop();
@@ -147,36 +149,36 @@ public class GeneratingMapState : MapBaseState
         Vector2Int offset;
         Vector2 position = Vector2.zero;
 
-        int roomWidth = UnityEngine.Random.Range(manager.Settings.SquaredRoomMinSize.x, manager.Settings.squaredRoomMaxSize.x + 1);
-        int roomHeight = UnityEngine.Random.Range(manager.Settings.SquaredRoomMinSize.y, manager.Settings.squaredRoomMaxSize.y + 1);
+        int roomWidth = rng.Next(MapSettings.Instance.RoomMinSize.x, MapSettings.Instance.roomMaxSize.x + 1);
+        int roomHeight = rng.Next(MapSettings.Instance.RoomMinSize.y, MapSettings.Instance.roomMaxSize.y + 1);
         offset = new(roomWidth / 2, roomHeight / 2);
 
-        if (manager.Settings.generateInCircle)
+        if (MapSettings.Instance.spawnFunction == SpawnFunction.Circle)
         {
-            position = RandomPositionInCircle(manager.Settings.generationRadius) - offset;
+            position = RandomPositionInCircle(MapSettings.Instance.generationRadius) - offset;
         }
-        else if (manager.Settings.generateInStrip)
+        else if (MapSettings.Instance.spawnFunction == SpawnFunction.Strip)
         {
-            position = RandomPositionInStrip(manager.Settings.stripSize.x, manager.Settings.stripSize.y) - offset;
+            position = RandomPositionInStrip(MapSettings.Instance.stripSize.x, MapSettings.Instance.stripSize.y) - offset;
         }
 
-        room = new Room(roomWidth, roomHeight, position, manager.Settings.roundCorners);
+        room = new Room(roomWidth, roomHeight, position, MapSettings.Instance.roundCorners);
 
         return room;
     }
 
     public Vector2 RandomPositionInCircle(float radius)
     {
-        float r = radius * Mathf.Sqrt(UnityEngine.Random.Range(0.0001f, 1));
-        float theta = UnityEngine.Random.Range(0.0001f, 1) * 2 * Mathf.PI;
+        float r = radius * Mathf.Sqrt((float)rng.NextDouble());
+        float theta = (float)rng.NextDouble() * 2 * Mathf.PI;
 
         return new Vector2(r * Mathf.Cos(theta), r * Mathf.Sin(theta));
     }
 
-    public Vector2 RandomPositionInStrip(float width, float height)
+    public Vector2 RandomPositionInStrip(int width, int height)
     {
-        float x = UnityEngine.Random.Range(-width / 2, width / 2);
-        float y = UnityEngine.Random.Range(-height / 2, height / 2);
+        int x = rng.Next(-width / 2, width / 2);
+        int y = rng.Next(-height / 2, height / 2);
 
         return new Vector2(x, y);
     }
@@ -289,14 +291,14 @@ public class GeneratingMapState : MapBaseState
         #region Super Triangle
         Vector2 a, b, c;
 
-        if (manager.Settings.generationRadius <= 0)
+        if (MapSettings.Instance.generationRadius <= 0)
         {
-            manager.Settings.generationRadius = 1;
+            MapSettings.Instance.generationRadius = 1;
         }
 
-        a = new Vector2(-manager.Settings.generationRadius, -manager.Settings.generationRadius) * 100;
-        b = new Vector2(manager.Settings.generationRadius, -manager.Settings.generationRadius) * 100;
-        c = new Vector2(0, manager.Settings.generationRadius) * 100;
+        a = new Vector2(-MapSettings.Instance.generationRadius, -MapSettings.Instance.generationRadius) * 100;
+        b = new Vector2(MapSettings.Instance.generationRadius, -MapSettings.Instance.generationRadius) * 100;
+        c = new Vector2(0, MapSettings.Instance.generationRadius) * 100;
 
         Triangle superTriangle;
 
@@ -431,7 +433,7 @@ public class GeneratingMapState : MapBaseState
         #endregion
 
         #region Debug
-        if (manager.Settings.debugTriangulation)
+        if (MapSettings.Instance.debugTriangulation)
         {
             triangulationDebug = new()
             {
@@ -641,10 +643,10 @@ public class GeneratingMapState : MapBaseState
 
             while (true)
             {
-                Edge current = edgeList[UnityEngine.Random.Range(0, edgeList.Count)];
+                Edge current = edgeList[rng.Next(0, edgeList.Count)];
 
                 if (!loopedEdges.Contains(current))
-                {
+                {   
                     loopedEdges.Add(current);
                     count++;
                 }
@@ -659,7 +661,7 @@ public class GeneratingMapState : MapBaseState
         }
 
         #region Debug
-        if (manager.Settings.debugSpanningTree)
+        if (MapSettings.Instance.debugSpanningTree)
         {
             minimumSpanningTreeDebug = new()
             {
@@ -692,6 +694,11 @@ public class GeneratingMapState : MapBaseState
     #region Hallways generation
     private void GenerateHallways(MapGenerationManager manager, List<Edge> connections, float hallwayWidth)
     {
+        if (hallwayWidth <= 0)
+        {
+            return;
+        }
+
         foreach (Edge connection in connections)
         {
             List<Room> roomList = new();
@@ -780,28 +787,35 @@ public class GeneratingMapState : MapBaseState
     {
 
     }
-
-    private void Reset(MapGenerationManager manager)
-    {
-        manager.Settings.groundTileMap.ClearAllTiles();
-        rooms.Clear();
-        mainRooms.Clear();
-        triangulation.Clear();
-        minimumSpanningTree.Clear();
-        groundTilePositions.Clear();
-        edgeTiles.Clear();
-
-        canMoveRoom = false;
-    }
 }
 #endregion
 
-#region Load State
-public class LoadMapState : MapBaseState
+#region Loaded State
+public class LoadedMapState : MapBaseState
 {
     public override void EnterState(MapGenerationManager manager)
     {
+        manager.map = new()
+        {
+            seed = MapSettings.Instance.seed,
+            spawnFunction = MapSettings.Instance.spawnFunction,
+            roomMaxSize = MapSettings.Instance.roomMaxSize,
+            roomMinSize = MapSettings.Instance.RoomMinSize,
+            amountOfRooms = MapSettings.Instance.totalRoomsCount,
+            amountOfMainRooms = MapSettings.Instance.AmountOfMainRooms,
+            amountOfLoops = MapSettings.Instance.amountOfLoops,
+            hallwayWidth = MapSettings.Instance.hallwayWidth,
+            stripSpawnSize = MapSettings.Instance.stripSize,
+            spawnRadius = MapSettings.Instance.generationRadius
+        };
 
+
+        GameObject player = GameObject.FindGameObjectWithTag("Player");
+
+        if (player != null)
+        {
+            player.transform.position = manager.startingRoom.WorldPosition;
+        }
     }
 
     public override void UpdateState(MapGenerationManager manager)
@@ -811,7 +825,7 @@ public class LoadMapState : MapBaseState
 
     public override void ExitState(MapGenerationManager manager)
     {
-
+        MapSettings.Instance.groundTileMap.ClearAllTiles();
     }
 }
 #endregion
@@ -864,9 +878,8 @@ public class Room : IHeapItem<Room>
     public HashSet<Vector2Int> tilePositions = new();
     public readonly int tileCount = new();
 
-    private Circle c1, c2;
+    private readonly Circle c1, c2;
 
-    #region Square Room
     public Room(int width, int height, Vector2 position, bool roundCorners = false)
     {
         this.width = width;
@@ -879,24 +892,30 @@ public class Room : IHeapItem<Room>
         #region Set Circles
         if (roundCorners)
         {
-            float r = 0;
-            Vector2 temp1 = Vector2.zero, temp2 = Vector2.zero;
+            float r;
+            Vector2 tempPosition1, tempPosition2;
 
             if (width < height)
             {
                 r = width / 2f;
-                temp1 = new Vector2((int)position.x + width / 2f, (int)position.y + height - height / 3f);
-                temp2 = new Vector2((int)position.x + width / 2f, (int)position.y + height / 3f);
+                tempPosition1 = new Vector2((int)position.x + width / 2f, (int)position.y + height - width / 2.65f);
+                tempPosition2 = new Vector2((int)position.x + width / 2f, (int)position.y + width / 2.65f);
             }
             else if (width >= height)
             {
                 r = height / 2f;
-                temp1 = new Vector2((int)position.x + width - width / 3f, (int)position.y + height / 2f);
-                temp2 = new Vector2((int)position.x + width / 3f, (int)position.y + height / 2f);
+                tempPosition1 = new Vector2((int)position.x + width - height / 2.65f, (int)position.y + height / 2f);
+                tempPosition2 = new Vector2((int)position.x + height / 2.65f, (int)position.y + height / 2f);
+            }
+            else
+            {
+                r = 0;
+                tempPosition1 = Vector2.zero;
+                tempPosition2 = Vector2.zero;
             }
 
-            c1 = new Circle(temp1, r);
-            c2 = new Circle(temp2, r);
+            c1 = new Circle(tempPosition1, r);
+            c2 = new Circle(tempPosition2, r);
         }
         #endregion
 
@@ -950,7 +969,6 @@ public class Room : IHeapItem<Room>
 
         center = new Vector2((int)position.x + width / 2f, (int)position.y + height / 2f);
     }
-    #endregion
 
     public void MoveRoom(Vector2Int direction)
     {

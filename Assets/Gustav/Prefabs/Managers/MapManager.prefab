@@ -46,9 +46,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   seed: 0
-  spawnFunction: 0
+  spawnFunction: 1
   generationRadius: 75
-  stripSize: {x: 100, y: 50}
+  stripSize: {x: 150, y: 50}
   totalRoomsCount: 15
   amountOfMainRooms: 15
   roomMaxSize: {x: 42, y: 38}
@@ -75,6 +75,8 @@ MonoBehaviour:
   map:
     seed: 0
     spawnFunction: 0
+    spawnRadius: 0
+    stripSpawnSize: {x: 0, y: 0}
     amountOfRooms: 0
     amountOfMainRooms: 0
     roomMinSize: {x: 0, y: 0}

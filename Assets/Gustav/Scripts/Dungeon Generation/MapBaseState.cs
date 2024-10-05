@@ -25,7 +25,7 @@ public class GeneratingMapState : MapBaseState
 
     private HashSet<Vector3Int> groundTilePositions = new();
 
-    private GameObject triangulationDebug, minimumSpanningTreeDebug, pointsDebug;
+    private GameObject triangulationDebug, minimumSpanningTreeDebug;
 
     private bool canMoveRoom;
 
@@ -45,7 +45,6 @@ public class GeneratingMapState : MapBaseState
         #region Debug game objects
         GameObject.Destroy(triangulationDebug);
         GameObject.Destroy(minimumSpanningTreeDebug);
-        GameObject.Destroy(pointsDebug);
         #endregion
 
         rng = new System.Random(MapSettings.Instance.seed);
@@ -76,9 +75,6 @@ public class GeneratingMapState : MapBaseState
         }
 
         manager.startingRoom = mainRooms.First();
-
-        Debug.Log(rng.NextDouble());
-        Debug.Log(rng.NextDouble());
 
         diagnosticTime = stopwatch.ElapsedMilliseconds;
     }
@@ -873,10 +869,8 @@ public class Room : IHeapItem<Room>
     }
     #endregion
 
-    //public MapTile[,] grid;
     public Vector2Int?[] tiles;
-    public HashSet<Vector2Int> tilePositions = new();
-    public readonly int tileCount = new();
+    public readonly int tileCount = 0;
 
     private readonly Circle c1, c2;
 

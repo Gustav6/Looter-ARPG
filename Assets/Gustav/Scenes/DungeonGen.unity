@@ -558,7 +558,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8060619667817851746, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8146332157051368663, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: m_Color.b
@@ -1090,6 +1090,7 @@ GameObject:
   - component: {fileID: 1748755877}
   - component: {fileID: 1748755876}
   - component: {fileID: 1748755879}
+  - component: {fileID: 1748755880}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -1139,7 +1140,7 @@ Camera:
   near clip plane: 0.3
   far clip plane: 1000
   field of view: 170
-  orthographic: 0
+  orthographic: 1
   orthographic size: 5
   m_Depth: 0
   m_CullingMask:
@@ -1205,6 +1206,26 @@ MonoBehaviour:
   m_CameraActivatedEvent:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &1748755880
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1748755875}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6a160d838ff8b4b4693ac20007e008c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_AssetsPPU: 16
+  m_RefResolutionX: 1920
+  m_RefResolutionY: 1080
+  m_UpscaleRT: 0
+  m_PixelSnapping: 0
+  m_CropFrameX: 0
+  m_CropFrameY: 0
+  m_StretchFill: 0
 --- !u!1 &1939987701
 GameObject:
   m_ObjectHideFlags: 3
@@ -1507,53 +1528,13 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: ruleTile
+      value: 
+      objectReference: {fileID: 11400000, guid: dedf4b2ab3fe62d408122ba5930317a1, type: 2}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: groundTileMap
       value: 
       objectReference: {fileID: 28663809}
-    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: map.hallwayWidth
-      value: 11
-      objectReference: {fileID: 0}
-    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: map.amountOfLoops
-      value: 12.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: map.amountOfRooms
-      value: 12
-      objectReference: {fileID: 0}
-    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: map.roomMaxSize.x
-      value: 28
-      objectReference: {fileID: 0}
-    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: map.roomMaxSize.y
-      value: 26
-      objectReference: {fileID: 0}
-    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: map.roomMinSize.x
-      value: 42
-      objectReference: {fileID: 0}
-    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: map.roomMinSize.y
-      value: 38
-      objectReference: {fileID: 0}
-    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: map.spawnFunction
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: map.stripSpawnSize.x
-      value: 100
-      objectReference: {fileID: 0}
-    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: map.stripSpawnSize.y
-      value: 50
-      objectReference: {fileID: 0}
-    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: map.amountOfMainRooms
-      value: 12
-      objectReference: {fileID: 0}
     - target: {fileID: 3649946842529648313, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

@@ -1,4 +1,5 @@
 using NaughtyAttributes;
+using System;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -94,14 +95,13 @@ public class MapSettings : MonoBehaviour
     [BoxGroup("Hallway Variables")]
     [Range(0, 100)] public float amountOfLoops = 15;
     [BoxGroup("Hallway Variables")]
-    public int hallwayWidth = 10;
-    #endregion
-
-    #region Tile & TileMap
-    [BoxGroup("TileMap Variables")]
-    [Required("Reference tile map is needed")] public Tilemap groundTileMap;
-    [BoxGroup("TileMap Variables")]
-    [Required("Rule tile is needed for ground")] public TileBase ruleTile;
+    public bool randomizedHallwaySize = false;
+    [BoxGroup("Hallway Variables")]
+    [DisableIf("randomizedHallwaySize")] public int hallwayWidth = 10;
+    [BoxGroup("Hallway Variables")]
+    [EnableIf("randomizedHallwaySize")] public int hallwayMinWidth = 10;
+    [BoxGroup("Hallway Variables")]
+    [EnableIf("randomizedHallwaySize")] public int hallwayMaxWidth = 15;
     #endregion
 
     #region Debug
@@ -110,4 +110,11 @@ public class MapSettings : MonoBehaviour
     [Foldout("Debug")]
     public bool debugSpanningTree = false;
     #endregion
+}
+
+[Serializable]
+public struct TilePair
+{
+    public TileBase tile;
+    public TileTexture type;
 }

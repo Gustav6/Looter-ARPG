@@ -15,6 +15,15 @@ public class MapGenerationManager : MonoBehaviour
 
     #endregion
 
+    #region Tile & TileMap
+    [BoxGroup("TileMap Variables")]
+    [Required("Ground tile map is needed")] public Tilemap groundTileMap;
+    [BoxGroup("TileMap Variables")]
+    [Required("Wall tile map is needed")] public Tilemap wallTileMap;
+    [BoxGroup("TileMap Variables")]
+    public TilePair[] tiles;
+    #endregion
+
     public Room startingRoom;
 
     public Map map;
@@ -23,7 +32,10 @@ public class MapGenerationManager : MonoBehaviour
 
     private void Start()
     {
-        tilePairs.TryAdd(TileTexture.ruleTile, MapSettings.Instance.ruleTile);
+        foreach (TilePair pair in tiles)
+        {
+            tilePairs.TryAdd(pair.type, pair.tile);
+        }
 
         SwitchState(generationState);
     }
@@ -87,7 +99,7 @@ public enum SpawnFunction
 
 public enum TileTexture
 {
-    ruleTile,   
+    ground,   
     wall,
 }
 

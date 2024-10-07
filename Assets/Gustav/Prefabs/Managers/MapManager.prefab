@@ -45,19 +45,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6c7e02379639d0944a980187ed13587b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  seed: 0
+  seed: 2
   spawnFunction: 1
-  generationRadius: 75
-  stripSize: {x: 150, y: 50}
+  generationRadius: 200
+  stripSize: {x: 215, y: 125}
   totalRoomsCount: 15
   amountOfMainRooms: 15
-  roomMaxSize: {x: 42, y: 38}
+  roomMaxSize: {x: 45, y: 42}
   roomMinSize: {x: 28, y: 26}
   roundCorners: 1
   amountOfLoops: 12.5
+  randomizedHallwaySize: 1
   hallwayWidth: 11
-  groundTileMap: {fileID: 0}
-  ruleTile: {fileID: 11400000, guid: dedf4b2ab3fe62d408122ba5930317a1, type: 2}
+  hallwayMinWidth: 9
+  hallwayMaxWidth: 12
   debugTriangulation: 0
   debugSpanningTree: 0
 --- !u!114 &3171003164158351417
@@ -72,6 +73,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1675e689b4e4b5c4c9c5c07b0dd70e95, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  groundTileMap: {fileID: 0}
+  wallTileMap: {fileID: 0}
+  tiles:
+  - tile: {fileID: 11400000, guid: f360c7a4992a8a444b0a516f677637dc, type: 2}
+    type: 0
+  - tile: {fileID: 11400000, guid: 6e951250e583f4d4fad2ddcee48bc2a0, type: 2}
+    type: 1
   map:
     seed: 0
     spawnFunction: 0

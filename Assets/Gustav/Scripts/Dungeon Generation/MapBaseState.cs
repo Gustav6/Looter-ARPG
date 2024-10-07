@@ -23,7 +23,7 @@ public class GeneratingMapState : MapBaseState
     private List<Triangle> triangulation = new();
     private List<Edge> minimumSpanningTree = new();
 
-    private HashSet<Vector3Int> groundTilePositions = new();
+    private HashSet<Vector3Int> groundTilePositions = new(), wallTilePositions = new();
 
     private GameObject triangulationDebug, minimumSpanningTreeDebug;
 
@@ -55,6 +55,7 @@ public class GeneratingMapState : MapBaseState
         triangulation.Clear();
         minimumSpanningTree.Clear();
         groundTilePositions.Clear();
+        wallTilePositions.Clear();
 
         rooms = new Room[MapSettings.Instance.totalRoomsCount];
         Heap<Room> roomHeapForSize = new(MapSettings.Instance.totalRoomsCount);
@@ -93,6 +94,20 @@ public class GeneratingMapState : MapBaseState
 
     public override void ExitState(MapGenerationManager manager)
     {
+        foreach (Room room in mainRooms)
+        {
+            foreach (Vector3Int? position in room.tiles.Select(v => (Vector3Int?)v))
+            {
+                if (position != null)
+                {
+                    groundTilePositions.Add(position.Value);
+                }
+            }
+
+            wallTilePositions.UnionWith(room.walls);
+        }
+
+        #region Methods for generation
         diagnosticTime = stopwatch.ElapsedMilliseconds;
         triangulation = GenerateDelaunayTriangulation(manager, mainRooms);
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to triangulate points");
@@ -102,34 +117,29 @@ public class GeneratingMapState : MapBaseState
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to get minimum spanning tree");
 
         diagnosticTime = stopwatch.ElapsedMilliseconds;
-        GenerateHallways(manager, minimumSpanningTree, MapSettings.Instance.hallwayWidth);
+        GenerateHallways(manager, minimumSpanningTree);
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to generate hallways");
+        #endregion
 
         diagnosticTime = stopwatch.ElapsedMilliseconds;
 
-        foreach (Room room in mainRooms)
-        {
-            foreach (Vector2Int? position in room.tiles)
-            {
-                if (position != null)
-                {
-                    groundTilePositions.Add((Vector3Int)position.Value);
-                }
-            }
-        }
+        TileBase[] tempArray = new TileBase[groundTilePositions.Count];
+        Array.Fill(tempArray, manager.tilePairs[TileTexture.ground]);
 
-        Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to add room tiles");
-
-        diagnosticTime = stopwatch.ElapsedMilliseconds;
-
-        TileBase[] tiles = new TileBase[groundTilePositions.Count];
-        Array.Fill(tiles, manager.tilePairs[TileTexture.ruleTile]);
-
-        MapSettings.Instance.groundTileMap.SetTiles(groundTilePositions.ToArray(), tiles);
+        manager.groundTileMap.SetTiles(groundTilePositions.ToArray(), tempArray);
 
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to set ground tiles");
 
-        Debug.Log("Tile changed: " + groundTilePositions.Count);
+        diagnosticTime = stopwatch.ElapsedMilliseconds;
+
+        tempArray = new TileBase[wallTilePositions.Count];
+        Array.Fill(tempArray, manager.tilePairs[TileTexture.wall]);
+
+        manager.wallTileMap.SetTiles(wallTilePositions.ToArray(), tempArray);
+
+        Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to set wall tiles");
+
+
 
         #region Diagnostic End
         stopwatch.Stop();
@@ -688,15 +698,17 @@ public class GeneratingMapState : MapBaseState
     #endregion
 
     #region Hallways generation
-    private void GenerateHallways(MapGenerationManager manager, List<Edge> connections, float hallwayWidth)
+    private void GenerateHallways(MapGenerationManager manager, List<Edge> connections)
     {
-        if (hallwayWidth <= 0)
-        {
-            return;
-        }
+        int hallwayWidth = MapSettings.Instance.hallwayWidth;
 
         foreach (Edge connection in connections)
         {
+            if (MapSettings.Instance.randomizedHallwaySize)
+            {
+                hallwayWidth = rng.Next(MapSettings.Instance.hallwayMinWidth, MapSettings.Instance.hallwayMaxWidth);
+            }
+
             List<Room> roomList = new();
 
             foreach (Room room in mainRooms)
@@ -717,7 +729,7 @@ public class GeneratingMapState : MapBaseState
 
             // Find a path starting from first room in list towards the connected room.
 
-            HashSet<Vector3Int> hallwayTilePositions = new (AStar.FindPath(startingPosition, targetPosition));
+            List<Vector3Int> hallwayTilePositions = new (AStar.FindPath(startingPosition, targetPosition));
 
             // *Working*s but not very good looking
             #region Room intersection check
@@ -760,24 +772,140 @@ public class GeneratingMapState : MapBaseState
             #region Hallway width
             HashSet<Vector3Int> widthTiles = new();
 
-            foreach (Vector3Int vector in hallwayTilePositions)
+            for (int i = 0; i < hallwayTilePositions.Count; i++)
             {
-                for (int x = (int)-hallwayWidth / 2; x < hallwayWidth; x++)
+                if (i + 1 < hallwayTilePositions.Count)
                 {
-                    for (int y = (int)-hallwayWidth / 2; y < hallwayWidth; y++)
+                    if (hallwayTilePositions[i].x == hallwayTilePositions[i + 1].x)
                     {
-                        widthTiles.Add(new (vector.x + x, vector.y + y));
+                        for (int x = -hallwayWidth + 1; x < hallwayWidth; x++)
+                        {
+                            widthTiles.Add(new(hallwayTilePositions[i].x + x, hallwayTilePositions[i].y));
+                        }
+
+                        wallTilePositions.Add(new(hallwayTilePositions[i].x + hallwayWidth, hallwayTilePositions[i].y));
+                        wallTilePositions.Add(new(hallwayTilePositions[i].x - hallwayWidth, hallwayTilePositions[i].y));
+                    }
+                    else if (hallwayTilePositions[i].y == hallwayTilePositions[i + 1].y)
+                    {
+                        for (int y = -hallwayWidth + 1; y < hallwayWidth; y++)
+                        {
+                            widthTiles.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y + y));
+                        }
+
+                        wallTilePositions.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y + hallwayWidth));
+                        wallTilePositions.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y - hallwayWidth));
+                    }
+                    else
+                    {
+                        if (hallwayTilePositions[i].y > hallwayTilePositions[i + 1].y)
+                        {
+                            if (hallwayTilePositions[i].x > hallwayTilePositions[i + 1].x)
+                            {
+                                for (int x = 0; x < hallwayWidth; x++)
+                                {
+                                    widthTiles.Add(new(hallwayTilePositions[i].x - x, hallwayTilePositions[i].y));
+                                }
+                                for (int y = 0; y < hallwayWidth; y++)
+                                {
+                                    widthTiles.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y - y));
+                                }
+
+                                wallTilePositions.Add(new(hallwayTilePositions[i].x - hallwayWidth, hallwayTilePositions[i].y));
+                                wallTilePositions.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y - hallwayWidth));
+                            }
+                            else
+                            {
+                                for (int x = 0; x < hallwayWidth; x++)
+                                {
+                                    widthTiles.Add(new(hallwayTilePositions[i].x + x, hallwayTilePositions[i].y));
+                                }
+                                for (int y = 0; y < hallwayWidth; y++)
+                                {
+                                    widthTiles.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y - y));
+                                }
+
+                                wallTilePositions.Add(new(hallwayTilePositions[i].x + hallwayWidth, hallwayTilePositions[i].y));
+                                wallTilePositions.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y - hallwayWidth));
+                            }
+                        }
+                        else
+                        {
+                            if (hallwayTilePositions[i].x > hallwayTilePositions[i + 1].x)
+                            {
+                                for (int x = 0; x < hallwayWidth; x++)
+                                {
+                                    widthTiles.Add(new(hallwayTilePositions[i].x - x, hallwayTilePositions[i].y));
+                                }
+                                for (int y = 0; y < hallwayWidth; y++)
+                                {
+                                    widthTiles.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y + y));
+                                }
+
+                                wallTilePositions.Add(new(hallwayTilePositions[i].x - hallwayWidth, hallwayTilePositions[i].y));
+                                wallTilePositions.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y + hallwayWidth));
+                            }
+                            else
+                            {
+                                for (int x = 0; x < hallwayWidth; x++)
+                                {
+                                    widthTiles.Add(new(hallwayTilePositions[i].x + x, hallwayTilePositions[i].y));
+                                }
+                                for (int y = 0; y < hallwayWidth; y++)
+                                {
+                                    widthTiles.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y + y));
+                                }
+
+                                wallTilePositions.Add(new(hallwayTilePositions[i].x + hallwayWidth, hallwayTilePositions[i].y));
+                                wallTilePositions.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y + hallwayWidth));
+                            }
+                        }
                     }
                 }
             }
 
-            hallwayTilePositions.UnionWith(widthTiles);
+            //foreach (Vector3Int vector in hallwayTilePositions)
+            //{
+            //    for (int x = (int)-hallwayWidth / 2; x < hallwayWidth; x++)
+            //    {
+            //        for (int y = (int)-hallwayWidth / 2; y < hallwayWidth; y++)
+            //        {
+            //            widthTiles.Add(new (vector.x + x, vector.y + y));
+            //        }
+            //    }
+            //}
+
+            hallwayTilePositions.AddRange(widthTiles);
             #endregion
+
+            foreach (Vector3Int vector in hallwayTilePositions)
+            {
+                if (wallTilePositions.Contains(vector))
+                {
+                    wallTilePositions.Remove(vector);
+                }
+            }
+
+            foreach (Vector3Int vector in groundTilePositions)
+            {
+                if (wallTilePositions.Contains(vector))
+                {
+                    wallTilePositions.Remove(vector);
+                }
+            }
 
             groundTilePositions.UnionWith(hallwayTilePositions);
         }
     }
     #endregion
+
+    private void AddWallTiles()
+    {
+        foreach (Vector3Int vector in wallTilePositions)
+        {
+
+        }
+    }
 
     private void Decorate()
     {
@@ -821,7 +949,8 @@ public class LoadedMapState : MapBaseState
 
     public override void ExitState(MapGenerationManager manager)
     {
-        MapSettings.Instance.groundTileMap.ClearAllTiles();
+        manager.groundTileMap.ClearAllTiles();
+        manager.wallTileMap.ClearAllTiles();
     }
 }
 #endregion
@@ -842,14 +971,14 @@ public class Room : IHeapItem<Room>
     {
         get
         {
-            return new Vector2(WorldPosition.x - width / 2, WorldPosition.y - height / 2);
+            return new Vector2(WorldPosition.x - width / 2, WorldPosition.y - height / 2) - Vector2.one;
         }
     }
     public Vector2 TopRight
     {
         get
         {
-            return new Vector2(WorldPosition.x + width / 2 + 1, WorldPosition.y + height / 2 + 1);
+            return new Vector2(WorldPosition.x + width / 2 + 1, WorldPosition.y + height / 2 + 1) + Vector2.one;
         }
     }
 
@@ -869,6 +998,7 @@ public class Room : IHeapItem<Room>
     }
     #endregion
 
+    public List<Vector3Int> walls = new();
     public Vector2Int?[] tiles;
     public readonly int tileCount = 0;
 
@@ -959,6 +1089,26 @@ public class Room : IHeapItem<Room>
                 tiles[i] = new Vector2Int(xPosition, yPosition);
                 tileCount++;
             }
+            else
+            {
+                walls.Add(new Vector3Int(xPosition, yPosition));
+            }
+        }
+
+        for (int i = 0; i < width; i++)
+        {
+            int xPosition = i + (int)position.x;
+
+            walls.Add(new Vector3Int(xPosition, (int)position.y - 1));
+            walls.Add(new Vector3Int(xPosition, (int)position.y + height));
+        }
+
+        for (int i = -1; i < height + 1; i++)
+        {
+            int yPosition = i + (int)position.y;
+
+            walls.Add(new Vector3Int((int)position.x - 1, yPosition));
+            walls.Add(new Vector3Int((int)position.x + width, yPosition));
         }
 
         center = new Vector2((int)position.x + width / 2f, (int)position.y + height / 2f);
@@ -972,6 +1122,11 @@ public class Room : IHeapItem<Room>
             {
                 tiles[i] += direction;
             }
+        }
+
+        for (int i = 0; i < walls.Count; i++)
+        {
+            walls[i] += (Vector3Int)direction;
         }
 
         center += direction;

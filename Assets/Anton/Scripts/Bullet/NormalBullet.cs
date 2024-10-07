@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using UnityEngine;
 
@@ -9,10 +10,15 @@ public class NormalBullet : MonoBehaviour
     int amountOfEnemiesHit;
     float angle;
     Rigidbody2D rb;
+    CircleCollider2D colider;
+
+    public GameObject explosionCiclePrefab;
 
     private void Start()
     {
         rb = GetComponent<Rigidbody2D>();
+        colider = GetComponent<CircleCollider2D>();
+        colider.radius = 1;
     }
 
     void Update()
@@ -34,6 +40,10 @@ public class NormalBullet : MonoBehaviour
         if (collision.tag == "Enemy")
         {
             amountOfEnemiesHit += 1;
+            if (GunController.explosion)
+            {
+                Instantiate(explosionCiclePrefab, transform.position, Quaternion.identity);
+            }
             if (GunController.pierce)
             {
                 if (amountOfEnemiesHit >= GunController.pierceAmount)

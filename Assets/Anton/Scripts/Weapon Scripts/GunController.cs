@@ -19,6 +19,7 @@ public class GunController : MonoBehaviour
     public static int Damage;
     public static int pierceAmount;
     public static bool pierce;
+    public static bool explosion;
     public static float fireForce;
     #endregion
 
@@ -33,11 +34,17 @@ public class GunController : MonoBehaviour
         fireForce = gun.fireForce;
 
         pierce = false;
+        explosion = false;
         if (gun.effects != null && gun.effects.Length != 0)
         {
             if (gun.effects.Contains(WeaponEffect.pierceShot))
             {
                 pierce = true;
+            }
+
+            if (gun.effects.Contains(WeaponEffect.expolsiveOnImpact))
+            {
+                explosion = true;
             }
         }
     }

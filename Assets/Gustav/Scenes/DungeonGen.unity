@@ -193,7 +193,7 @@ TilemapRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -704271707
+  m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
@@ -1139,7 +1139,7 @@ TilemapRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: -704271707
+  m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
@@ -1292,8 +1292,10 @@ GameObject:
   - component: {fileID: 2079187795}
   - component: {fileID: 2079187794}
   - component: {fileID: 2079187793}
+  - component: {fileID: 2079187797}
+  - component: {fileID: 2079187796}
   m_Layer: 0
-  m_Name: InteractableMap
+  m_Name: TrapMap
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1388,7 +1390,7 @@ TilemapRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 1022315979
+  m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_ChunkSize: {x: 32, y: 32, z: 32}
@@ -1485,6 +1487,45 @@ Tilemap:
     e31: 0
     e32: 0
     e33: 1
+--- !u!114 &2079187796
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2079187789}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3b9f122917bf8db4b94e7733f96a252f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!50 &2079187797
+Rigidbody2D:
+  serializedVersion: 4
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2079187789}
+  m_BodyType: 1
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDrag: 0
+  m_AngularDrag: 0.05
+  m_GravityScale: 1
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 1
+  m_Constraints: 7
 --- !u!1001 &7987577704223409528
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1494,21 +1535,65 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: seed
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: ruleTile
       value: 
       objectReference: {fileID: 11400000, guid: 2551f7a2c1abd7348a73013c0430f4b8, type: 2}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: stripSize.x
+      value: 250
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: stripSize.y
+      value: 125
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: hallwayWidth
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: amountOfLoops
+      value: 12.5
+      objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: groundTileMap
       value: 
       objectReference: {fileID: 28663809}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: roomMinSize.x
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: roomMinSize.y
+      value: 20
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: totalRoomsCount
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: amountOfMainRooms
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: debugSpanningTree
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: debugTriangulation
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: randomizedHallwaySize
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: trapTileMap
+      value: 
+      objectReference: {fileID: 2079187795}
     - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: wallTileMap
       value: 
@@ -1517,6 +1602,18 @@ PrefabInstance:
       propertyPath: groundTileMap
       value: 
       objectReference: {fileID: 28663809}
+    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: tiles.Array.size
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: tiles.Array.data[2].tile
+      value: 
+      objectReference: {fileID: 11400000, guid: a4ccb216abfa579489a7441184f157f8, type: 2}
+    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: tiles.Array.data[2].type
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 3649946842529648313, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

@@ -21,6 +21,8 @@ public class MapGenerationManager : MonoBehaviour
     [BoxGroup("TileMap Variables")]
     [Required("Wall tile map is needed")] public Tilemap wallTileMap;
     [BoxGroup("TileMap Variables")]
+    [Required("Trap tile map is needed")] public Tilemap trapTileMap;
+    [BoxGroup("TileMap Variables")]
     public TilePair[] tiles;
     #endregion
 
@@ -101,6 +103,7 @@ public enum TileTexture
 {
     ground,   
     wall,
+    spikeTrap,
 }
 
 [Serializable]

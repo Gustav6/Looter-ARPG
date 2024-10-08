@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Rocket Launcher
   description: 
-  sprite: {fileID: -1591389660, guid: e89a104cc74b80444afa07fa92cd8e81, type: 3}
+  sprite: {fileID: -1105330770, guid: fee0ac3d32e8b9d40a7958a86b291f18, type: 3}
   bulletPrefab: {fileID: 4550873575046521524, guid: 5047a56b2eea81945b43cf151678d32d, type: 3}
   damage: 500
   Ammo: 2
@@ -24,4 +24,4 @@ MonoBehaviour:
   reloadTime: 0
   effects: 00000000
   amountOfPircableEnemies: 0
-  damageTypes: 
+  damageTypes: 01000000

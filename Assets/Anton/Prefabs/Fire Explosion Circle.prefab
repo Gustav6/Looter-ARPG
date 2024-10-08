@@ -14,8 +14,8 @@ GameObject:
   - component: {fileID: 926451368795916441}
   - component: {fileID: 3049900224317724000}
   m_Layer: 0
-  m_Name: Explosion Circle
-  m_TagString: Explosion
+  m_Name: Fire Explosion Circle
+  m_TagString: Fire
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0

@@ -9,6 +9,8 @@ TagManager:
   - Enemy
   - Bullet
   - Gun
+  - Explosion
+  - Fire
   layers:
   - Default
   - TransparentFX

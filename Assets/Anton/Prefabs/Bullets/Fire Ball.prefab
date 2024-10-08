@@ -10,12 +10,12 @@ GameObject:
   m_Component:
   - component: {fileID: 4414496023921939969}
   - component: {fileID: 2882783880392440476}
-  - component: {fileID: 7219379024159458411}
   - component: {fileID: 3637908344632344400}
   - component: {fileID: 7513639064025469287}
   - component: {fileID: -1854825082180706029}
+  - component: {fileID: 2874499348662371371}
   m_Layer: 0
-  m_Name: Rocket
+  m_Name: Fire Ball
   m_TagString: Bullet
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -31,7 +31,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 6, y: 6, z: 1}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -77,8 +77,8 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: ada755eee43b45d438647ce7c4feb906, type: 3}
-  m_Color: {r: 0.5660378, g: 0.5660378, b: 0.5660378, a: 1}
+  m_Sprite: {fileID: -2413806693520163455, guid: a86470a33a6bf42c4b3595704624658b, type: 3}
+  m_Color: {r: 1, g: 0.6688455, b: 0, a: 1}
   m_FlipX: 0
   m_FlipY: 0
   m_DrawMode: 0
@@ -88,19 +88,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &7219379024159458411
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4550873575046521524}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f04ee56eb4290ff4e915eafecb4218f7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  explosionCiclePrefab: {fileID: 3246453459513043161, guid: 41e5449bdf4adea46baf4cdf72d2a29d, type: 3}
 --- !u!50 &3637908344632344400
 Rigidbody2D:
   serializedVersion: 4
@@ -160,9 +147,9 @@ CircleCollider2D:
   m_IsTrigger: 1
   m_UsedByEffector: 0
   m_UsedByComposite: 0
-  m_Offset: {x: 0, y: -0.007629792}
+  m_Offset: {x: 0, y: 0}
   serializedVersion: 2
-  m_Radius: 0.32451627
+  m_Radius: 0.5
 --- !u!96 &-1854825082180706029
 TrailRenderer:
   serializedVersion: 3
@@ -171,7 +158,7 @@ TrailRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4550873575046521524}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -205,7 +192,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.05
+  m_Time: 0.02
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
@@ -215,7 +202,7 @@ TrailRenderer:
       m_Curve:
       - serializedVersion: 3
         time: 0
-        value: 1
+        value: 0.6156845
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -227,17 +214,17 @@ TrailRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 0.93730223, b: 0, a: 1}
-      key1: {r: 1, g: 0.07371566, b: 0, a: 1}
-      key2: {r: 0, g: 0, b: 0, a: 0}
+      key0: {r: 1, g: 1, b: 1, a: 1}
+      key1: {r: 1, g: 0.97296894, b: 0, a: 1}
+      key2: {r: 1, g: 0.31793582, b: 0, a: 0}
       key3: {r: 0, g: 0, b: 0, a: 0}
       key4: {r: 0, g: 0, b: 0, a: 0}
       key5: {r: 0, g: 0, b: 0, a: 0}
       key6: {r: 0, g: 0, b: 0, a: 0}
       key7: {r: 0, g: 0, b: 0, a: 0}
       ctime0: 0
-      ctime1: 65535
-      ctime2: 0
+      ctime1: 1002
+      ctime2: 65535
       ctime3: 0
       ctime4: 0
       ctime5: 0
@@ -253,13 +240,13 @@ TrailRenderer:
       atime7: 0
       m_Mode: 0
       m_ColorSpace: 0
-      m_NumColorKeys: 2
+      m_NumColorKeys: 3
       m_NumAlphaKeys: 2
     numCornerVertices: 0
     numCapVertices: 0
     alignment: 0
     textureMode: 0
-    textureScale: {x: 1, y: 1.87}
+    textureScale: {x: 1, y: 1}
     shadowBias: 0.5
     generateLightingData: 0
   m_MinVertexDistance: 0.1
@@ -267,3 +254,16 @@ TrailRenderer:
   m_Autodestruct: 0
   m_Emitting: 1
   m_ApplyActiveColorSpace: 1
+--- !u!114 &2874499348662371371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4550873575046521524}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d373384c665e9504a94e15727c9ff33f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  FireExplosionCiclePrefab: {fileID: 3246453459513043161, guid: 7db1d548e2a60e942a268ad191d89ecc, type: 3}

@@ -20,6 +20,7 @@ public class GunController : MonoBehaviour
     public static int pierceAmount;
     public static bool pierce;
     public static bool explosion;
+    public static bool dmgOverTime;
     public static float fireForce;
     #endregion
 
@@ -33,8 +34,10 @@ public class GunController : MonoBehaviour
         pierceAmount = gun.amountOfPircableEnemies;
         fireForce = gun.fireForce;
 
+        #region Set Static Variables
         pierce = false;
         explosion = false;
+        dmgOverTime = false;
         if (gun.effects != null && gun.effects.Length != 0)
         {
             if (gun.effects.Contains(WeaponEffect.pierceShot))
@@ -46,7 +49,13 @@ public class GunController : MonoBehaviour
             {
                 explosion = true;
             }
+
+            if (gun.effects.Contains(WeaponEffect.dmgOverTime))
+            {
+                dmgOverTime = true;
+            }
         }
+        #endregion
     }
 
     void Update()

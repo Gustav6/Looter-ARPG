@@ -44,6 +44,10 @@ public class NormalBullet : MonoBehaviour
             {
                 Instantiate(explosionCiclePrefab, transform.position, Quaternion.identity);
             }
+            if (GunController.dmgOverTime)
+            {
+                //Instantiate(FireExplosionCiclePrefab, transform.position, Quaternion.identity);
+            }
             if (GunController.pierce)
             {
                 if (amountOfEnemiesHit >= GunController.pierceAmount)

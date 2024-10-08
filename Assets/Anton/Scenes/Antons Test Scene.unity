@@ -1036,7 +1036,7 @@ Transform:
   m_GameObject: {fileID: 2127833817}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.91, y: 0.51, z: 0.05133289}
+  m_LocalPosition: {x: 5.67, y: 0.51, z: 0.05133289}
   m_LocalScale: {x: 13, y: 13, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -1055,7 +1055,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac5104ccd9543a94f8ebe50159834ede, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gun: {fileID: 11400000, guid: ddbc4c73383053443ab6145f503f179d, type: 2}
+  gun: {fileID: 11400000, guid: 269593c87e578bd4f80b4af796f261da, type: 2}
   firePoint: {fileID: 1468096973}
   firePoint2: {fileID: 939792213}
   sprite: {fileID: 2127833820}

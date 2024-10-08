@@ -9,11 +9,10 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e25795d307c4464dad9f8305fe8cef0, type: 3}
-  m_Name: Player
+  m_Script: {fileID: 11500000, guid: 679891f6c63190f469ac18c8d37a33d3, type: 3}
+  m_Name: potion2
   m_EditorClassIdentifier: 
-  Container:
-  - item: {fileID: 11400000, guid: fc561e20df0a6324bb54fa5db8bb7a59, type: 2}
-    amount: 10
-  - item: {fileID: 11400000, guid: 849341e1f30023f4786e20f72afdd4ac, type: 2}
-    amount: 25
+  prefab: {fileID: 2482142415080548964, guid: 4170da3e66047aa49b43abaaf837ac70, type: 3}
+  type: 1
+  description: 
+  restoreHealth: 0

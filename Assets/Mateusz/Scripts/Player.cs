@@ -20,7 +20,10 @@ public class Player : MonoBehaviour
     private Image staminaProgressUI = null;
     [SerializeField]
     private CanvasGroup sliderCanvasGroup = null;
-    
+
+    public GameObject inventoryCanvas;
+
+    bool inventoryOpen;
     bool running;
 
     Vector3 velocity;
@@ -34,7 +37,6 @@ public class Player : MonoBehaviour
         stamina = maxStamina;
         moveSpeed = 5;
         controller = GetComponent<Controller2D>();
-        Debug.Log(+moveSpeed);
     }
 
     private void Update()
@@ -46,8 +48,6 @@ public class Player : MonoBehaviour
         velocity.y = direction.y * moveSpeed;
         controller.Move(velocity * Time.deltaTime);
 
-        
-
         if (Input.GetKeyDown(KeyCode.LeftShift) && stamina > 0)
         { 
             running = true;
@@ -55,6 +55,17 @@ public class Player : MonoBehaviour
         }else if (Input.GetKeyUp(KeyCode.LeftShift))
         {
             running = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Tab) && !inventoryOpen)
+        {
+            inventoryCanvas.SetActive(true);
+            inventoryOpen = true;
+        }
+        else if (Input.GetKeyDown(KeyCode.Tab) && inventoryOpen)
+        {
+            inventoryCanvas.SetActive(false);
+            inventoryOpen = false;
         }
 
         if (running)
@@ -73,6 +84,7 @@ public class Player : MonoBehaviour
             stamina += Time.deltaTime * rechargeTime;
             UpdateStamina(1);
         }
+
     }
 
 
@@ -89,14 +101,20 @@ public class Player : MonoBehaviour
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public void OnTriggerEnter2D(Collider2D other)
     {
-        Debug.Log("BIG BLACK FUCKING BAKLKS");
-        var item = GetComponent<Item>();
+        Debug.Log("henlo");
+        var item = other.GetComponent<Item>();
         if (item)
         {
+            Debug.Log("henlo2");
             inventory.AddItem(item.item, 1);
-            Destroy(collision.gameObject);
+            Destroy(other.gameObject);
         }
+    }
+
+    private void OnApplicationQuit()
+    {
+        inventory.Container.Clear();
     }
 }

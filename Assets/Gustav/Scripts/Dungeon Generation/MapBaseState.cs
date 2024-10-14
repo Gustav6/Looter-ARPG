@@ -4,6 +4,8 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using static UnityEngine.RuleTile.TilingRuleOutput;
+using UnityEngine.UIElements;
 
 #region Base State
 public abstract class MapBaseState
@@ -96,7 +98,7 @@ public class GeneratingMapState : MapBaseState
     {
         foreach (Room room in mainRooms)
         {
-            foreach (Vector3Int? position in room.tiles.Select(v => (Vector3Int?)v))
+            foreach (Vector3Int? position in room.groundTiles.Select(v => (Vector3Int?)v))
             {
                 if (position != null)
                 {
@@ -105,6 +107,43 @@ public class GeneratingMapState : MapBaseState
             }
 
             wallTilePositions.UnionWith(room.walls);
+
+            float xOffset = rng.Next(-100000, 100000);
+            float yOffset = rng.Next(-100000, 100000);
+
+            float[,] noiseMap = NoiseMapGenerator.Instance.GenerateMap(room.width, room.height, MapSettings.Instance.seed, new(xOffset, yOffset));
+
+            for (int x = 0; x < noiseMap.GetLength(0); x++)
+            {
+                for (int y = 0; y < noiseMap.GetLength(1); y++)
+                {
+                    Vector3Int prefabPosition = new (x - (room.width / 2) + (int)room.center.x, y - (room.height / 2) + (int)room.center.y);
+                    prefabPosition += Vector3Int.one;
+
+                    if (groundTilePositions.Contains(prefabPosition))
+                    {
+                        float currentHeight = noiseMap[x, y];
+
+                        for (int i = 0; i < NoiseMapGenerator.Instance.regions.Length; i++)
+                        {
+                            if (currentHeight <= NoiseMapGenerator.Instance.regions[i].heightValue)
+                            {
+                                if (NoiseMapGenerator.Instance.regions[i].prefab == null)
+                                {
+                                    Debug.Log("Error within noise array, on position: " + i);
+                                    continue;
+                                }
+
+                                GameObject.Instantiate(NoiseMapGenerator.Instance.regions[i].prefab, prefabPosition, Quaternion.identity);
+
+                                //manager.trapTileMap.SetTile(trapTilePosition, NoiseMapGenerator.Instance.regions[i].tile);
+
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
         }
 
         #region Methods for generation
@@ -143,7 +182,7 @@ public class GeneratingMapState : MapBaseState
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to set wall tiles");
         #endregion
 
-        AddTraps(manager);
+        //AddTraps(manager);
 
         #region Diagnostic End
         stopwatch.Stop();
@@ -914,13 +953,13 @@ public class GeneratingMapState : MapBaseState
     {
         List<Vector3Int> trapPositions = new();
 
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < groundTilePositions.Count * (MapSettings.Instance.amountOfTraps / 100); i++)
         {
             trapPositions.Add(groundTilePositions.ElementAt(rng.Next(0, groundTilePositions.Count)));
         }
 
         TileBase[] tempArray = new TileBase[trapPositions.Count];
-        Array.Fill(tempArray, manager.tilePairs[TileTexture.spikeTrap]);
+        //Array.Fill(tempArray, MapManager.Instance.tilePairs[TrapType.spike]);
 
         manager.trapTileMap.SetTiles(trapPositions.ToArray(), tempArray);
     }
@@ -932,7 +971,7 @@ public class LoadedMapState : MapBaseState
 {
     public override void EnterState(MapGenerationManager manager)
     {
-        manager.map = new()
+        manager.loadedMap = new()
         {
             seed = MapSettings.Instance.seed,
             spawnFunction = MapSettings.Instance.spawnFunction,
@@ -964,6 +1003,8 @@ public class LoadedMapState : MapBaseState
     {
         manager.groundTileMap.ClearAllTiles();
         manager.wallTileMap.ClearAllTiles();
+        manager.trapTileMap.ClearAllTiles();
+        TrapManager.Instance.DestroyTraps();
     }
 }
 #endregion
@@ -1012,7 +1053,7 @@ public class Room : IHeapItem<Room>
     #endregion
 
     public List<Vector3Int> walls = new();
-    public Vector2Int?[] tiles;
+    public Vector2Int?[] groundTiles;
     public readonly int tileCount = 0;
 
     private readonly Circle c1, c2;
@@ -1024,7 +1065,7 @@ public class Room : IHeapItem<Room>
         c1 = null;
         c2 = null;
 
-        tiles = new Vector2Int?[width * height];
+        groundTiles = new Vector2Int?[width * height];
 
         #region Set Circles
         if (roundCorners)
@@ -1056,7 +1097,7 @@ public class Room : IHeapItem<Room>
         }
         #endregion
 
-        for (int i = 0; i < tiles.Length; i++)
+        for (int i = 0; i < groundTiles.Length; i++)
         {
             bool canAdd = false;
 
@@ -1099,7 +1140,7 @@ public class Room : IHeapItem<Room>
 
             if (canAdd)
             {
-                tiles[i] = new Vector2Int(xPosition, yPosition);
+                groundTiles[i] = new Vector2Int(xPosition, yPosition);
                 tileCount++;
             }
             else
@@ -1131,11 +1172,11 @@ public class Room : IHeapItem<Room>
 
     public void MoveRoom(Vector2Int direction)
     {
-        for (int i = 0; i < tiles.Length; i++)
+        for (int i = 0; i < groundTiles.Length; i++)
         {
-            if (tiles[i] != null)
+            if (groundTiles[i] != null)
             {
-                tiles[i] += direction;
+                groundTiles[i] += direction;
             }
         }
 

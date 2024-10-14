@@ -104,6 +104,11 @@ public class MapSettings : MonoBehaviour
     [EnableIf("randomizedHallwaySize")] public int hallwayMaxWidth = 15;
     #endregion
 
+    #region Traps
+    [BoxGroup("Trap Variables")]
+    [Range(0, 100)] public float amountOfTraps = 10;
+    #endregion
+
     #region Debug
     [Foldout("Debug")]
     public bool debugTriangulation = false;

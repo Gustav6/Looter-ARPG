@@ -8,11 +8,9 @@ using UnityEngine.Tilemaps;
 public class MapGenerationManager : MonoBehaviour
 {
     #region States
-
     private MapBaseState currentState;
     public GeneratingMapState generationState = new();
     public LoadedMapState loadedState = new();
-
     #endregion
 
     #region Tile & TileMap
@@ -28,7 +26,9 @@ public class MapGenerationManager : MonoBehaviour
 
     public Room startingRoom;
 
-    public Map map;
+    public Map loadedMap;
+
+    public GameObject trapPrefab;
 
     public readonly Dictionary<TileTexture, TileBase> tilePairs = new();
 
@@ -36,7 +36,7 @@ public class MapGenerationManager : MonoBehaviour
     {
         foreach (TilePair pair in tiles)
         {
-            tilePairs.TryAdd(pair.type, pair.tile);
+            tilePairs.Add(pair.type, pair.tile);
         }
 
         SwitchState(generationState);
@@ -91,6 +91,19 @@ public class MapGenerationManager : MonoBehaviour
 
         return grid[x, y];
     }
+
+    [Serializable]
+    public struct Map
+    {
+        public int seed;
+        public SpawnFunction spawnFunction;
+        public int spawnRadius;
+        public Vector2Int stripSpawnSize;
+        public int amountOfRooms, amountOfMainRooms;
+        public Vector2Int roomMinSize, roomMaxSize;
+        public float amountOfLoops;
+        public int hallwayWidth;
+    }
 }
 
 public enum SpawnFunction
@@ -103,18 +116,4 @@ public enum TileTexture
 {
     ground,   
     wall,
-    spikeTrap,
-}
-
-[Serializable]
-public struct Map
-{
-    public int seed;
-    public SpawnFunction spawnFunction;
-    public int spawnRadius;
-    public Vector2Int stripSpawnSize;
-    public int amountOfRooms, amountOfMainRooms;
-    public Vector2Int roomMinSize, roomMaxSize;
-    public float amountOfLoops;
-    public int hallwayWidth;
 }

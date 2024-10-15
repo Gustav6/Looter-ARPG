@@ -37,6 +37,8 @@ public class Player : MonoBehaviour
         stamina = maxStamina;
         moveSpeed = 5;
         controller = GetComponent<Controller2D>();
+
+
     }
 
     private void Update()
@@ -66,6 +68,17 @@ public class Player : MonoBehaviour
         {
             inventoryCanvas.SetActive(false);
             inventoryOpen = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            Debug.Log("Saving");
+            inventory.Save();
+        }
+        if (Input.GetKeyDown(KeyCode.Q))
+        {
+            Debug.Log("Loading");
+            inventory.Load();
         }
 
         if (running)

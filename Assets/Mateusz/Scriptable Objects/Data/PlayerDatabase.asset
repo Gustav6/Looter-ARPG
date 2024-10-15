@@ -9,9 +9,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e25795d307c4464dad9f8305fe8cef0, type: 3}
-  m_Name: Player
+  m_Script: {fileID: 11500000, guid: 4addb78a237a1504885902379c4fa5e2, type: 3}
+  m_Name: PlayerDatabase
   m_EditorClassIdentifier: 
-  savePath: 
-  database: {fileID: 11400000, guid: 88aa0db497929594eb51dbf2236c65c6, type: 2}
-  Container: []
+  Items: []

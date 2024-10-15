@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 4008461861435447006}
   - component: {fileID: 7786192453122711135}
   - component: {fileID: 926451368795916441}
-  - component: {fileID: 3049900224317724000}
+  - component: {fileID: -6693468064605272041}
   m_Layer: 0
   m_Name: Fire Explosion Circle
   m_TagString: Fire
@@ -134,7 +134,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 06e8d6ff25d1cb34d8c5dea6583be379, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!50 &3049900224317724000
+--- !u!50 &-6693468064605272041
 Rigidbody2D:
   serializedVersion: 4
   m_ObjectHideFlags: 0

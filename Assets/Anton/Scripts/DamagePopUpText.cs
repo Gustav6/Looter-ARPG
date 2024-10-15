@@ -11,7 +11,7 @@ public class DamagePopUpText : MonoBehaviour
     void Start()
     {
         timer = destructTimer;
-        textMeshPro.SetText(GunController.Damage.ToString());
+        textMeshPro.SetText(AntonsTemporaryEnemyScript.dmgTakenEnemy.ToString());
     }
 
     private void Update()

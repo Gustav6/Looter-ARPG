@@ -9,7 +9,7 @@ public class ExplosionCircle : MonoBehaviour
     {
         transform.localScale = new Vector3(1, 1);
     }
-    void Update()
+    void FixedUpdate()
     {
         transform.localScale += new Vector3(2f, 2f);
         timer += Time.deltaTime;

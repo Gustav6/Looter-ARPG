@@ -6,7 +6,7 @@ public class AntonsPlayerController : MonoBehaviour
 {
     Rigidbody2D rb;
 
-    public static float walkSpeed = 15f;
+    public static float walkSpeed = 25f;
     float speedLimiter = 0.7f;
     float inputHorizontal;
     float inputVertical;

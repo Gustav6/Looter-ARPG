@@ -60,7 +60,6 @@ public class GunController : MonoBehaviour
 
     void Update()
     {
-        ammoCount.SetText(ammo.ToString());
         #region Input
         if (attackTimer >= gun.fireRate)
         {

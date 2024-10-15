@@ -19,8 +19,8 @@ MonoBehaviour:
   damage: 25
   Ammo: 20
   critChanse: 0
-  fireRate: 0.3
-  fireForce: 120
+  fireRate: 0.2
+  fireForce: 150
   reloadTime: 0
   effects: 
   amountOfPircableEnemies: 0

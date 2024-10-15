@@ -205,7 +205,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.02
+  m_Time: 0.01
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
@@ -214,8 +214,8 @@ TrailRenderer:
       serializedVersion: 2
       m_Curve:
       - serializedVersion: 3
-        time: 0
-        value: 0.19999695
+        time: 0.0032844543
+        value: 0.07058716
         inSlope: 0
         outSlope: 0
         tangentMode: 0
@@ -262,7 +262,7 @@ TrailRenderer:
     textureScale: {x: 1, y: 1}
     shadowBias: 0.5
     generateLightingData: 0
-  m_MinVertexDistance: 0.1
+  m_MinVertexDistance: 0.05
   m_MaskInteraction: 0
   m_Autodestruct: 0
   m_Emitting: 1

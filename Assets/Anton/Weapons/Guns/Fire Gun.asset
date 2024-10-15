@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: Fire Gun
   description: 
-  sprite: {fileID: 1922192494, guid: e89a104cc74b80444afa07fa92cd8e81, type: 3}
+  sprite: {fileID: 755783589, guid: 95ed301aadc503645b106b472b391a98, type: 3}
   bulletPrefab: {fileID: 4550873575046521524, guid: a200788b222f71746820a0f720dd684b, type: 3}
   damage: 50
   Ammo: 5

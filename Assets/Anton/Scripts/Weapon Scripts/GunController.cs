@@ -63,7 +63,7 @@ public class GunController : MonoBehaviour
         #region Input
         if (attackTimer >= gun.fireRate)
         {
-            if (Input.GetMouseButtonDown(0))
+            if (Input.GetMouseButton(0))
             {
                 if (ammo > 0)
                 {

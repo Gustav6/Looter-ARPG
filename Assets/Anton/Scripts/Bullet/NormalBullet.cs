@@ -18,7 +18,7 @@ public class NormalBullet : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         colider = GetComponent<CircleCollider2D>();
-        colider.radius = 1;
+        colider.radius = 0.5f;
     }
 
     void Update()

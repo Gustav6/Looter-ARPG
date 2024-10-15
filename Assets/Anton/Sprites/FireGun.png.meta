@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: fee0ac3d32e8b9d40a7958a86b291f18
+guid: 95ed301aadc503645b106b472b391a98
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -48,7 +48,7 @@ TextureImporter:
   spriteMeshType: 1
   alignment: 0
   spritePivot: {x: 0.5, y: 0.5}
-  spritePixelsToUnits: 16
+  spritePixelsToUnits: 20
   spriteBorder: {x: 0, y: 0, z: 0, w: 0}
   spriteGenerateFallbackPhysicsShape: 1
   alphaUsage: 1
@@ -97,7 +97,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: CannonConcept1-export_0
+      name: FireGun_0
       rect:
         serializedVersion: 2
         x: 0
@@ -111,14 +111,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b9fd4b2a74a091c47b9412a98f91c32b
-      internalID: 1713884475
+      spriteID: 13d0e9bd109fe34429b87877d5a7856f
+      internalID: 2131861403
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: CannonConcept1-export_1
+      name: FireGun_1
       rect:
         serializedVersion: 2
         x: 0
@@ -132,8 +132,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e3ab7303e6be60f4397cc46b1df2bf37
-      internalID: -1105330770
+      spriteID: 55f1e8c659de21a4493397965cd61307
+      internalID: 755783589
       vertices: []
       indices: 
       edges: []
@@ -149,8 +149,8 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      CannonConcept1-export_0: 1713884475
-      CannonConcept1-export_1: -1105330770
+      FireGun_0: 2131861403
+      FireGun_1: 755783589
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

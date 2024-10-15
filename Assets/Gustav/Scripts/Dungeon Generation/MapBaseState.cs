@@ -118,15 +118,14 @@ public class GeneratingMapState : MapBaseState
                 for (int y = 0; y < noiseMap.GetLength(1); y++)
                 {
                     Vector3Int prefabPosition = new (x - (room.width / 2) + (int)room.center.x, y - (room.height / 2) + (int)room.center.y);
-                    prefabPosition += Vector3Int.one;
 
                     if (groundTilePositions.Contains(prefabPosition))
                     {
-                        float currentHeight = noiseMap[x, y];
+                        float currentHeight1 = noiseMap[x, y];
 
                         for (int i = 0; i < NoiseMapGenerator.Instance.regions.Length; i++)
                         {
-                            if (currentHeight <= NoiseMapGenerator.Instance.regions[i].heightValue)
+                            if (currentHeight1 <= NoiseMapGenerator.Instance.regions[i].heightValue)
                             {
                                 if (NoiseMapGenerator.Instance.regions[i].prefab == null)
                                 {
@@ -134,9 +133,18 @@ public class GeneratingMapState : MapBaseState
                                     continue;
                                 }
 
-                                GameObject.Instantiate(NoiseMapGenerator.Instance.regions[i].prefab, prefabPosition, Quaternion.identity);
-
-                                //manager.trapTileMap.SetTile(trapTilePosition, NoiseMapGenerator.Instance.regions[i].tile);
+                                if (NoiseMapGenerator.Instance.regions[i].prefab.CompareTag("Trap"))
+                                {
+                                    TrapManager.Instance.AddTrap(prefabPosition, NoiseMapGenerator.Instance.regions[i].prefab);
+                                }
+                                else if (NoiseMapGenerator.Instance.regions[i].prefab.CompareTag("Destructible"))
+                                {
+                                    DestructibleManager.Instance.AddBreakble(prefabPosition, NoiseMapGenerator.Instance.regions[i].prefab);
+                                }
+                                else
+                                {
+                                    Debug.Log("Error with prefab no tag found: " + NoiseMapGenerator.Instance.regions[i].prefab);
+                                }
 
                                 break;
                             }
@@ -948,21 +956,6 @@ public class GeneratingMapState : MapBaseState
         }
     }
     #endregion
-
-    private void AddTraps(MapGenerationManager manager)
-    {
-        List<Vector3Int> trapPositions = new();
-
-        for (int i = 0; i < groundTilePositions.Count * (MapSettings.Instance.amountOfTraps / 100); i++)
-        {
-            trapPositions.Add(groundTilePositions.ElementAt(rng.Next(0, groundTilePositions.Count)));
-        }
-
-        TileBase[] tempArray = new TileBase[trapPositions.Count];
-        //Array.Fill(tempArray, MapManager.Instance.tilePairs[TrapType.spike]);
-
-        manager.trapTileMap.SetTiles(trapPositions.ToArray(), tempArray);
-    }
 }
 #endregion
 
@@ -985,13 +978,7 @@ public class LoadedMapState : MapBaseState
             spawnRadius = MapSettings.Instance.generationRadius
         };
 
-
-        GameObject player = GameObject.FindGameObjectWithTag("Player");
-
-        if (player != null)
-        {
-            player.transform.position = manager.startingRoom.WorldPosition;
-        }
+        manager.playerReference.transform.position = manager.startingRoom.WorldPosition;
     }
 
     public override void UpdateState(MapGenerationManager manager)

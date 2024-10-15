@@ -30,6 +30,8 @@ public class MapGenerationManager : MonoBehaviour
 
     public GameObject trapPrefab;
 
+    public GameObject playerReference;
+
     public readonly Dictionary<TileTexture, TileBase> tilePairs = new();
 
     private void Start()
@@ -37,6 +39,11 @@ public class MapGenerationManager : MonoBehaviour
         foreach (TilePair pair in tiles)
         {
             tilePairs.Add(pair.type, pair.tile);
+        }
+
+        if (GameObject.FindGameObjectWithTag("Player") != null)
+        {
+            playerReference = GameObject.FindGameObjectWithTag("Player");
         }
 
         SwitchState(generationState);

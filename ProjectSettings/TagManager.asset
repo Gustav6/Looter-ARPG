@@ -11,6 +11,8 @@ TagManager:
   - Gun
   - Explosion
   - Fire
+  - Trap
+  - Destructible
   layers:
   - Default
   - TransparentFX

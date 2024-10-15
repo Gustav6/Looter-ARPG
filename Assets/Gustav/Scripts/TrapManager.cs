@@ -10,9 +10,6 @@ public class TrapManager : MonoBehaviour
 
     public HashSet<Vector3Int> TrapsPositions { get; private set; }
 
-    //[field: SerializeField] public Trap[] trapArray { get; private set; }
-    //private Dictionary<TrapType, GameObject> trapPairs = new();
-
     private void Start()
     {
         if (Instance == null)
@@ -27,11 +24,6 @@ public class TrapManager : MonoBehaviour
         }
 
         TrapsPositions = new HashSet<Vector3Int>();
-
-        //foreach (Trap trap in trapArray)
-        //{
-        //    trapPairs.Add(trap.type, trap.prefab);
-        //}
     }
 
     public void AddTrap(Vector3Int position, GameObject prefab)
@@ -52,14 +44,3 @@ public class TrapManager : MonoBehaviour
     }
 }
 
-//[System.Serializable]
-//public struct Trap
-//{
-//    public TrapType type;
-//    public GameObject prefab;
-//}
-
-public enum TrapType
-{
-    spike
-}

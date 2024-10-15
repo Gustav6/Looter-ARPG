@@ -7,6 +7,7 @@ public class TrapManager : MonoBehaviour
     public static TrapManager Instance { get; private set; }
 
     private List<GameObject> traps = new();
+    public Dictionary<Room, List<GameObject>> TrapsWithinRoom { get; private set; }
 
     public HashSet<Vector3Int> TrapsPositions { get; private set; }
 
@@ -23,23 +24,37 @@ public class TrapManager : MonoBehaviour
             return;
         }
 
+        TrapsWithinRoom = new();
         TrapsPositions = new HashSet<Vector3Int>();
     }
 
-    public void AddTrap(Vector3Int position, GameObject prefab)
+    public void AddTrap(Vector3Int position, GameObject prefab, Room relevantRoom)
     {
-        traps.Add(Instantiate(prefab, position, Quaternion.identity, transform));
+        GameObject trap = Instantiate(prefab, position, Quaternion.identity, transform);
+        //trap.SetActive(false);
+
+        if (TrapsWithinRoom.ContainsKey(relevantRoom))
+        {
+            TrapsWithinRoom[relevantRoom].Add(trap);
+        }
+        else
+        {
+            TrapsWithinRoom.Add(relevantRoom, new List<GameObject>() { trap });
+        }
+
+        traps.Add(trap);
 
         TrapsPositions.Add(position);
     }
 
-    public void DestroyTraps()
+    public void ClearTraps()
     {
         for (int i = 0; i < traps.Count; i++)
         {
             Destroy(traps[i]);
         }
 
+        TrapsWithinRoom.Clear();
         TrapsPositions.Clear();
     }
 }

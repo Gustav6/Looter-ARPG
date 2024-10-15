@@ -26,11 +26,12 @@ public class MapGenerationManager : MonoBehaviour
 
     public Room startingRoom;
 
-    public Map loadedMap;
+    public Map currentMap;
 
-    public GameObject trapPrefab;
+    public List<Edge> connectedRooms;
+    public List<Room> rooms;
 
-    public GameObject playerReference;
+    [field: SerializeField] public GameObject PlayerReference { get; private set; }
 
     public readonly Dictionary<TileTexture, TileBase> tilePairs = new();
 
@@ -43,7 +44,7 @@ public class MapGenerationManager : MonoBehaviour
 
         if (GameObject.FindGameObjectWithTag("Player") != null)
         {
-            playerReference = GameObject.FindGameObjectWithTag("Player");
+            PlayerReference = GameObject.FindGameObjectWithTag("Player");
         }
 
         SwitchState(generationState);

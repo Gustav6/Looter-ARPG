@@ -1,14 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 public class DestructibleManager : MonoBehaviour
 {
     public static DestructibleManager Instance { get; private set; }
 
-    private List<GameObject> breakble = new();
+    private List<GameObject> breakbles = new();
 
-    public HashSet<Vector3Int> BreakblePositions { get; private set; }
+    public Dictionary<Room, List<GameObject>> BreakablesWithinRoom { get; private set; }
+
+    public HashSet<Vector3Int> BreakablePositions { get; private set; }
 
     private void Start()
     {
@@ -23,24 +26,38 @@ public class DestructibleManager : MonoBehaviour
             return;
         }
 
-        BreakblePositions = new HashSet<Vector3Int>();
+        BreakablesWithinRoom = new();
+        BreakablePositions = new();
     }
 
 
-    public void AddBreakble(Vector3Int position, GameObject prefab)
+    public void AddBreakable(Vector3Int position, GameObject prefab, Room relevantRoom)
     {
-        breakble.Add(Instantiate(prefab, position, Quaternion.identity, transform));
+        GameObject breakable = Instantiate(prefab, position, Quaternion.identity, transform);
+        //breakable.SetActive(false);
 
-        BreakblePositions.Add(position);
-    }
-
-    public void DestroyTraps()
-    {
-        for (int i = 0; i < breakble.Count; i++)
+        if (BreakablesWithinRoom.ContainsKey(relevantRoom))
         {
-            Destroy(breakble[i]);
+            BreakablesWithinRoom[relevantRoom].Add(breakable);
+        }
+        else
+        {
+            BreakablesWithinRoom.Add(relevantRoom, new List<GameObject>() { breakable });
         }
 
-        BreakblePositions.Clear();
+        breakbles.Add(breakable);
+
+        BreakablePositions.Add(position);
+    }
+
+    public void ClearBreakbles()
+    {
+        for (int i = 0; i < breakbles.Count; i++)
+        {
+            Destroy(breakbles[i]);
+        }
+
+        BreakablesWithinRoom.Clear();
+        BreakablePositions.Clear();
     }
 }

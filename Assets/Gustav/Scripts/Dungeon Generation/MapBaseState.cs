@@ -6,6 +6,8 @@ using UnityEngine;
 using UnityEngine.Tilemaps;
 using static UnityEngine.RuleTile.TilingRuleOutput;
 using UnityEngine.UIElements;
+using System.Collections.ObjectModel;
+using UnityEditor.MemoryProfiler;
 
 #region Base State
 public abstract class MapBaseState
@@ -19,7 +21,7 @@ public abstract class MapBaseState
 #region Generation State
 public class GeneratingMapState : MapBaseState
 {
-    public Room[] rooms;
+    public Room[] tempRoomList;
     public List<Room> mainRooms = new();
 
     private List<Triangle> triangulation = new();
@@ -59,7 +61,7 @@ public class GeneratingMapState : MapBaseState
         groundTilePositions.Clear();
         wallTilePositions.Clear();
 
-        rooms = new Room[MapSettings.Instance.totalRoomsCount];
+        tempRoomList = new Room[MapSettings.Instance.totalRoomsCount];
         Heap<Room> roomHeapForSize = new(MapSettings.Instance.totalRoomsCount);
 
         // Generate x amount of rooms
@@ -67,7 +69,7 @@ public class GeneratingMapState : MapBaseState
         {
             Room newRoom = GenerateRoom(manager);
 
-            rooms[i] = newRoom;
+            tempRoomList[i] = newRoom;
             roomHeapForSize.Add(newRoom);
         }
 
@@ -135,11 +137,11 @@ public class GeneratingMapState : MapBaseState
 
                                 if (NoiseMapGenerator.Instance.regions[i].prefab.CompareTag("Trap"))
                                 {
-                                    TrapManager.Instance.AddTrap(prefabPosition, NoiseMapGenerator.Instance.regions[i].prefab);
+                                    TrapManager.Instance.AddTrap(prefabPosition, NoiseMapGenerator.Instance.regions[i].prefab, room);
                                 }
                                 else if (NoiseMapGenerator.Instance.regions[i].prefab.CompareTag("Destructible"))
                                 {
-                                    DestructibleManager.Instance.AddBreakble(prefabPosition, NoiseMapGenerator.Instance.regions[i].prefab);
+                                    DestructibleManager.Instance.AddBreakable(prefabPosition, NoiseMapGenerator.Instance.regions[i].prefab, room);
                                 }
                                 else
                                 {
@@ -154,6 +156,8 @@ public class GeneratingMapState : MapBaseState
             }
         }
 
+        manager.rooms = mainRooms;
+
         #region Methods for generation
         diagnosticTime = stopwatch.ElapsedMilliseconds;
         triangulation = GenerateDelaunayTriangulation(manager, mainRooms);
@@ -161,6 +165,8 @@ public class GeneratingMapState : MapBaseState
 
         diagnosticTime = stopwatch.ElapsedMilliseconds;
         minimumSpanningTree = GetMinimumSpanningTree(manager, triangulation, mainRooms, MapSettings.Instance.amountOfLoops);
+
+        manager.connectedRooms = minimumSpanningTree;
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to get minimum spanning tree");
 
         diagnosticTime = stopwatch.ElapsedMilliseconds;
@@ -189,8 +195,6 @@ public class GeneratingMapState : MapBaseState
 
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to set wall tiles");
         #endregion
-
-        //AddTraps(manager);
 
         #region Diagnostic End
         stopwatch.Stop();
@@ -247,7 +251,7 @@ public class GeneratingMapState : MapBaseState
     {
         canMoveRoom = false;
 
-        foreach (Room room in rooms)
+        foreach (Room room in tempRoomList)
         {
             Vector2Int direction = GetDirection(manager, room);
 
@@ -284,7 +288,7 @@ public class GeneratingMapState : MapBaseState
         Vector2 separationVelocity = Vector2.zero;
         Vector2 otherPosition, otherAgentToCurrent, directionToTravel;
 
-        foreach (Room room in rooms)
+        foreach (Room room in tempRoomList)
         {
             if (!RoomIntersects(currentRoom, room))
             {
@@ -962,9 +966,11 @@ public class GeneratingMapState : MapBaseState
 #region Loaded State
 public class LoadedMapState : MapBaseState
 {
+    private Room currentRoom;
+
     public override void EnterState(MapGenerationManager manager)
     {
-        manager.loadedMap = new()
+        manager.currentMap = new()
         {
             seed = MapSettings.Instance.seed,
             spawnFunction = MapSettings.Instance.spawnFunction,
@@ -978,7 +984,10 @@ public class LoadedMapState : MapBaseState
             spawnRadius = MapSettings.Instance.generationRadius
         };
 
-        manager.playerReference.transform.position = manager.startingRoom.WorldPosition;
+        currentRoom = manager.startingRoom;
+
+        LoadRooms(manager, currentRoom);
+        manager.PlayerReference.transform.position = currentRoom.WorldPosition;
     }
 
     public override void UpdateState(MapGenerationManager manager)
@@ -991,426 +1000,47 @@ public class LoadedMapState : MapBaseState
         manager.groundTileMap.ClearAllTiles();
         manager.wallTileMap.ClearAllTiles();
         manager.trapTileMap.ClearAllTiles();
-        TrapManager.Instance.DestroyTraps();
+        TrapManager.Instance.ClearTraps();
+        DestructibleManager.Instance.ClearBreakbles();
     }
-}
-#endregion
 
-#region Room and tile class
-public class Room : IHeapItem<Room>
-{
-    #region World position
-    public Vector2 WorldPosition
+    private void LoadRooms(MapGenerationManager manager, Room currentRoom)
     {
-        get
+        List<Room> roomsToCheck = manager.rooms;
+        roomsToCheck.Remove(currentRoom);
+        List<Room> roomsToLoad = new()
         {
-            return center;
-        }
-    }
+            currentRoom
+        };
 
-    public Vector2 BottomLeft
-    {
-        get
+        foreach (Edge connection in manager.connectedRooms)
         {
-            return new Vector2(WorldPosition.x - width / 2, WorldPosition.y - height / 2) - Vector2.one;
-        }
-    }
-    public Vector2 TopRight
-    {
-        get
-        {
-            return new Vector2(WorldPosition.x + width / 2 + 1, WorldPosition.y + height / 2 + 1) + Vector2.one;
-        }
-    }
-
-    public Vector2 center;
-    #endregion
-
-    #region Size of room
-    public readonly int width, height;
-    #endregion
-
-    #region Heap variables
-    private int heapIndex;
-    public int HeapIndex
-    {
-        get { return heapIndex; }
-        set { heapIndex = value; }
-    }
-    #endregion
-
-    public List<Vector3Int> walls = new();
-    public Vector2Int?[] groundTiles;
-    public readonly int tileCount = 0;
-
-    private readonly Circle c1, c2;
-
-    public Room(int width, int height, Vector2 position, bool roundCorners = false)
-    {
-        this.width = width;
-        this.height = height;
-        c1 = null;
-        c2 = null;
-
-        groundTiles = new Vector2Int?[width * height];
-
-        #region Set Circles
-        if (roundCorners)
-        {
-            float r;
-            Vector2 tempPosition1, tempPosition2;
-
-            if (width < height)
+            if (connection.points.Contains(currentRoom.center))
             {
-                r = width / 2f;
-                tempPosition1 = new Vector2((int)position.x + width / 2f, (int)position.y + height - width / 2.65f);
-                tempPosition2 = new Vector2((int)position.x + width / 2f, (int)position.y + width / 2.65f);
-            }
-            else if (width >= height)
-            {
-                r = height / 2f;
-                tempPosition1 = new Vector2((int)position.x + width - height / 2.65f, (int)position.y + height / 2f);
-                tempPosition2 = new Vector2((int)position.x + height / 2.65f, (int)position.y + height / 2f);
-            }
-            else
-            {
-                r = 0;
-                tempPosition1 = Vector2.zero;
-                tempPosition2 = Vector2.zero;
-            }
-
-            c1 = new Circle(tempPosition1, r);
-            c2 = new Circle(tempPosition2, r);
-        }
-        #endregion
-
-        for (int i = 0; i < groundTiles.Length; i++)
-        {
-            bool canAdd = false;
-
-            int xPosition = i % width + (int)position.x;
-            int yPosition = i / width + (int)position.y;
-
-            if (roundCorners)
-            {
-                if (c1.position.y == c2.position.y)
+                for (int i = roomsToCheck.Count - 1; i >= 0; i--)
                 {
-                    if (xPosition <= c1.position.x && xPosition >= c2.position.x)
+                    if (connection.points.Contains(roomsToCheck[i].center))
                     {
-                        canAdd = true;
-                    }
-                }
-                else if (c1.position.x == c2.position.x)
-                {
-                    if (yPosition <= c1.position.y && yPosition >= c2.position.y)
-                    {
-                        canAdd = true;
-                    }
-                }
-
-                if (!canAdd)
-                {
-                    if (c1.Intersects(new Vector2(xPosition + 0.5f, yPosition + 0.5f)))
-                    {
-                        canAdd = true;
-                    }
-                    else if (c2.Intersects(new Vector2(xPosition + 0.5f, yPosition + 0.5f)))
-                    {
-                        canAdd = true;
+                        roomsToLoad.Add(roomsToCheck[i]);
+                        roomsToCheck.Remove(roomsToCheck[i]);
                     }
                 }
             }
-            else
-            {
-                canAdd = true;
-            }
-
-            if (canAdd)
-            {
-                groundTiles[i] = new Vector2Int(xPosition, yPosition);
-                tileCount++;
-            }
-            else
-            {
-                walls.Add(new Vector3Int(xPosition, yPosition));
-            }
         }
 
-        for (int i = 0; i < width; i++)
+        foreach (Room room in roomsToLoad)
         {
-            for (int j = 0; j < height; j++)
+            foreach (GameObject gameObject in DestructibleManager.Instance.BreakablesWithinRoom[room])
             {
-                walls.Add(new Vector3Int(i + (int)position.x, (int)position.y - 1 - j));
-                walls.Add(new Vector3Int(i + (int)position.x, (int)position.y + height + j));
+                gameObject.SetActive(true);
+            }
+
+            foreach (GameObject gameObject in TrapManager.Instance.TrapsWithinRoom[room])
+            {
+                gameObject.SetActive(true);
             }
         }
-
-        for (int i = -height; i < height * 2; i++)
-        {
-            for (int j = 0; j < width; j++)
-            {
-                walls.Add(new Vector3Int((int)position.x - 1 - j , i + (int)position.y));
-                walls.Add(new Vector3Int((int)position.x + width + j, i + (int)position.y));
-            }
-        }
-
-        center = new Vector2((int)position.x + width / 2f, (int)position.y + height / 2f);
-    }
-
-    public void MoveRoom(Vector2Int direction)
-    {
-        for (int i = 0; i < groundTiles.Length; i++)
-        {
-            if (groundTiles[i] != null)
-            {
-                groundTiles[i] += direction;
-            }
-        }
-
-        for (int i = 0; i < walls.Count; i++)
-        {
-            walls[i] += (Vector3Int)direction;
-        }
-
-        center += direction;
-    }
-
-    public int CompareTo(Room other)
-    {
-        int compare = tileCount.CompareTo(other.tileCount);
-
-        return compare;
     }
 }
 #endregion
 
-#region Edge class
-public class Edge : IHeapItem<Edge>
-{
-    public Vector2 pointA, pointB;
-    public readonly Vector2[] points = new Vector2[2];
-
-    private int heapIndex;
-    public int HeapIndex
-    {
-        get { return heapIndex; }
-        set { heapIndex = value; }
-    }
-
-    public Edge(Vector2 pointA, Vector2 pointB)
-    {
-        this.pointA = pointA;
-        this.pointB = pointB;
-
-        points[0] = pointA;
-        points[1] = pointB;
-    }
-
-    public bool Equals(Edge other)
-    {
-        if (other.pointA == pointA && other.pointB == pointB || other.pointB == pointA && other.pointA == pointB)
-        {
-            return true;
-        }
-
-        return false;
-    }
-
-    public int CompareTo(Edge other)
-    {
-        float distance = Vector2.Distance(pointA, pointB);
-
-        float othersDistance = Vector2.Distance(other.pointA, other.pointB);
-
-        int compare = othersDistance.CompareTo(distance);
-
-        return compare;
-    }
-}
-#endregion
-
-#region Circle class
-public class Circle
-{
-    public Vector2 position;
-    public float radius;
-
-    public Circle(Vector2 position, float radius)
-    {
-        this.position = position;
-        this.radius = radius;
-    }
-
-    public bool Intersects(Vector2 point)
-    {
-        float distance = Mathf.Sqrt((position.x - point.x) * (position.x - point.x) + (position.y - point.y) * (position.y - point.y));
-
-        if (distance <= radius)
-        {
-            return true;
-        }
-
-        return false;
-    }
-}
-#endregion
-
-#region Triangle class
-public class Triangle
-{
-    public Vector2 pointA, pointB, pointC;
-    public readonly Vector2[] vertices = new Vector2[3];
-
-    public readonly Edge edgeAB, edgeBC, edgeCA;
-    public readonly Edge[] edges = new Edge[3];
-
-    public Triangle(Vector2 a, Vector2 b, Vector2 c)
-    {
-        pointA = a;
-        pointB = b;
-        pointC = c;
-
-        vertices[0] = pointA;
-        vertices[1] = pointB;
-        vertices[2] = pointC;
-
-        edgeAB = new Edge(a, b);
-        edgeBC = new Edge(b, c);
-        edgeCA = new Edge(c, a);
-
-        edges[0] = edgeAB;
-        edges[1] = edgeBC;
-        edges[2] = edgeCA;
-    }
-
-    public bool ContainsPoint(Vector2 point)
-    {
-        return vertices.Contains(point);
-    }
-
-    float Sign(Vector2 p1, Vector2 p2, Vector2 p3)
-    {
-        return (p1.x - p3.x) * (p2.y - p3.y) - (p2.x - p3.x) * (p1.y - p3.y);
-    }
-
-    public bool PointInTriangle(Vector2 pt)
-    {
-        Vector2 v1 = pointA;
-        Vector2 v2 = pointB;
-        Vector2 v3 = pointC;
-
-        float d1, d2, d3;
-        bool has_neg, has_pos;
-
-        d1 = Sign(pt, v1, v2);
-        d2 = Sign(pt, v2, v3);
-        d3 = Sign(pt, v3, v1);
-
-        has_neg = (d1 < 0) || (d2 < 0) || (d3 < 0);
-        has_pos = (d1 > 0) || (d2 > 0) || (d3 > 0);
-
-        return !(has_neg && has_pos);
-    }
-
-    #region Circum circle related methods
-    public Vector2 CircumCenter()
-    {
-        List<double> a = new()
-        {
-            pointA.x,
-            pointA.y
-        };
-        List<double> b = new()
-        {
-            pointB.x,
-            pointB.y
-        };
-        List<double> c = new()
-        {
-            pointC.x,
-            pointC.y
-        };
-
-        List<double> center = FindCircumCenter(a, b, c);
-
-        return new Vector2((float)center[0], (float)center[1]);
-    }
-
-    public static void LineFromPoints(List<double> P, List<double> Q, ref double a, ref double b, ref double c)
-    {
-        a = Q[1] - P[1];
-        b = P[0] - Q[0];
-        c = a * (P[0]) + b * (P[1]);
-    }
-
-    // Function which converts the input line to its
-    // perpendicular bisector. It also inputs the points
-    // whose mid-point lies on the bisector
-    public static void PerpendicularBisectorFromLine(List<double> P, List<double> Q, ref double a, ref double b, ref double c)
-    {
-        List<double> mid_point = new List<double>();
-        mid_point.Add((P[0] + Q[0]) / 2);
-
-        mid_point.Add((P[1] + Q[1]) / 2);
-
-        // c = -bx + ay
-        c = -b * (mid_point[0]) + a * (mid_point[1]);
-
-        double temp = a;
-        a = -b;
-        b = temp;
-    }
-
-    // Returns the intersection point of two lines
-    public static List<double> LineLineIntersection(double a1, double b1, double c1, double a2, double b2, double c2)
-    {
-        List<double> ans = new List<double>();
-        double determinant = a1 * b2 - a2 * b1;
-        if (determinant == 0)
-        {
-            // The lines are parallel. This is simplified
-            // by returning a pair of FLT_MAX
-            ans.Add(double.MaxValue);
-            ans.Add(double.MaxValue);
-        }
-
-        else
-        {
-            double x = (b2 * c1 - b1 * c2) / determinant;
-            double y = (a1 * c2 - a2 * c1) / determinant;
-            ans.Add(x);
-            ans.Add(y);
-        }
-
-        return ans;
-    }
-
-    public static List<double> FindCircumCenter(List<double> P, List<double> Q, List<double> R)
-    {
-        // Line PQ is represented as ax + by = c
-        double a = 0;
-        double b = 0;
-        double c = 0;
-        LineFromPoints(P, Q, ref a, ref b, ref c);
-
-        // Line QR is represented as ex + fy = g
-        double e = 0;
-        double f = 0;
-        double g = 0;
-        LineFromPoints(Q, R, ref e, ref f, ref g);
-
-        // Converting lines PQ and QR to perpendicular
-        // vbisectors. After this, L = ax + by = c
-        // M = ex + fy = g
-        PerpendicularBisectorFromLine(P, Q, ref a, ref b, ref c);
-        PerpendicularBisectorFromLine(Q, R, ref e, ref f, ref g);
-
-        // The point of intersection of L and M gives
-        // the circumcenter
-        List<double> circumcenter = LineLineIntersection(a, b, c, e, f, g);
-
-        return circumcenter;
-    }
-    #endregion
-}
-#endregion

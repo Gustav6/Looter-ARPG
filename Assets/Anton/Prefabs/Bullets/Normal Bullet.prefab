@@ -100,7 +100,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54a76121e9869a54ea154cfdd02acda2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  amountOfEnemiesHit: 0
   explosionCiclePrefab: {fileID: 3246453459513043161, guid: 41e5449bdf4adea46baf4cdf72d2a29d, type: 3}
+  collidableLayers:
+    serializedVersion: 2
+    m_Bits: 8
 --- !u!50 &3637908344632344400
 Rigidbody2D:
   serializedVersion: 4
@@ -157,7 +161,7 @@ CircleCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
@@ -171,7 +175,7 @@ TrailRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4550873575046521524}
-  m_Enabled: 1
+  m_Enabled: 0
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1

@@ -7,7 +7,7 @@ public class AntonsTemporaryEnemyScript : MonoBehaviour
 {
     public GameObject damagePopupPrefab;   
     public int maxhealth = 100;
-    private int currenthealth;
+    [SerializeField] public int currenthealth;
     private bool startTimer;
     private float timer;
     private int dmgTickCounter;
@@ -44,18 +44,8 @@ public class AntonsTemporaryEnemyScript : MonoBehaviour
     {   
             if (collision.tag == "Fire")
             {
-              startTimer = true;
-            }    
-                 
-            if (collision.tag == "Bullet")
-            {
-                TakeDamage(GunController.Damage);
-            }
-
-            if (collision.tag == "Explosion")
-            {
-                TakeDamage(GunController.Damage / 2);
-            }       
+               startTimer = true;
+            }        
     }
 
     public void TakeDamage(int damage)

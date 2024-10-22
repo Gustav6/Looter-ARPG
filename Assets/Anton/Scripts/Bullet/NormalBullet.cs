@@ -2,60 +2,47 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 
-public class NormalBullet : MonoBehaviour
+public class NormalBullet : Projectile
 {
-    float destroyBulletTimer = 2;
-    int amountOfEnemiesHit;
-    float angle;
-    Rigidbody2D rb;
-    CircleCollider2D colider;
-
     public GameObject explosionCiclePrefab;
-
-    private void Start()
+    RaycastHit2D hit;
+    public LayerMask collidableLayers;
+    Vector2 dir;
+    public override void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
-        colider = GetComponent<CircleCollider2D>();
-        colider.radius = 0.5f;
+        
     }
 
-    void Update()
+    public override void Update()
     {
-        destroyBulletTimer -= Time.deltaTime;
-
-        if (destroyBulletTimer <= 0)
+        if (Input.GetMouseButton(0))
         {
-            Destroy(gameObject);
+            dir = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
+            hit = Physics2D.Raycast(transform.position, dir, 20f, collidableLayers, 1f, 10f);
+            Debug.DrawRay(transform.position, dir, Color.red);
+            Debug.Log("RayCast");
         }
-
-        Vector2 v = rb.velocity;
-        angle = Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
-        transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
-    }
-
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.tag == "Enemy")
+        if (hit)
         {
-            amountOfEnemiesHit += 1;
-            if (GunController.explosion)
-            {
-                Instantiate(explosionCiclePrefab, transform.position, Quaternion.identity);
-            }
-            if (GunController.dmgOverTime)
-            {
-                //Instantiate(FireExplosionCiclePrefab, transform.position, Quaternion.identity);
-            }
-            if (GunController.pierce)
-            {
-                if (amountOfEnemiesHit >= GunController.pierceAmount)
-                {
-                    Destroy(gameObject);
-                }
-            }
-            else {Destroy(gameObject);}
+            hit.transform.GetComponent<AntonsTemporaryEnemyScript>().TakeDamage(GunController.Damage);
         }
-    }
+        // amountOfEnemiesHit += 1;
+        //if (GunController.explosion)
+        //{
+        //   Instantiate(explosionCiclePrefab, transform.position, Quaternion.identity);
+        //}
+
+        //if (GunController.pierce)
+        //{
+        //   if (amountOfEnemiesHit >= GunController.pierceAmount)
+        //   {
+        //      Destroy(gameObject);
+        //   }    
+        //} 
+        //else { Destroy(gameObject); }
+
+    }      
 }

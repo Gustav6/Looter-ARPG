@@ -1,22 +1,26 @@
+using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
-using UnityEngine;
+using UnityEngine; 
 
 public class Projectile : MonoBehaviour
 {
     float destroyBulletTimer = 2;
     Rigidbody2D rb;
     CircleCollider2D colider;
-    float angle;
+    float angle; 
+    [SerializeField] public int amountOfEnemiesHit; 
 
     public virtual void Start()
     {
+        colider.radius = 0.5f;
         rb = GetComponent<Rigidbody2D>();
         colider = GetComponent<CircleCollider2D>();
     }
 
     public virtual void Update()
     {
+         
         destroyBulletTimer -= Time.deltaTime;
 
         if (destroyBulletTimer <= 0)

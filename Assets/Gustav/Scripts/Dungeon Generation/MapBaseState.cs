@@ -12,9 +12,9 @@ using UnityEditor.MemoryProfiler;
 #region Base State
 public abstract class MapBaseState
 {
-    public abstract void EnterState(MapGenerationManager manager);
-    public abstract void UpdateState(MapGenerationManager manager);
-    public abstract void ExitState(MapGenerationManager manager);
+    public abstract void EnterState(MapManager manager);
+    public abstract void UpdateState(MapManager manager);
+    public abstract void ExitState(MapManager manager);
 }
 #endregion
 
@@ -39,7 +39,7 @@ public class GeneratingMapState : MapBaseState
     private System.Random rng;
 
 
-    public override void EnterState(MapGenerationManager manager)
+    public override void EnterState(MapManager manager)
     {
         #region Diagnostic Start
         stopwatch = new();
@@ -84,7 +84,7 @@ public class GeneratingMapState : MapBaseState
         diagnosticTime = stopwatch.ElapsedMilliseconds;
     }
 
-    public override void UpdateState(MapGenerationManager manager)
+    public override void UpdateState(MapManager manager)
     {
         SeparateRooms(manager);
 
@@ -96,7 +96,7 @@ public class GeneratingMapState : MapBaseState
         }
     }
 
-    public override void ExitState(MapGenerationManager manager)
+    public override void ExitState(MapManager manager)
     {
         foreach (Room room in mainRooms)
         {
@@ -204,7 +204,7 @@ public class GeneratingMapState : MapBaseState
     }
 
     #region Generate Room methods
-    private Room GenerateRoom(MapGenerationManager manager)
+    private Room GenerateRoom(MapManager manager)
     {
         Room room = null;
         Vector2Int offset;
@@ -247,7 +247,7 @@ public class GeneratingMapState : MapBaseState
 
     #region Seperate room methods
 
-    private void SeparateRooms(MapGenerationManager manager)
+    private void SeparateRooms(MapManager manager)
     {
         canMoveRoom = false;
 
@@ -283,7 +283,7 @@ public class GeneratingMapState : MapBaseState
         return false;
     }
 
-    public Vector2Int GetDirection(MapGenerationManager manager, Room currentRoom)
+    public Vector2Int GetDirection(MapManager manager, Room currentRoom)
     {
         Vector2 separationVelocity = Vector2.zero;
         Vector2 otherPosition, otherAgentToCurrent, directionToTravel;
@@ -333,7 +333,7 @@ public class GeneratingMapState : MapBaseState
     #endregion
 
     #region Delaunay triangulation
-    private List<Triangle> GenerateDelaunayTriangulation(MapGenerationManager manager, List<Room> rooms)
+    private List<Triangle> GenerateDelaunayTriangulation(MapManager manager, List<Room> rooms)
     {
         if (rooms.Count <= 3)
         {
@@ -557,7 +557,7 @@ public class GeneratingMapState : MapBaseState
     #endregion
 
     #region Minimum spanning tree
-    private List<Edge> GetMinimumSpanningTree(MapGenerationManager manager, List<Triangle> triangulation, List<Room> rooms, float percentageOfLoops)
+    private List<Edge> GetMinimumSpanningTree(MapManager manager, List<Triangle> triangulation, List<Room> rooms, float percentageOfLoops)
     {
         // Check for valid triangulation 
         if (triangulation.Count == 0 || percentageOfLoops < 0 || percentageOfLoops > 100)
@@ -753,7 +753,7 @@ public class GeneratingMapState : MapBaseState
     #endregion
 
     #region Hallways generation
-    private void GenerateHallways(MapGenerationManager manager, List<Edge> connections)
+    private void GenerateHallways(MapManager manager, List<Edge> connections)
     {
         int hallwayWidth = MapSettings.Instance.hallwayWidth;
 
@@ -968,7 +968,7 @@ public class LoadedMapState : MapBaseState
 {
     private Room currentRoom;
 
-    public override void EnterState(MapGenerationManager manager)
+    public override void EnterState(MapManager manager)
     {
         manager.currentMap = new()
         {
@@ -986,25 +986,28 @@ public class LoadedMapState : MapBaseState
 
         currentRoom = manager.startingRoom;
 
-        LoadRooms(manager, currentRoom);
+        manager.activeRooms.Add(currentRoom);
+
+        DestructibleManager.Instance.EnablePrefabs(currentRoom);
+        TrapManager.Instance.EnablePrefabs(currentRoom);
+
         manager.PlayerReference.transform.position = currentRoom.WorldPosition;
     }
 
-    public override void UpdateState(MapGenerationManager manager)
+    public override void UpdateState(MapManager manager)
     {
 
     }
 
-    public override void ExitState(MapGenerationManager manager)
+    public override void ExitState(MapManager manager)
     {
         manager.groundTileMap.ClearAllTiles();
         manager.wallTileMap.ClearAllTiles();
-        manager.trapTileMap.ClearAllTiles();
         TrapManager.Instance.ClearTraps();
         DestructibleManager.Instance.ClearBreakbles();
     }
 
-    private void LoadRooms(MapGenerationManager manager, Room currentRoom)
+    private void LoadRooms(MapManager manager, Room currentRoom)
     {
         List<Room> roomsToCheck = manager.rooms;
         roomsToCheck.Remove(currentRoom);

@@ -1,29 +1,25 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class Trap : MonoBehaviour
 {
-    [SerializeField] private Animator animator;
+    public Animator animator;
     [field: SerializeField] public int Damage { get; private set; }
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {
-        if (collision.CompareTag("Player"))
-        {
-            // Play animation
+    [SerializeField] private BoxCollider2D colliderComponent;
+    [SerializeField] private Rigidbody2D rbComponent;
 
-            animator.SetBool("Active", true);
-        }
+    private void OnBecameVisible()
+    {
+        colliderComponent.enabled = true;
+        rbComponent.simulated = true;
     }
 
-    private void OnTriggerExit2D(Collider2D collision)
+    private void OnBecameInvisible()
     {
-        if (collision.CompareTag("Player"))
-        {
-            // Disable animation
-
-            animator.SetBool("Active", false);
-        }
+        colliderComponent.enabled = false;
+        rbComponent.simulated = false;
     }
 }

@@ -5,8 +5,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
-public class MapGenerationManager : MonoBehaviour
+public class MapManager : MonoBehaviour
 {
+    public static MapManager Instance { get; private set; }
+
     #region States
     private MapBaseState currentState;
     public GeneratingMapState generationState = new();
@@ -19,10 +21,10 @@ public class MapGenerationManager : MonoBehaviour
     [BoxGroup("TileMap Variables")]
     [Required("Wall tile map is needed")] public Tilemap wallTileMap;
     [BoxGroup("TileMap Variables")]
-    [Required("Trap tile map is needed")] public Tilemap trapTileMap;
-    [BoxGroup("TileMap Variables")]
     public TilePair[] tiles;
     #endregion
+
+    public List<Room> activeRooms = new();
 
     public Room startingRoom;
 
@@ -37,6 +39,17 @@ public class MapGenerationManager : MonoBehaviour
 
     private void Start()
     {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            Destroy(this);
+            return;
+        }
+
         foreach (TilePair pair in tiles)
         {
             tilePairs.Add(pair.type, pair.tile);

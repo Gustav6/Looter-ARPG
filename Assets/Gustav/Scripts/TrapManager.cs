@@ -1,10 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 public class TrapManager : MonoBehaviour
 {
     public static TrapManager Instance { get; private set; }
+
+    public Renderer test;
+
 
     private List<GameObject> traps = new();
     public Dictionary<Room, List<GameObject>> TrapsWithinRoom { get; private set; }
@@ -30,8 +34,9 @@ public class TrapManager : MonoBehaviour
 
     public void AddTrap(Vector3Int position, GameObject prefab, Room relevantRoom)
     {
-        GameObject trap = Instantiate(prefab, position, Quaternion.identity, transform);
-        //trap.SetActive(false);
+        GameObject trap = Instantiate(prefab, position + (Vector3)(Vector2.one / 2), Quaternion.identity, transform);
+        trap.GetComponent<BoxCollider2D>().enabled = false;
+        trap.SetActive(false);
 
         if (TrapsWithinRoom.ContainsKey(relevantRoom))
         {
@@ -45,6 +50,14 @@ public class TrapManager : MonoBehaviour
         traps.Add(trap);
 
         TrapsPositions.Add(position);
+    }
+
+    public void EnablePrefabs(Room room)
+    {
+        foreach (GameObject trap in TrapsWithinRoom[room])
+        {
+            trap.SetActive(true);
+        }
     }
 
     public void ClearTraps()

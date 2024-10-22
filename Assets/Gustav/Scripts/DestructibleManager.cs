@@ -30,11 +30,11 @@ public class DestructibleManager : MonoBehaviour
         BreakablePositions = new();
     }
 
-
     public void AddBreakable(Vector3Int position, GameObject prefab, Room relevantRoom)
     {
-        GameObject breakable = Instantiate(prefab, position, Quaternion.identity, transform);
-        //breakable.SetActive(false);
+        GameObject breakable = Instantiate(prefab, position + (Vector3)(Vector2.one / 2), Quaternion.identity, transform);
+        breakable.GetComponent<BoxCollider2D>().enabled = false;
+        breakable.SetActive(false);
 
         if (BreakablesWithinRoom.ContainsKey(relevantRoom))
         {
@@ -48,6 +48,14 @@ public class DestructibleManager : MonoBehaviour
         breakbles.Add(breakable);
 
         BreakablePositions.Add(position);
+    }
+
+    public void EnablePrefabs(Room room)
+    {
+        foreach (GameObject breakable in BreakablesWithinRoom[room])
+        {
+            breakable.SetActive(true);
+        }
     }
 
     public void ClearBreakbles()

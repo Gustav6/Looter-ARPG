@@ -13,5 +13,5 @@ MonoBehaviour:
   m_Name: Player
   m_EditorClassIdentifier: 
   savePath: 
-  database: {fileID: 11400000, guid: 88aa0db497929594eb51dbf2236c65c6, type: 2}
+  database: {fileID: 11400000, guid: d12ac20b13b695d46a1e3ceefb391d99, type: 2}
   Container: []

@@ -9,13 +9,13 @@ public class CollisionScript : MonoBehaviour
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        Debug.Log("Enter Collision");
-
         switch (type)
         {
             case Type.trap:
                 if (collision.CompareTag("Player"))
                 {
+                    Debug.Log("Enter Collision");
+
                     // Play animation
 
                     ((Trap)script).animator.SetBool("Active", true);
@@ -24,6 +24,8 @@ public class CollisionScript : MonoBehaviour
             case Type.breakable:
                 if (collision.CompareTag("Player") || collision.CompareTag("Bullet"))
                 {
+                    Debug.Log("Enter Collision");
+
                     Destroy(gameObject);
                 }
                 break;
@@ -34,19 +36,22 @@ public class CollisionScript : MonoBehaviour
 
     private void OnTriggerExit2D(Collider2D collision)
     {
-        Debug.Log("Exit Collision");
-
         switch (type)
         {
             case Type.trap:
                 if (collision.CompareTag("Player"))
                 {
+                    Debug.Log("Exit Collision");
+
                     // Play animation
 
                     ((Trap)script).animator.SetBool("Active", false);
                 }
                 break;
             case Type.breakable:
+
+                Debug.Log("Exit Collision");
+
                 break;
             default:
                 break;

@@ -103,14 +103,17 @@ public class Player : MonoBehaviour
 
     void UpdateStamina(int value)
     {
-        staminaProgressUI.fillAmount = stamina / maxStamina;
-        if (value == 0)
+        if (staminaProgressUI != null && sliderCanvasGroup != null)
         {
-            sliderCanvasGroup.alpha = 0;
-        }
-        else
-        {
-            sliderCanvasGroup.alpha = 1;
+            staminaProgressUI.fillAmount = stamina / maxStamina;
+            if (value == 0)
+            {
+                sliderCanvasGroup.alpha = 0;
+            }
+            else
+            {
+                sliderCanvasGroup.alpha = 1;
+            }
         }
     }
 

@@ -1,19 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using UnityEngine;
 
 public class TrapManager : MonoBehaviour
 {
     public static TrapManager Instance { get; private set; }
 
-    public Renderer test;
-
-
     private List<GameObject> traps = new();
     public Dictionary<Room, List<GameObject>> TrapsWithinRoom { get; private set; }
 
     public HashSet<Vector3Int> TrapsPositions { get; private set; }
+
+    private List<GameObject> parentObjects = new();
 
     private void Start()
     {
@@ -29,22 +29,34 @@ public class TrapManager : MonoBehaviour
         }
 
         TrapsWithinRoom = new();
-        TrapsPositions = new HashSet<Vector3Int>();
+        TrapsPositions = new();
     }
 
     public void AddTrap(Vector3Int position, GameObject prefab, Room relevantRoom)
     {
         GameObject trap = Instantiate(prefab, position + (Vector3)(Vector2.one / 2), Quaternion.identity, transform);
         trap.GetComponent<BoxCollider2D>().enabled = false;
-        trap.SetActive(false);
 
         if (TrapsWithinRoom.ContainsKey(relevantRoom))
         {
+            trap.transform.parent = TrapsWithinRoom[relevantRoom].First().transform.parent;
+
             TrapsWithinRoom[relevantRoom].Add(trap);
         }
         else
         {
+            GameObject parent = new()
+            {
+                name = "Room " + TrapsWithinRoom.Count
+            };
+
+            parentObjects.Add(parent);
+            parent.transform.parent = transform;
+            trap.transform.parent = parent.transform;
+
             TrapsWithinRoom.Add(relevantRoom, new List<GameObject>() { trap });
+
+            parent.SetActive(false);
         }
 
         traps.Add(trap);
@@ -54,21 +66,19 @@ public class TrapManager : MonoBehaviour
 
     public void EnablePrefabs(Room room)
     {
-        foreach (GameObject trap in TrapsWithinRoom[room])
-        {
-            trap.SetActive(true);
-        }
+        TrapsWithinRoom[room].First().transform.parent.gameObject.SetActive(true);
     }
 
     public void ClearTraps()
     {
-        for (int i = 0; i < traps.Count; i++)
+        foreach (GameObject gameObject in parentObjects)
         {
-            Destroy(traps[i]);
+            Destroy(gameObject);
         }
 
-        TrapsWithinRoom.Clear();
+        parentObjects.Clear();
         TrapsPositions.Clear();
+        TrapsWithinRoom = new();
     }
 }
 

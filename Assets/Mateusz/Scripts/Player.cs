@@ -3,15 +3,39 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-
 [RequireComponent(typeof(Controller2D))]
 public class Player : MonoBehaviour
 {
+    public static Player Instance { get; private set; }
+
+    public bool IsMoving { get; private set; }
+    public Vector3 Direction { get; private set; }
+
     public float moveSpeed;
-    [SerializeField]
-    private float stamina;
-    public float maxStamina = 100;
-    public float runCost = 25f;
+
+    [SerializeField] private float currentStamina;
+    public float Stamina
+    {
+        get { return currentStamina; }
+        set
+        {
+            if (value > maxStamina)
+            {
+                currentStamina = maxStamina;
+            }
+            else if (value < 0)
+            {
+                currentStamina = 0;
+            }
+            else
+            {
+                currentStamina = value;
+            }
+        }
+    }
+
+    public float maxStamina = 100f;
+    public float sprintCost = 25f;
     public float rechargeTime = 1f;
 
     public InventoryObject inventory;
@@ -24,39 +48,60 @@ public class Player : MonoBehaviour
     public GameObject inventoryCanvas;
 
     bool inventoryOpen;
-    bool running;
-
-    Vector3 velocity;
+    bool sprinting;
 
     Controller2D controller;
 
-
-
     private void Start()
     {
-        stamina = maxStamina;
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            Destroy(this);
+            return;
+        }
+
+        Stamina = maxStamina;
         moveSpeed = 5;
         controller = GetComponent<Controller2D>();
-
-
     }
 
     private void Update()
     {
-        Vector3 direction = new Vector3(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        IsMoving = false;
+        Direction = new (Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 
-
-        velocity.x = direction.x * moveSpeed;
-        velocity.y = direction.y * moveSpeed;
-        controller.Move(velocity * Time.deltaTime);
-
-        if (Input.GetKeyDown(KeyCode.LeftShift) && stamina > 0)
-        { 
-            running = true;
-
-        }else if (Input.GetKeyUp(KeyCode.LeftShift))
+        if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            running = false;
+            moveSpeed = 10f;
+            sprinting = true;
+
+        }
+        else if (Input.GetKeyUp(KeyCode.LeftShift) || Stamina == 0)
+        {
+            moveSpeed = 5f;
+            sprinting = false;
+        }
+
+        if (Direction != Vector3.zero)
+        {
+            IsMoving = true;
+            controller.Move(moveSpeed * Time.deltaTime * Direction);
+        }
+
+        if (sprinting)
+        {
+            Stamina -= sprintCost * Time.deltaTime;
+            UpdateStaminaBar(1);
+        }
+        else if (!sprinting && Stamina < maxStamina)
+        {
+            Stamina += Time.deltaTime * rechargeTime;
+            UpdateStaminaBar(1);
         }
 
         if (Input.GetKeyDown(KeyCode.Tab) && !inventoryOpen)
@@ -80,32 +125,14 @@ public class Player : MonoBehaviour
             Debug.Log("Loading");
             inventory.Load();
         }
-
-        if (running)
-        {
-            moveSpeed = 10f;
-            stamina -= runCost * Time.deltaTime;
-            if (stamina < 0)
-            {
-                running = false;
-            }
-            UpdateStamina(1);
-        }
-        else if (!running && stamina < maxStamina)
-        {
-            moveSpeed = 5f;
-            stamina += Time.deltaTime * rechargeTime;
-            UpdateStamina(1);
-        }
-
     }
 
 
-    void UpdateStamina(int value)
+    void UpdateStaminaBar(int value)
     {
         if (staminaProgressUI != null && sliderCanvasGroup != null)
         {
-            staminaProgressUI.fillAmount = stamina / maxStamina;
+            staminaProgressUI.fillAmount = Stamina / maxStamina;
             if (value == 0)
             {
                 sliderCanvasGroup.alpha = 0;

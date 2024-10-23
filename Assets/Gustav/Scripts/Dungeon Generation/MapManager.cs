@@ -24,16 +24,18 @@ public class MapManager : MonoBehaviour
     public TilePair[] tiles;
     #endregion
 
+    public Camera cameraTest;
+
     public List<Room> activeRooms = new();
+
+    public MapSettings Settings { get; private set; }
 
     public Room startingRoom;
 
     public Map currentMap;
 
-    public List<Edge> connectedRooms;
-    public List<Room> rooms;
-
-    [field: SerializeField] public GameObject PlayerReference { get; private set; }
+    public List<Edge> minimumSpanningTree;
+    public Room[] rooms;
 
     public readonly Dictionary<TileTexture, TileBase> tilePairs = new();
 
@@ -50,14 +52,11 @@ public class MapManager : MonoBehaviour
             return;
         }
 
+        Settings = GetComponent<MapSettings>(); 
+
         foreach (TilePair pair in tiles)
         {
             tilePairs.Add(pair.type, pair.tile);
-        }
-
-        if (GameObject.FindGameObjectWithTag("Player") != null)
-        {
-            PlayerReference = GameObject.FindGameObjectWithTag("Player");
         }
 
         SwitchState(generationState);
@@ -84,16 +83,16 @@ public class MapManager : MonoBehaviour
 
     public void LoadMap(Map mapToLoad)
     {
-        MapSettings.Instance.seed = mapToLoad.seed;
-        MapSettings.Instance.spawnFunction = mapToLoad.spawnFunction;
-        MapSettings.Instance.roomMaxSize = mapToLoad.roomMaxSize;
-        MapSettings.Instance.RoomMinSize = mapToLoad.roomMinSize;
-        MapSettings.Instance.totalRoomsCount = mapToLoad.amountOfRooms;
-        MapSettings.Instance.AmountOfMainRooms = mapToLoad.amountOfMainRooms;
-        MapSettings.Instance.amountOfLoops = mapToLoad.amountOfLoops;
-        MapSettings.Instance.hallwayWidth = mapToLoad.hallwayWidth;
-        MapSettings.Instance.stripSize = mapToLoad.stripSpawnSize;
-        MapSettings.Instance.generationRadius = mapToLoad.spawnRadius;
+        Settings.seed = mapToLoad.seed;
+        Settings.spawnFunction = mapToLoad.spawnFunction;
+        Settings.roomMaxSize = mapToLoad.roomMaxSize;
+        Settings.RoomMinSize = mapToLoad.roomMinSize;
+        Settings.totalRoomsCount = mapToLoad.amountOfRooms;
+        Settings.AmountOfMainRooms = mapToLoad.amountOfMainRooms;
+        Settings.amountOfHallwayLoops = mapToLoad.amountOfLoops;
+        Settings.hallwayWidth = mapToLoad.hallwayWidth;
+        Settings.stripSize = mapToLoad.stripSpawnSize;
+        Settings.generationRadius = mapToLoad.spawnRadius;
 
         SwitchState(generationState);
     }

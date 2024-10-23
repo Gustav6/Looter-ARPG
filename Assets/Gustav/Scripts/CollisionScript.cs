@@ -49,9 +49,6 @@ public class CollisionScript : MonoBehaviour
                 }
                 break;
             case Type.breakable:
-
-                Debug.Log("Exit Collision");
-
                 break;
             default:
                 break;

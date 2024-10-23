@@ -11,7 +11,6 @@ GameObject:
   - component: {fileID: 3649946842529648313}
   - component: {fileID: 2847025328454488880}
   - component: {fileID: 3171003164158351417}
-  - component: {fileID: 3739947794880966024}
   m_Layer: 0
   m_Name: MapManager
   m_TagString: Untagged
@@ -55,12 +54,23 @@ MonoBehaviour:
   roomMaxSize: {x: 45, y: 42}
   roomMinSize: {x: 25, y: 20}
   roundCorners: 1
-  amountOfLoops: 12.5
+  amountOfHallwayLoops: 15
   randomizedHallwaySize: 1
   hallwayWidth: 0
   hallwayMinWidth: 9
   hallwayMaxWidth: 12
-  amountOfTraps: 5
+  amountOfNoiseLoops: 4
+  noiseScale: 8
+  octaves: 2
+  persistence: 0.5
+  lacunarity: 2
+  regions:
+  - name: Barrel
+    heightValue: 0.085
+    prefab: {fileID: 4889750398875816261, guid: 46289d76540a0724e9abe84559d0610c, type: 3}
+  - name: Spike Trap
+    heightValue: 0.175
+    prefab: {fileID: 7687138853657912553, guid: f5fbfca504f544347a5c2c54d12a41ed, type: 3}
   debugTriangulation: 0
   debugSpanningTree: 0
 --- !u!114 &3171003164158351417
@@ -77,15 +87,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   groundTileMap: {fileID: 0}
   wallTileMap: {fileID: 0}
-  trapTileMap: {fileID: 0}
   tiles:
   - tile: {fileID: 11400000, guid: f360c7a4992a8a444b0a516f677637dc, type: 2}
     type: 0
   - tile: {fileID: 11400000, guid: 6e951250e583f4d4fad2ddcee48bc2a0, type: 2}
     type: 1
-  - tile: {fileID: 11400000, guid: a4ccb216abfa579489a7441184f157f8, type: 2}
-    type: 2
-  loadedMap:
+  currentMap:
     seed: 0
     spawnFunction: 0
     spawnRadius: 0
@@ -96,23 +103,4 @@ MonoBehaviour:
     roomMaxSize: {x: 0, y: 0}
     amountOfLoops: 0
     hallwayWidth: 0
---- !u!114 &3739947794880966024
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4600069235979334545}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fcef1a91532796546a31d3e775d09375, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  noiseScale: 10
-  octaves: 5
-  persistence: 0.5
-  lacunarity: 2
-  regions:
-  - name: SpikeTrap
-    heightValue: 0.2
-    tile: {fileID: 11400000, guid: a4ccb216abfa579489a7441184f157f8, type: 2}
+  <PlayerReference>k__BackingField: {fileID: 0}

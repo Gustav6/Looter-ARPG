@@ -4,10 +4,6 @@ using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using static UnityEngine.RuleTile.TilingRuleOutput;
-using UnityEngine.UIElements;
-using System.Collections.ObjectModel;
-using UnityEditor.MemoryProfiler;
 
 #region Base State
 public abstract class MapBaseState
@@ -25,7 +21,6 @@ public class GeneratingMapState : MapBaseState
     public List<Room> mainRooms = new();
 
     private List<Triangle> triangulation = new();
-    private List<Edge> minimumSpanningTree = new();
 
     private HashSet<Vector3Int> groundTilePositions = new(), wallTilePositions = new();
 
@@ -51,21 +46,20 @@ public class GeneratingMapState : MapBaseState
         GameObject.Destroy(minimumSpanningTreeDebug);
         #endregion
 
-        rng = new System.Random(MapSettings.Instance.seed);
+        rng = new System.Random(manager.Settings.seed);
 
         canMoveRoom = false;
 
         mainRooms.Clear();
         triangulation.Clear();
-        minimumSpanningTree.Clear();
         groundTilePositions.Clear();
         wallTilePositions.Clear();
 
-        tempRoomList = new Room[MapSettings.Instance.totalRoomsCount];
-        Heap<Room> roomHeapForSize = new(MapSettings.Instance.totalRoomsCount);
+        tempRoomList = new Room[manager.Settings.totalRoomsCount];
+        Heap<Room> roomHeapForSize = new(manager.Settings.totalRoomsCount);
 
         // Generate x amount of rooms
-        for (int i = 0; i < MapSettings.Instance.totalRoomsCount; i++)
+        for (int i = 0; i < manager.Settings.totalRoomsCount; i++)
         {
             Room newRoom = GenerateRoom(manager);
 
@@ -74,7 +68,7 @@ public class GeneratingMapState : MapBaseState
         }
 
         // Add x amount (Amount of main rooms) with the largest area
-        for (int i = 0; i < MapSettings.Instance.AmountOfMainRooms; i++)
+        for (int i = 0; i < manager.Settings.AmountOfMainRooms; i++)
         {
             mainRooms.Add(roomHeapForSize.RemoveFirst());
         }
@@ -110,45 +104,58 @@ public class GeneratingMapState : MapBaseState
 
             wallTilePositions.UnionWith(room.walls);
 
-            float xOffset = rng.Next(-100000, 100000);
-            float yOffset = rng.Next(-100000, 100000);
+            float[][,] noiseMaps = new float[manager.Settings.amountOfNoiseLoops][,];
 
-            float[,] noiseMap = NoiseMapGenerator.Instance.GenerateMap(room.width, room.height, MapSettings.Instance.seed, new(xOffset, yOffset));
-
-            for (int x = 0; x < noiseMap.GetLength(0); x++)
+            for (int i = 0; i < noiseMaps.Length; i++)
             {
-                for (int y = 0; y < noiseMap.GetLength(1); y++)
+                float xOffset = rng.Next(-100000, 100000);
+                float yOffset = rng.Next(-100000, 100000);
+
+                noiseMaps[i] = NoiseMapGenerator.GenerateMap(room.width, room.height, manager.Settings.seed, manager.Settings.noiseScale, manager.Settings.octaves, manager.Settings.persistence, manager.Settings.lacunarity, new(xOffset, yOffset));
+            }
+
+            foreach (float[,] noiseMap in noiseMaps)
+            {
+                for (int x = 0; x < noiseMap.GetLength(0); x++)
                 {
-                    Vector3Int prefabPosition = new (x - (room.width / 2) + (int)room.center.x, y - (room.height / 2) + (int)room.center.y);
-
-                    if (groundTilePositions.Contains(prefabPosition))
+                    for (int y = 0; y < noiseMap.GetLength(1); y++)
                     {
-                        float currentHeight1 = noiseMap[x, y];
+                        Vector3Int prefabPosition = new(x - (room.width / 2) + (int)room.center.x, y - (room.height / 2) + (int)room.center.y);
 
-                        for (int i = 0; i < NoiseMapGenerator.Instance.regions.Length; i++)
+                        if (DestructibleManager.Instance.BreakablePositions.Contains(prefabPosition) || TrapManager.Instance.TrapsPositions.Contains(prefabPosition))
                         {
-                            if (currentHeight1 <= NoiseMapGenerator.Instance.regions[i].heightValue)
+                            continue;
+                        }
+
+                        if (groundTilePositions.Contains(prefabPosition))
+                        {
+                            float currentHeight1 = noiseMap[x, y];
+
+                            for (int i = 0; i < manager.Settings.regions.Length; i++)
                             {
-                                if (NoiseMapGenerator.Instance.regions[i].prefab == null)
+                                if (currentHeight1 <= manager.Settings.regions[i].heightValue)
                                 {
-                                    Debug.Log("Error within noise array, on position: " + i);
-                                    continue;
-                                }
+                                    if (manager.Settings.regions[i].prefab == null)
+                                    {
+                                        Debug.Log("Error within noise array, on position: " + i);
+                                        continue;
+                                    }
 
-                                if (NoiseMapGenerator.Instance.regions[i].prefab.CompareTag("Trap"))
-                                {
-                                    TrapManager.Instance.AddTrap(prefabPosition, NoiseMapGenerator.Instance.regions[i].prefab, room);
-                                }
-                                else if (NoiseMapGenerator.Instance.regions[i].prefab.CompareTag("Destructible"))
-                                {
-                                    DestructibleManager.Instance.AddBreakable(prefabPosition, NoiseMapGenerator.Instance.regions[i].prefab, room);
-                                }
-                                else
-                                {
-                                    Debug.Log("Error with prefab no tag found: " + NoiseMapGenerator.Instance.regions[i].prefab);
-                                }
+                                    if (manager.Settings.regions[i].prefab.CompareTag("Trap"))
+                                    {
+                                        TrapManager.Instance.AddTrap(prefabPosition, manager.Settings.regions[i].prefab, room);
+                                    }
+                                    else if (manager.Settings.regions[i].prefab.CompareTag("Destructible"))
+                                    {
+                                        DestructibleManager.Instance.AddBreakable(prefabPosition, manager.Settings.regions[i].prefab, room);
+                                    }
+                                    else
+                                    {
+                                        Debug.Log("Error with prefab no tag found: " + manager.Settings.regions[i].prefab);
+                                    }
 
-                                break;
+                                    break;
+                                }
                             }
                         }
                     }
@@ -156,7 +163,7 @@ public class GeneratingMapState : MapBaseState
             }
         }
 
-        manager.rooms = mainRooms;
+        manager.rooms = mainRooms.ToArray();
 
         #region Methods for generation
         diagnosticTime = stopwatch.ElapsedMilliseconds;
@@ -164,13 +171,12 @@ public class GeneratingMapState : MapBaseState
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to triangulate points");
 
         diagnosticTime = stopwatch.ElapsedMilliseconds;
-        minimumSpanningTree = GetMinimumSpanningTree(manager, triangulation, mainRooms, MapSettings.Instance.amountOfLoops);
 
-        manager.connectedRooms = minimumSpanningTree;
+        manager.minimumSpanningTree = GetMinimumSpanningTree(manager);
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to get minimum spanning tree");
 
         diagnosticTime = stopwatch.ElapsedMilliseconds;
-        GenerateHallways(manager, minimumSpanningTree);
+        GenerateHallways(manager);
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to generate hallways");
         #endregion
 
@@ -210,20 +216,20 @@ public class GeneratingMapState : MapBaseState
         Vector2Int offset;
         Vector2 position = Vector2.zero;
 
-        int roomWidth = rng.Next(MapSettings.Instance.RoomMinSize.x, MapSettings.Instance.roomMaxSize.x + 1);
-        int roomHeight = rng.Next(MapSettings.Instance.RoomMinSize.y, MapSettings.Instance.roomMaxSize.y + 1);
+        int roomWidth = rng.Next(manager.Settings.RoomMinSize.x, manager.Settings.roomMaxSize.x + 1);
+        int roomHeight = rng.Next(manager.Settings.RoomMinSize.y, manager.Settings.roomMaxSize.y + 1);
         offset = new(roomWidth / 2, roomHeight / 2);
 
-        if (MapSettings.Instance.spawnFunction == SpawnFunction.Circle)
+        if (manager.Settings.spawnFunction == SpawnFunction.Circle)
         {
-            position = RandomPositionInCircle(MapSettings.Instance.generationRadius) - offset;
+            position = RandomPositionInCircle(manager.Settings.generationRadius) - offset;
         }
-        else if (MapSettings.Instance.spawnFunction == SpawnFunction.Strip)
+        else if (manager.Settings.spawnFunction == SpawnFunction.Strip)
         {
-            position = RandomPositionInStrip(MapSettings.Instance.stripSize.x, MapSettings.Instance.stripSize.y) - offset;
+            position = RandomPositionInStrip(manager.Settings.stripSize.x, manager.Settings.stripSize.y) - offset;
         }
 
-        room = new Room(roomWidth, roomHeight, position, MapSettings.Instance.roundCorners);
+        room = new Room(roomWidth, roomHeight, position, manager.Settings.roundCorners);
 
         return room;
     }
@@ -352,14 +358,14 @@ public class GeneratingMapState : MapBaseState
         #region Super Triangle
         Vector2 a, b, c;
 
-        if (MapSettings.Instance.generationRadius <= 0)
+        if (manager.Settings.generationRadius <= 0)
         {
-            MapSettings.Instance.generationRadius = 1;
+            manager.Settings.generationRadius = 1;
         }
 
-        a = new Vector2(-MapSettings.Instance.generationRadius, -MapSettings.Instance.generationRadius) * 100;
-        b = new Vector2(MapSettings.Instance.generationRadius, -MapSettings.Instance.generationRadius) * 100;
-        c = new Vector2(0, MapSettings.Instance.generationRadius) * 100;
+        a = new Vector2(-manager.Settings.generationRadius, -manager.Settings.generationRadius) * 100;
+        b = new Vector2(manager.Settings.generationRadius, -manager.Settings.generationRadius) * 100;
+        c = new Vector2(0, manager.Settings.generationRadius) * 100;
 
         Triangle superTriangle;
 
@@ -494,7 +500,7 @@ public class GeneratingMapState : MapBaseState
         #endregion
 
         #region Debug
-        if (MapSettings.Instance.debugTriangulation)
+        if (manager.Settings.debugTriangulation)
         {
             triangulationDebug = new()
             {
@@ -557,10 +563,10 @@ public class GeneratingMapState : MapBaseState
     #endregion
 
     #region Minimum spanning tree
-    private List<Edge> GetMinimumSpanningTree(MapManager manager, List<Triangle> triangulation, List<Room> rooms, float percentageOfLoops)
+    private List<Edge> GetMinimumSpanningTree(MapManager manager)
     {
         // Check for valid triangulation 
-        if (triangulation.Count == 0 || percentageOfLoops < 0 || percentageOfLoops > 100)
+        if (triangulation.Count == 0 || manager.Settings.amountOfHallwayLoops < 0 || manager.Settings.amountOfHallwayLoops > 100)
         {
             return new List<Edge>();
         }
@@ -691,13 +697,13 @@ public class GeneratingMapState : MapBaseState
                 minimumSpanningTree.Add(shortestEdge);
             }
 
-            if (rooms.Count == minimumSpanningTree.Count + 1)
+            if (manager.rooms.Length == minimumSpanningTree.Count + 1)
             {
                 break;
             }
         }
 
-        if (percentageOfLoops > 0)
+        if (manager.Settings.amountOfHallwayLoops > 0)
         {
             List<Edge> loopedEdges = new();
             float count = 0;
@@ -712,7 +718,7 @@ public class GeneratingMapState : MapBaseState
                     count++;
                 }
 
-                if (count / edgeList.Count >= percentageOfLoops / 100)
+                if (count / edgeList.Count >= manager.Settings.amountOfHallwayLoops / 100)
                 {
                     break;
                 }
@@ -722,7 +728,7 @@ public class GeneratingMapState : MapBaseState
         }
 
         #region Debug
-        if (MapSettings.Instance.debugSpanningTree)
+        if (manager.Settings.debugSpanningTree)
         {
             minimumSpanningTreeDebug = new()
             {
@@ -753,15 +759,15 @@ public class GeneratingMapState : MapBaseState
     #endregion
 
     #region Hallways generation
-    private void GenerateHallways(MapManager manager, List<Edge> connections)
+    private void GenerateHallways(MapManager manager)
     {
-        int hallwayWidth = MapSettings.Instance.hallwayWidth;
+        int hallwayWidth = manager.Settings.hallwayWidth;
 
-        foreach (Edge connection in connections)
+        foreach (Edge connection in manager.minimumSpanningTree)
         {
-            if (MapSettings.Instance.randomizedHallwaySize)
+            if (manager.Settings.randomizedHallwaySize)
             {
-                hallwayWidth = rng.Next(MapSettings.Instance.hallwayMinWidth, MapSettings.Instance.hallwayMaxWidth);
+                hallwayWidth = rng.Next(manager.Settings.hallwayMinWidth, manager.Settings.hallwayMaxWidth);
             }
 
             List<Room> roomList = new();
@@ -967,36 +973,66 @@ public class GeneratingMapState : MapBaseState
 public class LoadedMapState : MapBaseState
 {
     private Room currentRoom;
+    private List<Vector2> points = new();
+
+    private Vector3Int previousPlayerPosition;
 
     public override void EnterState(MapManager manager)
     {
         manager.currentMap = new()
         {
-            seed = MapSettings.Instance.seed,
-            spawnFunction = MapSettings.Instance.spawnFunction,
-            roomMaxSize = MapSettings.Instance.roomMaxSize,
-            roomMinSize = MapSettings.Instance.RoomMinSize,
-            amountOfRooms = MapSettings.Instance.totalRoomsCount,
-            amountOfMainRooms = MapSettings.Instance.AmountOfMainRooms,
-            amountOfLoops = MapSettings.Instance.amountOfLoops,
-            hallwayWidth = MapSettings.Instance.hallwayWidth,
-            stripSpawnSize = MapSettings.Instance.stripSize,
-            spawnRadius = MapSettings.Instance.generationRadius
+            seed = manager.Settings.seed,
+            spawnFunction = manager.Settings.spawnFunction,
+            roomMaxSize = manager.Settings.roomMaxSize,
+            roomMinSize = manager.Settings.RoomMinSize,
+            amountOfRooms = manager.Settings.totalRoomsCount,
+            amountOfMainRooms = manager.Settings.AmountOfMainRooms,
+            amountOfLoops = manager.Settings.amountOfHallwayLoops,
+            hallwayWidth = manager.Settings.hallwayWidth,
+            stripSpawnSize = manager.Settings.stripSize,
+            spawnRadius = manager.Settings.generationRadius
         };
 
-        currentRoom = manager.startingRoom;
+        points.Clear();
+        manager.activeRooms.Clear();
 
-        manager.activeRooms.Add(currentRoom);
+        LoadRooms(manager, manager.startingRoom);
 
-        DestructibleManager.Instance.EnablePrefabs(currentRoom);
-        TrapManager.Instance.EnablePrefabs(currentRoom);
-
-        manager.PlayerReference.transform.position = currentRoom.WorldPosition;
+        Player.Instance.transform.position = currentRoom.WorldPosition;
+        previousPlayerPosition = Vector3Int.FloorToInt(Player.Instance.transform.position);
     }
 
     public override void UpdateState(MapManager manager)
     {
+        if (Player.Instance.IsMoving && previousPlayerPosition != Vector3Int.FloorToInt(Player.Instance.transform.position))
+        {
+            foreach (Room room in manager.activeRooms)
+            {
+                //if (room != currentRoom && player intersects with room)
+                //{
+                    //LoadRooms(manager, room);
+                //}
 
+                if (!DestructibleManager.Instance.BreakablesWithinRoom[room].First().transform.parent.gameObject.activeInHierarchy)
+                {
+                    if (IsVisible(room.center, new Vector3(room.width + 1, room.height + 1), manager.cameraTest))
+                    {
+                        DestructibleManager.Instance.BreakablesWithinRoom[room].First().transform.parent.gameObject.SetActive(true);
+                        TrapManager.Instance.TrapsWithinRoom[room].First().transform.parent.gameObject.SetActive(true);
+                    }
+                }
+                else
+                {
+                    if (!IsVisible(room.center, new Vector3(room.width + 1, room.height + 1), manager.cameraTest))
+                    {
+                        DestructibleManager.Instance.BreakablesWithinRoom[room].First().transform.parent.gameObject.SetActive(false);
+                        TrapManager.Instance.TrapsWithinRoom[room].First().transform.parent.gameObject.SetActive(false);
+                    }
+                }
+            }
+
+            previousPlayerPosition = Vector3Int.FloorToInt(Player.Instance.transform.position);
+        }
     }
 
     public override void ExitState(MapManager manager)
@@ -1004,43 +1040,61 @@ public class LoadedMapState : MapBaseState
         manager.groundTileMap.ClearAllTiles();
         manager.wallTileMap.ClearAllTiles();
         TrapManager.Instance.ClearTraps();
-        DestructibleManager.Instance.ClearBreakbles();
+        DestructibleManager.Instance.ClearBreakables();
     }
 
-    private void LoadRooms(MapManager manager, Room currentRoom)
+    private bool IsVisible(Vector3 pos, Vector3 boundSize, Camera camera)
     {
-        List<Room> roomsToCheck = manager.rooms;
-        roomsToCheck.Remove(currentRoom);
-        List<Room> roomsToLoad = new()
-        {
-            currentRoom
-        };
+        var bounds = new Bounds(pos, boundSize);
+        var planes = GeometryUtility.CalculateFrustumPlanes(camera);
+        return GeometryUtility.TestPlanesAABB(planes, bounds);
+    }
 
-        foreach (Edge connection in manager.connectedRooms)
+    private void LoadRooms(MapManager manager, Room room)
+    {
+        currentRoom = room;
+
+        foreach (Room previouslyActiveRoom in manager.activeRooms)
         {
-            if (connection.points.Contains(currentRoom.center))
+            if (previouslyActiveRoom != currentRoom)
             {
-                for (int i = roomsToCheck.Count - 1; i >= 0; i--)
-                {
-                    if (connection.points.Contains(roomsToCheck[i].center))
-                    {
-                        roomsToLoad.Add(roomsToCheck[i]);
-                        roomsToCheck.Remove(roomsToCheck[i]);
-                    }
-                }
+                DestructibleManager.Instance.BreakablesWithinRoom[previouslyActiveRoom].First().transform.parent.gameObject.SetActive(false);
+                TrapManager.Instance.TrapsWithinRoom[previouslyActiveRoom].First().transform.parent.gameObject.SetActive(false);
             }
         }
 
-        foreach (Room room in roomsToLoad)
-        {
-            foreach (GameObject gameObject in DestructibleManager.Instance.BreakablesWithinRoom[room])
-            {
-                gameObject.SetActive(true);
-            }
+        manager.activeRooms.Clear();
 
-            foreach (GameObject gameObject in TrapManager.Instance.TrapsWithinRoom[room])
+        manager.activeRooms.Add(currentRoom);
+
+        foreach (Edge edge in manager.minimumSpanningTree)
+        {
+            if (edge.pointA == currentRoom.center)
             {
-                gameObject.SetActive(true);
+                points.Add(edge.pointB);
+            }
+            else if (edge.pointB == currentRoom.center)
+            {
+                points.Add(edge.pointA);
+            }
+        }
+
+        foreach (Room connectedRoom in manager.rooms)
+        {
+            if (connectedRoom != currentRoom && points.Contains(connectedRoom.center))
+            {
+                manager.activeRooms.Add(connectedRoom);
+
+                if (IsVisible(connectedRoom.center, new Vector3(connectedRoom.width, connectedRoom.height), manager.cameraTest))
+                {
+                    DestructibleManager.Instance.BreakablesWithinRoom[connectedRoom].First().transform.parent.gameObject.SetActive(true);
+                    TrapManager.Instance.TrapsWithinRoom[connectedRoom].First().transform.parent.gameObject.SetActive(true);
+                }
+                else
+                {
+                    DestructibleManager.Instance.BreakablesWithinRoom[connectedRoom].First().transform.parent.gameObject.SetActive(false);
+                    TrapManager.Instance.TrapsWithinRoom[connectedRoom].First().transform.parent.gameObject.SetActive(false);
+                }
             }
         }
     }

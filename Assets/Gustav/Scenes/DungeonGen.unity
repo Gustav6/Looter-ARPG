@@ -385,6 +385,11 @@ Transform:
   - {fileID: 1542683324}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!20 &555261845 stripped
+Camera:
+  m_CorrespondingSourceObject: {fileID: 1689737114163325548, guid: 7782a358ea2820641ad509817eaa57d8, type: 3}
+  m_PrefabInstance: {fileID: 750982633}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &652268724
 GameObject:
   m_ObjectHideFlags: 0
@@ -1621,22 +1626,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: debugSpanningTree
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: debugTriangulation
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: trapPrefab
+      propertyPath: cameraTest
       value: 
-      objectReference: {fileID: 7687138853657912553, guid: f5fbfca504f544347a5c2c54d12a41ed, type: 3}
-    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: trapTileMap
-      value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 555261845}
     - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: wallTileMap
       value: 
@@ -1645,10 +1638,6 @@ PrefabInstance:
       propertyPath: groundTileMap
       value: 
       objectReference: {fileID: 28663809}
-    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: tiles.Array.size
-      value: 2
-      objectReference: {fileID: 0}
     - target: {fileID: 3649946842529648313, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -1688,42 +1677,6 @@ PrefabInstance:
     - target: {fileID: 3649946842529648313, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3739947794880966024, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: regions.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 3739947794880966024, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: regions.Array.data[0].name
-      value: Barrel
-      objectReference: {fileID: 0}
-    - target: {fileID: 3739947794880966024, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: regions.Array.data[0].tile
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 3739947794880966024, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: regions.Array.data[1].name
-      value: SpikeTrap
-      objectReference: {fileID: 0}
-    - target: {fileID: 3739947794880966024, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: regions.Array.data[1].tile
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 3739947794880966024, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: regions.Array.data[0].prefab
-      value: 
-      objectReference: {fileID: 4889750398875816261, guid: 46289d76540a0724e9abe84559d0610c, type: 3}
-    - target: {fileID: 3739947794880966024, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: regions.Array.data[1].prefab
-      value: 
-      objectReference: {fileID: 7687138853657912553, guid: f5fbfca504f544347a5c2c54d12a41ed, type: 3}
-    - target: {fileID: 3739947794880966024, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: regions.Array.data[0].heightValue
-      value: 0.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 3739947794880966024, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: regions.Array.data[1].heightValue
-      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 4600069235979334545, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: m_Name

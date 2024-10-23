@@ -5,22 +5,6 @@ using UnityEngine.Tilemaps;
 
 public class MapSettings : MonoBehaviour
 {
-    public static MapSettings Instance { get; private set; }
-
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else if (Instance != this)
-        {
-            Destroy(this);
-            return;
-        }
-    }
-
     #region Generation
     [BoxGroup("Generation Variables")]
     public int seed;
@@ -93,7 +77,7 @@ public class MapSettings : MonoBehaviour
 
     #region Hallway
     [BoxGroup("Hallway Variables")]
-    [Range(0, 100)] public float amountOfLoops = 15;
+    [Range(0, 100)] public float amountOfHallwayLoops = 15;
     [BoxGroup("Hallway Variables")]
     public bool randomizedHallwaySize = false;
     [BoxGroup("Hallway Variables")]
@@ -104,9 +88,19 @@ public class MapSettings : MonoBehaviour
     [EnableIf("randomizedHallwaySize")] public int hallwayMaxWidth = 15;
     #endregion
 
-    #region Traps
-    [BoxGroup("Trap Variables")]
-    [Range(0, 100)] public float amountOfTraps = 10;
+    #region Perlin Noise
+    [Foldout("Perlin Noise")]
+    public int amountOfNoiseLoops;
+    [Foldout("Perlin Noise")]
+    public float noiseScale;
+    [Foldout("Perlin Noise")]
+    public int octaves;
+    [Foldout("Perlin Noise")]
+    [Range(0, 1)] public float persistence;
+    [Foldout("Perlin Noise")]
+    public float lacunarity;
+    [Foldout("Perlin Noise")]
+    public TerrainType[] regions;
     #endregion
 
     #region Debug
@@ -115,6 +109,7 @@ public class MapSettings : MonoBehaviour
     [Foldout("Debug")]
     public bool debugSpanningTree = false;
     #endregion
+
 }
 
 [Serializable]

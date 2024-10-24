@@ -2,13 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Transition
+public abstract class Transition
 {
     public delegate void ExecuteOnCompletion();
     public ExecuteOnCompletion executeOnCompletion;
 
+    public GameObject id;
+    public bool loop;
+
     public bool isRemoved;
-    public bool loop = false;
 
     public float timer;
     public float timerMax;

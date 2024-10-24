@@ -946,19 +946,19 @@ public class GeneratingMapState : MapBaseState
             hallwayTilePositions.AddRange(widthTiles);
             #endregion
 
-            foreach (Vector3Int vector in hallwayTilePositions)
+            foreach (Vector3Int point in hallwayTilePositions)
             {
-                if (wallTilePositions.Contains(vector))
+                if (wallTilePositions.Contains(point))
                 {
-                    wallTilePositions.Remove(vector);
+                    wallTilePositions.Remove(point);
                 }
             }
 
-            foreach (Vector3Int vector in groundTilePositions)
+            foreach (Vector3Int point in groundTilePositions)
             {
-                if (wallTilePositions.Contains(vector))
+                if (wallTilePositions.Contains(point))
                 {
-                    wallTilePositions.Remove(vector);
+                    wallTilePositions.Remove(point);
                 }
             }
 
@@ -993,7 +993,6 @@ public class LoadedMapState : MapBaseState
             spawnRadius = manager.Settings.generationRadius
         };
 
-        points.Clear();
         manager.activeRooms.Clear();
 
         LoadRooms(manager, manager.startingRoom);
@@ -1008,10 +1007,14 @@ public class LoadedMapState : MapBaseState
         {
             foreach (Room room in manager.activeRooms)
             {
-                //if (room != currentRoom && player intersects with room)
-                //{
-                    //LoadRooms(manager, room);
-                //}
+                if (!PlayerWithin(currentRoom))
+                {
+                    if (room != currentRoom && PlayerWithin(room))
+                    {
+                        LoadRooms(manager, room);
+                        break;
+                    }
+                }
 
                 if (!DestructibleManager.Instance.BreakablesWithinRoom[room].First().transform.parent.gameObject.activeInHierarchy)
                 {
@@ -1050,6 +1053,19 @@ public class LoadedMapState : MapBaseState
         return GeometryUtility.TestPlanesAABB(planes, bounds);
     }
 
+    private bool PlayerWithin(Room room)
+    {
+        if (room.BottomLeft.x < Player.Instance.transform.position.x && room.TopRight.x > Player.Instance.transform.position.x)
+        {
+            if (room.BottomLeft.y < Player.Instance.transform.position.y && room.TopRight.y > Player.Instance.transform.position.y)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     private void LoadRooms(MapManager manager, Room room)
     {
         currentRoom = room;
@@ -1064,6 +1080,7 @@ public class LoadedMapState : MapBaseState
         }
 
         manager.activeRooms.Clear();
+        points.Clear();
 
         manager.activeRooms.Add(currentRoom);
 
@@ -1097,6 +1114,7 @@ public class LoadedMapState : MapBaseState
                 }
             }
         }
+        Debug.Log(manager.activeRooms.Count);
     }
 }
 #endregion

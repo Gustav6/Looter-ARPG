@@ -3,10 +3,11 @@ using System;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public class UIButton : MonoBehaviour
+public class UIButton : UIBaseScript, IPointerClickHandler
 {
     //[BoxGroup("Button variables")]
 
@@ -22,13 +23,22 @@ public class UIButton : MonoBehaviour
     [Foldout("Button references")]
     public Image backgroundReference;
 
-    private void Start()
+    public override void Start()
     {
         functionLookup = new Dictionary<Functions, Action>()
         {
             { Functions.QuitGame, Application.Quit },
             { Functions.ChangeScene, SwitchScene },
         };
+
+        base.Start();
+    }
+
+    private void RunOnActivation()
+    {
+        ActivateSelectedFunctions();
+
+        Debug.Log("PRESSED");
     }
 
     private void ActivateSelectedFunctions()
@@ -42,6 +52,16 @@ public class UIButton : MonoBehaviour
     public void SwitchScene()
     {
         SceneManager.LoadScene(scene);
+    }
+
+    public void OnPointerClick(PointerEventData eventData)
+    {
+        if (eventData.button != PointerEventData.InputButton.Left)
+        {
+            return;
+        }
+
+        RunOnActivation();
     }
 
     private enum Functions

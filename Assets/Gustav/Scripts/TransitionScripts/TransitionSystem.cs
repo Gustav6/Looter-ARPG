@@ -1,50 +1,66 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.Mathematics;
 using Unity.VisualScripting;
 using UnityEngine;
 
 public class TransitionSystem
 {
-    public static List<Transition> transitions = new();
+    //public static List<Transition> transitions = new();
+    private static readonly Dictionary<GameObject, List<Transition>> transitionPairs = new();
 
     public static void Update()
     {
-        for (int i = 0; i < transitions.Count; i++)
+        foreach (GameObject id in transitionPairs.Keys)
         {
-            transitions[i].Update();
+            foreach (Transition transition in transitionPairs[id])
+            {
+                transition.Update();
+            }
         }
 
-        for (int i = transitions.Count - 1; i >= 0; i--)
+        for (int i = transitionPairs.Keys.Count - 1; i >= 0; i--)
         {
-            if (transitions[i].isRemoved)
+            for (int j = transitionPairs.ElementAt(i).Value.Count - 1; j >= 0; j--)
             {
-                transitions[i].executeOnCompletion?.Invoke();
-                transitions.RemoveAt(i);
+                if (transitionPairs.ElementAt(i).Value[j].isRemoved)
+                {
+                    transitionPairs.ElementAt(i).Value[j].executeOnCompletion?.Invoke();
+                    transitionPairs.ElementAt(i).Value.RemoveAt(j);
+
+                    if (transitionPairs[transitionPairs.ElementAt(i).Key].Count == 0)
+                    {
+                        transitionPairs.Remove(transitionPairs.ElementAt(i).Key);
+                    }
+                }
             }
         }
     }
 
-    //public static void AddMoveTransition(MoveTransition moveTransition)
-    //{
-    //    transitions.Add(moveTransition);
-    //    moveTransition.Start();
-    //}
-    //public static void AddScaleTransition(ScaleTransition scaleTransition)
-    //{
-    //    transitions.Add(scaleTransition);
-    //    scaleTransition.Start();
-    //}
-    //public static void AddColorTransition(ColorTransition colorTransition)
-    //{
-    //    transitions.Add(colorTransition);
-    //    colorTransition.Start();
-    //}
-    //public static void AddRotationTransition(RotationTransition rotationTransition)
-    //{
-    //    transitions.Add(rotationTransition);
-    //    rotationTransition.Start();
-    //}
+    public static void AddTransition(Transition transition, GameObject id, bool removeTransitionsWithSameID = true, bool loop = false)
+    {
+        transition.id = id;
+        transition.loop = loop;
+
+        if (transitionPairs.ContainsKey(transition.id))
+        {
+            if (removeTransitionsWithSameID)
+            {
+                transitionPairs.Remove(transition.id);
+            }
+            else
+            {
+                transitionPairs[transition.id].Add(transition);
+            }
+        }
+        else
+        {
+            transitionPairs.Add(transition.id, new List<Transition>() { transition });
+        }
+
+        transition.Start();
+    }
 
     public static float BounceClampTop(float t)
     {

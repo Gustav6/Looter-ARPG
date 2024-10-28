@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 public class Room : IHeapItem<Room>
 {
@@ -44,19 +45,15 @@ public class Room : IHeapItem<Room>
     #endregion
 
     public List<Vector3Int> walls = new();
-    public Vector2Int?[] groundTiles;
+    public List<Vector3Int> groundTiles = new();
     public readonly int tileCount = 0;
-
-    private readonly Circle c1, c2;
 
     public Room(int width, int height, Vector2 position, bool roundCorners = false)
     {
         this.width = width;
         this.height = height;
-        c1 = null;
-        c2 = null;
 
-        groundTiles = new Vector2Int?[width * height];
+        Circle c1 = null, c2 = null;
 
         #region Set Circles
         if (roundCorners)
@@ -88,37 +85,24 @@ public class Room : IHeapItem<Room>
         }
         #endregion
 
-        for (int i = 0; i < groundTiles.Length; i++)
-        {
-            bool canAdd = false;
+        Vector2Int tilePos;
+        bool canAdd;
 
-            int xPosition = i % width + (int)position.x;
-            int yPosition = i / width + (int)position.y;
+        for (int i = 0; i < width * height; i++)
+        {
+            tilePos = new Vector2Int(i % width, i / width) + Vector2Int.FloorToInt(position);
 
             if (roundCorners)
             {
-                if (c1.position.y == c2.position.y)
-                {
-                    if (xPosition <= c1.position.x && xPosition >= c2.position.x)
-                    {
-                        canAdd = true;
-                    }
-                }
-                else if (c1.position.x == c2.position.x)
-                {
-                    if (yPosition <= c1.position.y && yPosition >= c2.position.y)
-                    {
-                        canAdd = true;
-                    }
-                }
+                canAdd = false;
 
-                if (!canAdd)
+                if (tilePos.x <= c1.position.x && tilePos.x >= c2.position.x || tilePos.y <= c1.position.y && tilePos.y >= c2.position.y)
                 {
-                    if (c1.Intersects(new Vector2(xPosition + 0.5f, yPosition + 0.5f)))
-                    {
-                        canAdd = true;
-                    }
-                    else if (c2.Intersects(new Vector2(xPosition + 0.5f, yPosition + 0.5f)))
+                    canAdd = true;
+                }
+                else
+                {
+                    if (c1.Intersects(tilePos + (Vector2.one / 2)) || c2.Intersects(tilePos + (Vector2.one / 2)))
                     {
                         canAdd = true;
                     }
@@ -131,52 +115,49 @@ public class Room : IHeapItem<Room>
 
             if (canAdd)
             {
-                groundTiles[i] = new Vector2Int(xPosition, yPosition);
+                groundTiles.Add((Vector3Int)tilePos);
                 tileCount++;
             }
             else
             {
-                walls.Add(new Vector3Int(xPosition, yPosition));
+                walls.Add((Vector3Int)tilePos);
             }
         }
 
-        for (int i = 0; i < width; i++)
+        for (int x = 0; x < width; x++)
         {
-            for (int j = 0; j < height; j++)
+            for (int y = 0; y < height; y++)
             {
-                walls.Add(new Vector3Int(i + (int)position.x, (int)position.y - 1 - j));
-                walls.Add(new Vector3Int(i + (int)position.x, (int)position.y + height + j));
+                walls.Add(new Vector3Int(x, -1 - y) + Vector3Int.FloorToInt(position));
+                walls.Add(new Vector3Int(x, height + y) + Vector3Int.FloorToInt(position));
             }
         }
 
-        for (int i = -height; i < height * 2; i++)
+        for (int x = -height; x < height * 2; x++)
         {
-            for (int j = 0; j < width; j++)
+            for (int y = 0; y < width; y++)
             {
-                walls.Add(new Vector3Int((int)position.x - 1 - j, i + (int)position.y));
-                walls.Add(new Vector3Int((int)position.x + width + j, i + (int)position.y));
+                walls.Add(new Vector3Int(-1 - y, x) + Vector3Int.FloorToInt(position));
+                walls.Add(new Vector3Int(width + y, x) + Vector3Int.FloorToInt(position));
             }
         }
 
-        center = new Vector2((int)position.x + width / 2f, (int)position.y + height / 2f);
+        center = new Vector2(width / 2f, height / 2f) + position;
     }
 
-    public void MoveRoom(Vector2Int direction)
+    public void MoveRoom(Vector3Int direction)
     {
-        for (int i = 0; i < groundTiles.Length; i++)
+        for (int i = 0; i < groundTiles.Count; i++)
         {
-            if (groundTiles[i] != null)
-            {
-                groundTiles[i] += direction;
-            }
+            groundTiles[i] += direction;
         }
 
         for (int i = 0; i < walls.Count; i++)
         {
-            walls[i] += (Vector3Int)direction;
+            walls[i] += direction;
         }
 
-        center += direction;
+        center += (Vector2Int)direction;
     }
 
     public int CompareTo(Room other)

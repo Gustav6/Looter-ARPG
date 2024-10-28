@@ -26,13 +26,10 @@ public class GeneratingMapState : MapBaseState
 
     private GameObject triangulationDebug, minimumSpanningTreeDebug;
 
-    private bool canMoveRoom;
-
     System.Diagnostics.Stopwatch stopwatch;
     float diagnosticTime;
 
     private System.Random rng;
-
 
     public override void EnterState(MapManager manager)
     {
@@ -47,8 +44,6 @@ public class GeneratingMapState : MapBaseState
         #endregion
 
         rng = new System.Random(manager.Settings.seed);
-
-        canMoveRoom = false;
 
         mainRooms.Clear();
         triangulation.Clear();
@@ -76,92 +71,78 @@ public class GeneratingMapState : MapBaseState
         manager.startingRoom = mainRooms.First();
 
         diagnosticTime = stopwatch.ElapsedMilliseconds;
+
+        bool canMoveRoom;
+
+        while (true)
+        {
+            canMoveRoom = false;
+
+            foreach (Room room in tempRoomList)
+            {
+                Vector3Int dir = (Vector3Int)GetDirection(room);
+
+                if (dir != Vector3Int.zero)
+                {
+                    room.MoveRoom(dir);
+                    canMoveRoom = true;
+                }
+            }
+
+            if (!canMoveRoom)
+            {
+                Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to separate rooms");
+
+                manager.SwitchState(manager.loadedState);
+                break;
+            }
+        }
     }
 
     public override void UpdateState(MapManager manager)
     {
-        SeparateRooms(manager);
 
-        if (!canMoveRoom)
-        {
-            Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to separate rooms");
-
-            manager.SwitchState(manager.loadedState);
-        }
     }
 
     public override void ExitState(MapManager manager)
     {
+        diagnosticTime = stopwatch.ElapsedMilliseconds;
+
+        Vector3Int noiseMapTopRight = Vector3Int.FloorToInt(tempRoomList.First().TopRight);
+        Vector3Int noiseMapBottomLeft = Vector3Int.FloorToInt(tempRoomList.First().BottomLeft);
+
         foreach (Room room in mainRooms)
         {
-            foreach (Vector3Int? position in room.groundTiles.Select(v => (Vector3Int?)v))
-            {
-                if (position != null)
-                {
-                    groundTilePositions.Add(position.Value);
-                }
-            }
-
+            groundTilePositions.UnionWith(room.groundTiles);
             wallTilePositions.UnionWith(room.walls);
 
-            float[][,] noiseMaps = new float[manager.Settings.amountOfNoiseLoops][,];
-
-            for (int i = 0; i < noiseMaps.Length; i++)
+            if (noiseMapTopRight.x < room.TopRight.x)
             {
-                float xOffset = rng.Next(-100000, 100000);
-                float yOffset = rng.Next(-100000, 100000);
-
-                noiseMaps[i] = NoiseMapGenerator.GenerateMap(room.width, room.height, manager.Settings.seed, manager.Settings.noiseScale, manager.Settings.octaves, manager.Settings.persistence, manager.Settings.lacunarity, new(xOffset, yOffset));
+                noiseMapTopRight.x = Vector3Int.FloorToInt(room.TopRight).x + 1;
+            }
+            if (noiseMapTopRight.y < room.TopRight.y)
+            {
+                noiseMapTopRight.y = Vector3Int.FloorToInt(room.TopRight).y + 1;
             }
 
-            foreach (float[,] noiseMap in noiseMaps)
+            if (noiseMapBottomLeft.x > room.BottomLeft.x)
             {
-                for (int x = 0; x < noiseMap.GetLength(0); x++)
-                {
-                    for (int y = 0; y < noiseMap.GetLength(1); y++)
-                    {
-                        Vector3Int prefabPosition = new(x - (room.width / 2) + (int)room.center.x, y - (room.height / 2) + (int)room.center.y);
-
-                        if (DestructibleManager.Instance.BreakablePositions.Contains(prefabPosition) || TrapManager.Instance.TrapsPositions.Contains(prefabPosition))
-                        {
-                            continue;
-                        }
-
-                        if (groundTilePositions.Contains(prefabPosition))
-                        {
-                            float currentHeight1 = noiseMap[x, y];
-
-                            for (int i = 0; i < manager.Settings.regions.Length; i++)
-                            {
-                                if (currentHeight1 <= manager.Settings.regions[i].heightValue)
-                                {
-                                    if (manager.Settings.regions[i].prefab == null)
-                                    {
-                                        Debug.Log("Error within noise array, on position: " + i);
-                                        continue;
-                                    }
-
-                                    if (manager.Settings.regions[i].prefab.CompareTag("Trap"))
-                                    {
-                                        TrapManager.Instance.AddTrap(prefabPosition, manager.Settings.regions[i].prefab, room);
-                                    }
-                                    else if (manager.Settings.regions[i].prefab.CompareTag("Destructible"))
-                                    {
-                                        DestructibleManager.Instance.AddBreakable(prefabPosition, manager.Settings.regions[i].prefab, room);
-                                    }
-                                    else
-                                    {
-                                        Debug.Log("Error with prefab no tag found: " + manager.Settings.regions[i].prefab);
-                                    }
-
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                }
+                noiseMapBottomLeft.x = Vector3Int.FloorToInt(room.BottomLeft).x - 1;
+            }
+            if (noiseMapBottomLeft.y > room.BottomLeft.y)
+            {
+                noiseMapBottomLeft.y = Vector3Int.FloorToInt(room.BottomLeft).y - 1;
             }
         }
+
+        Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to loop through rooms");
+
+        int noiseMapWidth = Math.Abs(noiseMapBottomLeft.x) + Math.Abs(noiseMapTopRight.x);
+        int noiseMapHeight = Math.Abs(noiseMapBottomLeft.y) + Math.Abs(noiseMapTopRight.y);
+
+        Vector3Int noiseMapCenter = new(noiseMapBottomLeft.x + noiseMapWidth / 2, noiseMapBottomLeft.y + noiseMapHeight / 2);
+
+        GenerateNoiseMap(manager, noiseMapWidth, noiseMapHeight, noiseMapCenter);
 
         manager.rooms = mainRooms.ToArray();
 
@@ -209,16 +190,14 @@ public class GeneratingMapState : MapBaseState
         #endregion
     }
 
-    #region Generate Room methods
+    #region Generate rooms
     private Room GenerateRoom(MapManager manager)
     {
-        Room room = null;
-        Vector2Int offset;
         Vector2 position = Vector2.zero;
 
         int roomWidth = rng.Next(manager.Settings.RoomMinSize.x, manager.Settings.roomMaxSize.x + 1);
         int roomHeight = rng.Next(manager.Settings.RoomMinSize.y, manager.Settings.roomMaxSize.y + 1);
-        offset = new(roomWidth / 2, roomHeight / 2);
+        Vector2Int offset = new(roomWidth / 2, roomHeight / 2);
 
         if (manager.Settings.spawnFunction == SpawnFunction.Circle)
         {
@@ -229,9 +208,7 @@ public class GeneratingMapState : MapBaseState
             position = RandomPositionInStrip(manager.Settings.stripSize.x, manager.Settings.stripSize.y) - offset;
         }
 
-        room = new Room(roomWidth, roomHeight, position, manager.Settings.roundCorners);
-
-        return room;
+        return new Room(roomWidth, roomHeight, position, manager.Settings.roundCorners);
     }
 
     public Vector2 RandomPositionInCircle(float radius)
@@ -251,27 +228,7 @@ public class GeneratingMapState : MapBaseState
     }
     #endregion
 
-    #region Seperate room methods
-
-    private void SeparateRooms(MapManager manager)
-    {
-        canMoveRoom = false;
-
-        foreach (Room room in tempRoomList)
-        {
-            Vector2Int direction = GetDirection(manager, room);
-
-            if (direction != Vector2.zero)
-            {
-                room.MoveRoom(direction);
-
-                if (!canMoveRoom)
-                {
-                    canMoveRoom = true;
-                }
-            }
-        }
-    }
+    #region Seperate rooms
 
     private bool RoomIntersects(Room roomA, Room roomB)
     {
@@ -289,7 +246,7 @@ public class GeneratingMapState : MapBaseState
         return false;
     }
 
-    public Vector2Int GetDirection(MapManager manager, Room currentRoom)
+    public Vector2Int GetDirection(Room currentRoom)
     {
         Vector2 separationVelocity = Vector2.zero;
         Vector2 otherPosition, otherAgentToCurrent, directionToTravel;
@@ -443,7 +400,7 @@ public class GeneratingMapState : MapBaseState
                         }
                         else
                         {
-                            notSharedVertices.Add(vertice); 
+                            notSharedVertices.Add(vertice);
                         }
                     }
 
@@ -595,13 +552,11 @@ public class GeneratingMapState : MapBaseState
         }
 
         // Check each point and get the next closest point  
-        // *Important* use closed points list to avoid loops
         List<Edge> minimumSpanningTree = new();
-        List<Vector2> pointsVisited = new();
+        HashSet<Vector2> pointsVisited = new();
 
         List<Edge> openEdges = new();
-        List<Vector2> closedPoints = new();
-        Edge shortestEdge;
+        HashSet<Vector2> closedPoints = new();
 
         Heap<Edge> heap = new(edgeList.Count);
 
@@ -612,13 +567,7 @@ public class GeneratingMapState : MapBaseState
 
         while (true)
         {
-            if (heap.Count == 0)
-            {
-                Debug.Log("Error with heap");
-                break;
-            }
-
-            shortestEdge = heap.RemoveFirst();
+            Edge shortestEdge = heap.RemoveFirst();
             bool canAdd = true;
 
             if (pointsVisited.Contains(shortestEdge.pointA) && pointsVisited.Contains(shortestEdge.pointB))
@@ -641,50 +590,50 @@ public class GeneratingMapState : MapBaseState
                 {
                     for (int i = openEdges.Count - 1; i >= 0; i--)
                     {
-                        if (!closedPoints.Contains(openEdges[i].pointA))
+                        foreach (Vector2 point in openEdges[i].points)
                         {
+                            if (closedPoints.Contains(point))
+                            {
+                                continue;
+                            }
+
+                            closedPoints.Add(point);
+
                             foreach (Edge edge in minimumSpanningTree)
                             {
-                                if (edge.points.Contains(openEdges[i].pointA))
+                                if (edge.points.Contains(point))
                                 {
-                                    if (edge.points.Contains(shortestEdge.pointB))
+                                    if (point == openEdges[i].pointA)
                                     {
-                                        canAdd = false;
-                                        break;
+                                        if (edge.points.Contains(shortestEdge.pointB))
+                                        {
+                                            canAdd = false;
+                                            break;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        if (edge.points.Contains(shortestEdge.pointA))
+                                        {
+                                            canAdd = false;
+                                            break;
+                                        }
                                     }
 
                                     openEdges.Add(edge);
                                 }
                             }
-
-                            closedPoints.Add(openEdges[i].pointA);
                         }
 
-                        if (!closedPoints.Contains(openEdges[i].pointB))
+                        if (!canAdd)
                         {
-                            foreach (Edge edge in minimumSpanningTree)
-                            {
-                                if (edge.points.Contains(openEdges[i].pointB))
-                                {
-                                    if (edge.points.Contains(shortestEdge.pointB))
-                                    {
-                                        canAdd = false;
-                                        break;
-                                    }
-
-                                    openEdges.Add(edge);
-                                }
-                            }
-
-                            closedPoints.Add(openEdges[i].pointB);
+                            openEdges.Clear();
+                            break;
                         }
-
-                        openEdges.Remove(openEdges[i]);
-                    }
-
-                    if (!canAdd)
-                    {
-                        break;
+                        else
+                        {
+                            openEdges.Remove(openEdges[i]);
+                        }
                     }
                 }
                 #endregion
@@ -712,11 +661,9 @@ public class GeneratingMapState : MapBaseState
             {
                 Edge current = edgeList[rng.Next(0, edgeList.Count)];
 
-                if (!loopedEdges.Contains(current))
-                {   
-                    loopedEdges.Add(current);
-                    count++;
-                }
+                loopedEdges.Add(current);
+                edgeList.Remove(current);
+                count++;
 
                 if (count / edgeList.Count >= manager.Settings.amountOfHallwayLoops / 100)
                 {
@@ -758,7 +705,7 @@ public class GeneratingMapState : MapBaseState
     }
     #endregion
 
-    #region Hallways generation
+    #region Hallway generation
     private void GenerateHallways(MapManager manager)
     {
         int hallwayWidth = manager.Settings.hallwayWidth;
@@ -785,12 +732,12 @@ public class GeneratingMapState : MapBaseState
                 }
             }
 
-            Vector3Int startingPosition = new ((int)roomList[0].WorldPosition.x, (int)roomList[0].WorldPosition.y); // From roomList[0]
+            Vector3Int startingPosition = new((int)roomList[0].WorldPosition.x, (int)roomList[0].WorldPosition.y); // From roomList[0]
             Vector3Int targetPosition = new((int)roomList[1].WorldPosition.x, (int)roomList[1].WorldPosition.y); // Towards roomList[1]
 
             // Find a path starting from first room in list towards the connected room.
 
-            List<Vector3Int> hallwayTilePositions = new (AStar.FindPath(startingPosition, targetPosition));
+            List<Vector3Int> hallwayTilePositions = new(AStar.FindPath(startingPosition, targetPosition));
 
             // *Working*s but not very good looking
             #region Room intersection check
@@ -966,16 +913,62 @@ public class GeneratingMapState : MapBaseState
         }
     }
     #endregion
+
+    #region Noise map
+    private void GenerateNoiseMap(MapManager manager, int width, int height, Vector3Int center)
+    {
+        HashSet<Vector3Int> occupiedPositions = new();
+
+        float currentHeight;
+        Vector3Int tilePosition;
+        Vector2 offset;
+
+        for (int i = 0; i < manager.Settings.amountOfNoiseLoops; i++)
+        {
+            offset = new(rng.Next(-100000, 100000), rng.Next(-100000, 100000));
+
+            float[] noiseMap = NoiseMapGenerator.GenerateMap(width, height, manager.Settings.seed, manager.Settings.noiseScale, manager.Settings.octaves, manager.Settings.persistence, manager.Settings.lacunarity, offset);
+
+            for (int j = 0; j < noiseMap.Length; j++)
+            {
+                tilePosition = new((j % width) - (width / 2) + center.x, (j / width) - (height / 2) + center.y);
+
+                if (!groundTilePositions.Contains(tilePosition) || occupiedPositions.Contains(tilePosition))
+                {
+                    continue;
+                }
+
+                occupiedPositions.Add(tilePosition);
+
+                currentHeight = noiseMap[j];
+
+                foreach (PrefabType region in manager.Settings.interactables)
+                {
+                    if (currentHeight <= region.heightValue)
+                    {
+                        if (region.prefab != null)
+                        {
+                            GameObject p = GameObject.Instantiate(region.prefab, tilePosition + (Vector3)(Vector2.one / 2), Quaternion.identity);
+                            p.SetActive(false);
+
+                            manager.gameObjectsList.Add(p);
+                        }
+
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    #endregion
 }
 #endregion
 
 #region Loaded State
 public class LoadedMapState : MapBaseState
 {
-    private Room currentRoom;
-    private List<Vector2> points = new();
-
-    private Vector3Int previousPlayerPosition;
+    private Room[] roomList;
+    public Camera camera;
 
     public override void EnterState(MapManager manager)
     {
@@ -993,64 +986,92 @@ public class LoadedMapState : MapBaseState
             spawnRadius = manager.Settings.generationRadius
         };
 
-        manager.activeRooms.Clear();
+        roomList = manager.rooms;
 
-        LoadRooms(manager, manager.startingRoom);
+        manager.regions = new();
 
-        Player.Instance.transform.position = currentRoom.WorldPosition;
-        previousPlayerPosition = Vector3Int.FloorToInt(Player.Instance.transform.position);
+        foreach (GameObject g in manager.gameObjectsList)
+        {
+            Vector2Int region = new((int)(g.transform.position.x / manager.RegionWidth), (int)(g.transform.position.y / manager.RegionHeight));
+
+            if (manager.regions.ContainsKey(region))
+            {
+                manager.regions[region].Add(g);
+            }
+            else
+            {
+                manager.regions.Add(region, new List<GameObject> { g });
+            }
+        }
+
+        Player.Instance.transform.position = manager.startingRoom.WorldPosition;
+        Player.Instance.OnRegionSwitch += Player_OnRegionSwitch;
+        Player.Instance.UpdateRegion();
     }
 
     public override void UpdateState(MapManager manager)
     {
-        if (Player.Instance.IsMoving && previousPlayerPosition != Vector3Int.FloorToInt(Player.Instance.transform.position))
-        {
-            foreach (Room room in manager.activeRooms)
-            {
-                if (!PlayerWithin(currentRoom))
-                {
-                    if (room != currentRoom && PlayerWithin(room))
-                    {
-                        LoadRooms(manager, room);
-                        break;
-                    }
-                }
 
-                if (!DestructibleManager.Instance.BreakablesWithinRoom[room].First().transform.parent.gameObject.activeInHierarchy)
-                {
-                    if (IsVisible(room.center, new Vector3(room.width + 1, room.height + 1), manager.cameraTest))
-                    {
-                        DestructibleManager.Instance.BreakablesWithinRoom[room].First().transform.parent.gameObject.SetActive(true);
-                        TrapManager.Instance.TrapsWithinRoom[room].First().transform.parent.gameObject.SetActive(true);
-                    }
-                }
-                else
-                {
-                    if (!IsVisible(room.center, new Vector3(room.width + 1, room.height + 1), manager.cameraTest))
-                    {
-                        DestructibleManager.Instance.BreakablesWithinRoom[room].First().transform.parent.gameObject.SetActive(false);
-                        TrapManager.Instance.TrapsWithinRoom[room].First().transform.parent.gameObject.SetActive(false);
-                    }
-                }
-            }
-
-            previousPlayerPosition = Vector3Int.FloorToInt(Player.Instance.transform.position);
-        }
     }
 
     public override void ExitState(MapManager manager)
     {
         manager.groundTileMap.ClearAllTiles();
         manager.wallTileMap.ClearAllTiles();
-        TrapManager.Instance.ClearTraps();
-        DestructibleManager.Instance.ClearBreakables();
+    }
+    private void Player_OnRegionSwitch(object sender, EventArgs e)
+    {
+        EnableRegions();
+    }
+
+    private void EnableRegions()
+    {
+        DisableNonActiveRegions();
+
+        for (int x = -1; x < 2; x++)
+        {
+            for (int y = -1; y < 2; y++)
+            {
+                Vector2Int region = new Vector2Int(x, y) + Player.Instance.CurrentRegion;
+
+                if (MapManager.Instance.regions.TryGetValue(region, out var gameObjects))
+                {
+                    for (int i = 0; i < gameObjects.Count; i++)
+                    {
+                        gameObjects[i].SetActive(true);
+                    }
+                }
+            }
+        }
+    }
+
+    private void DisableNonActiveRegions()
+    {
+        for (int x = -1; x < 2; x++)
+        {
+            for (int y = -1; y < 2; y++)
+            {
+                Vector2Int region = new Vector2Int(x, y) + Player.Instance.PreviousRegion;
+
+                int xDistance = Math.Abs(region.x - Player.Instance.CurrentRegion.x), yDistance = Math.Abs(region.y - Player.Instance.CurrentRegion.y);
+
+                if (xDistance > 1 || yDistance > 1)
+                {
+                    if (MapManager.Instance.regions.TryGetValue(region, out var gameObjects))
+                    {
+                        for (int i = 0; i < gameObjects.Count; i++)
+                        {
+                            gameObjects[i].SetActive(false);
+                        }
+                    }
+                }
+            }
+        }
     }
 
     private bool IsVisible(Vector3 pos, Vector3 boundSize, Camera camera)
     {
-        var bounds = new Bounds(pos, boundSize);
-        var planes = GeometryUtility.CalculateFrustumPlanes(camera);
-        return GeometryUtility.TestPlanesAABB(planes, bounds);
+        return GeometryUtility.TestPlanesAABB(GeometryUtility.CalculateFrustumPlanes(camera), new Bounds(pos, boundSize));
     }
 
     private bool PlayerWithin(Room room)
@@ -1064,57 +1085,6 @@ public class LoadedMapState : MapBaseState
         }
 
         return false;
-    }
-
-    private void LoadRooms(MapManager manager, Room room)
-    {
-        currentRoom = room;
-
-        foreach (Room previouslyActiveRoom in manager.activeRooms)
-        {
-            if (previouslyActiveRoom != currentRoom)
-            {
-                DestructibleManager.Instance.BreakablesWithinRoom[previouslyActiveRoom].First().transform.parent.gameObject.SetActive(false);
-                TrapManager.Instance.TrapsWithinRoom[previouslyActiveRoom].First().transform.parent.gameObject.SetActive(false);
-            }
-        }
-
-        manager.activeRooms.Clear();
-        points.Clear();
-
-        manager.activeRooms.Add(currentRoom);
-
-        foreach (Edge edge in manager.minimumSpanningTree)
-        {
-            if (edge.pointA == currentRoom.center)
-            {
-                points.Add(edge.pointB);
-            }
-            else if (edge.pointB == currentRoom.center)
-            {
-                points.Add(edge.pointA);
-            }
-        }
-
-        foreach (Room connectedRoom in manager.rooms)
-        {
-            if (connectedRoom != currentRoom && points.Contains(connectedRoom.center))
-            {
-                manager.activeRooms.Add(connectedRoom);
-
-                if (IsVisible(connectedRoom.center, new Vector3(connectedRoom.width, connectedRoom.height), manager.cameraTest))
-                {
-                    DestructibleManager.Instance.BreakablesWithinRoom[connectedRoom].First().transform.parent.gameObject.SetActive(true);
-                    TrapManager.Instance.TrapsWithinRoom[connectedRoom].First().transform.parent.gameObject.SetActive(true);
-                }
-                else
-                {
-                    DestructibleManager.Instance.BreakablesWithinRoom[connectedRoom].First().transform.parent.gameObject.SetActive(false);
-                    TrapManager.Instance.TrapsWithinRoom[connectedRoom].First().transform.parent.gameObject.SetActive(false);
-                }
-            }
-        }
-        Debug.Log(manager.activeRooms.Count);
     }
 }
 #endregion

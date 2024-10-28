@@ -1,6 +1,5 @@
 using NaughtyAttributes;
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -24,10 +23,6 @@ public class MapManager : MonoBehaviour
     public TilePair[] tiles;
     #endregion
 
-    public Camera cameraTest;
-
-    public List<Room> activeRooms = new();
-
     public MapSettings Settings { get; private set; }
 
     public Room startingRoom;
@@ -38,6 +33,12 @@ public class MapManager : MonoBehaviour
     public Room[] rooms;
 
     public readonly Dictionary<TileTexture, TileBase> tilePairs = new();
+
+    public List<GameObject> gameObjectsList = new();
+
+    public Dictionary<Vector2Int, List<GameObject>> regions;
+    public int RegionWidth { get; private set; }
+    public int RegionHeight { get; private set; }
 
     private void Start()
     {
@@ -51,6 +52,11 @@ public class MapManager : MonoBehaviour
             Destroy(this);
             return;
         }
+
+        Camera camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+
+        RegionHeight = (int)(camera.orthographicSize) + 1;
+        RegionWidth = (int)(camera.aspect * RegionHeight * 0.85f);
 
         Settings = GetComponent<MapSettings>(); 
 

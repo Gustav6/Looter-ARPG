@@ -22,4 +22,21 @@ public class Trap : MonoBehaviour
         colliderComponent.enabled = false;
         rbComponent.simulated = false;
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            Debug.Log("Collision");
+            animator.SetBool("Active", true);
+        }
+    }
+
+    private void OnTriggerExit2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            animator.SetBool("Active", false);
+        }
+    }
 }

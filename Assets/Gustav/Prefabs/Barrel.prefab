@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 3801104038763376865}
   - component: {fileID: 8051332948224252702}
   - component: {fileID: 7290404244658454857}
-  - component: {fileID: 681671165044167110}
   m_Layer: 0
   m_Name: Barrel
   m_TagString: Destructible
@@ -175,17 +174,3 @@ MonoBehaviour:
   <Health>k__BackingField: 0
   colliderComponent: {fileID: 3801104038763376865}
   rbComponent: {fileID: 8051332948224252702}
---- !u!114 &681671165044167110
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4889750398875816261}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b166c9b9648e1f34299a0678af8e9ed9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  type: 1
-  script: {fileID: 7290404244658454857}

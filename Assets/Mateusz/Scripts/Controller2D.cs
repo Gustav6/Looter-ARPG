@@ -27,6 +27,7 @@ public class Controller2D : MonoBehaviour
     public void Move(Vector3 velocity)
     {
         UpdateRaycastOrigins();
+
         if (velocity.x != 0)
         {
             HorizontalCollisions(ref velocity);

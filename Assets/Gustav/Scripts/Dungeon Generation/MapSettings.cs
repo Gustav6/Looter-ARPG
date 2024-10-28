@@ -100,7 +100,9 @@ public class MapSettings : MonoBehaviour
     [Foldout("Perlin Noise")]
     public float lacunarity;
     [Foldout("Perlin Noise")]
-    public TerrainType[] regions;
+    public PrefabType[] interactables;
+    [Foldout("Perlin Noise")]
+    public PrefabType[] enemies;
     #endregion
 
     #region Debug

@@ -5,7 +5,7 @@ using UnityEngine;
 
 public static class NoiseMapGenerator
 {
-    public static float[,] GenerateMap(int width, int height, int seed, float scale, int octaves, float persistence, float lacunarity, Vector2 offset)
+    public static float[] GenerateMap(int width, int height, int seed, float scale, int octaves, float persistence, float lacunarity, Vector2 offset)
     {
         if (lacunarity < 1 || octaves < 0)
         {
@@ -17,7 +17,7 @@ public static class NoiseMapGenerator
 }
 
 [System.Serializable]
-public struct TerrainType
+public struct PrefabType
 {
     public string name;
     public float heightValue;

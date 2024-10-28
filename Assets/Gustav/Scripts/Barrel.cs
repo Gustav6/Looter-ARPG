@@ -20,4 +20,14 @@ public class Barrel : MonoBehaviour
         colliderComponent.enabled = false;
         rbComponent.simulated = false;
     }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Player"))
+        {
+            Vector2Int region = new((int)(transform.position.x / MapManager.Instance.RegionWidth), (int)(transform.position.y / MapManager.Instance.RegionHeight));
+            MapManager.Instance.regions[region].Remove(gameObject);
+            Destroy(gameObject);
+        }
+    }
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -52,7 +53,12 @@ public class Player : MonoBehaviour
 
     Controller2D controller;
 
-    private void Start()
+    public event EventHandler OnRegionSwitch;
+    public Vector2Int CurrentRegion { get; private set; }
+    public Vector2Int PreviousRegion { get; private set; }
+
+
+    private void Awake()
     {
         if (Instance == null)
         {
@@ -68,6 +74,8 @@ public class Player : MonoBehaviour
         Stamina = maxStamina;
         moveSpeed = 5;
         controller = GetComponent<Controller2D>();
+
+        CurrentRegion = Vector2Int.FloorToInt(transform.position);
     }
 
     private void Update()
@@ -91,14 +99,20 @@ public class Player : MonoBehaviour
         {
             IsMoving = true;
             controller.Move(moveSpeed * Time.deltaTime * Direction);
+
+            if (sprinting)
+            {
+                Stamina -= sprintCost * Time.deltaTime;
+                UpdateStaminaBar(1);
+            }
+
+            if (CurrentRegion != new Vector2Int((int)(transform.position.x / MapManager.Instance.RegionWidth), (int)(transform.position.y / MapManager.Instance.RegionHeight)))
+            {
+                UpdateRegion();
+            }
         }
 
-        if (sprinting)
-        {
-            Stamina -= sprintCost * Time.deltaTime;
-            UpdateStaminaBar(1);
-        }
-        else if (!sprinting && Stamina < maxStamina)
+        if (!sprinting && Stamina < maxStamina)
         {
             Stamina += Time.deltaTime * rechargeTime;
             UpdateStaminaBar(1);
@@ -127,6 +141,12 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void UpdateRegion()
+    {
+        CurrentRegion = new Vector2Int((int)(transform.position.x / MapManager.Instance.RegionWidth), (int)(transform.position.y / MapManager.Instance.RegionHeight));
+        OnRegionSwitch?.Invoke(this, EventArgs.Empty);
+        PreviousRegion = CurrentRegion;
+    }
 
     void UpdateStaminaBar(int value)
     {

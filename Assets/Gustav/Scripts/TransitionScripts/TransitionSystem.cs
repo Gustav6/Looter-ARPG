@@ -7,7 +7,6 @@ using UnityEngine;
 
 public class TransitionSystem
 {
-    //public static List<Transition> transitions = new();
     private static readonly Dictionary<GameObject, List<Transition>> transitionPairs = new();
 
     public static void Update()
@@ -24,12 +23,12 @@ public class TransitionSystem
         {
             for (int j = transitionPairs.ElementAt(i).Value.Count - 1; j >= 0; j--)
             {
-                if (transitionPairs.ElementAt(i).Value[j].isRemoved)
+                if (transitionPairs.ElementAt(i).Value.ElementAt(j).isRemoved)
                 {
-                    transitionPairs.ElementAt(i).Value[j].executeOnCompletion?.Invoke();
+                    transitionPairs.ElementAt(i).Value.ElementAt(j).execute?.Invoke();
                     transitionPairs.ElementAt(i).Value.RemoveAt(j);
 
-                    if (transitionPairs[transitionPairs.ElementAt(i).Key].Count == 0)
+                    if (transitionPairs.ElementAt(i).Value.Count == 0)
                     {
                         transitionPairs.Remove(transitionPairs.ElementAt(i).Key);
                     }
@@ -38,25 +37,33 @@ public class TransitionSystem
         }
     }
 
+    public static void ClearTransitionList()
+    {
+        transitionPairs.Clear();
+    }
+
     public static void AddTransition(Transition transition, GameObject id, bool removeTransitionsWithSameID = true, bool loop = false)
     {
-        transition.id = id;
         transition.loop = loop;
 
-        if (transitionPairs.ContainsKey(transition.id))
+        if (transitionPairs.ContainsKey(id))
         {
             if (removeTransitionsWithSameID)
             {
-                transitionPairs.Remove(transition.id);
+                for (int i = transitionPairs[id].Count - 1; i >= 0; i--)
+                {
+                    if (transition.GetType() == transitionPairs[id].ElementAt(i).GetType())
+                    {
+                        transitionPairs[id].RemoveAt(i);
+                    }
+                }
             }
-            else
-            {
-                transitionPairs[transition.id].Add(transition);
-            }
+
+            transitionPairs[id].Add(transition);
         }
         else
         {
-            transitionPairs.Add(transition.id, new List<Transition>() { transition });
+            transitionPairs.Add(id, new List<Transition>() { transition });
         }
 
         transition.Start();
@@ -144,6 +151,7 @@ public class TransitionSystem
         return (1 - t) * a + t * b;
     }
 }
+
 public enum TransitionType
 {
     SmoothStart2,
@@ -155,4 +163,13 @@ public enum TransitionType
     SmoothStop4,
 
     SinCurve,
+    CosCurve,
+}
+
+public enum TransitionVariant
+{
+    color,
+    rotation,
+    scale,
+    move
 }

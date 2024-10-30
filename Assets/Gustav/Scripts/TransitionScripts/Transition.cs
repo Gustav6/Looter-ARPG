@@ -4,10 +4,11 @@ using UnityEngine;
 
 public abstract class Transition
 {
-    public delegate void ExecuteOnCompletion();
-    public ExecuteOnCompletion executeOnCompletion;
+    public delegate void ExecuteAfterTransition();
+    public ExecuteAfterTransition execute;
 
-    public GameObject id;
+    protected TransitionType transition;
+
     public bool loop;
 
     public bool isRemoved;
@@ -17,7 +18,7 @@ public abstract class Transition
 
     public virtual void Start()
     {
-
+        execute += RunAfterTransition;
     }
 
     public virtual void Update()
@@ -38,5 +39,10 @@ public abstract class Transition
                 isRemoved = true;
             }
         }
+    }
+
+    public virtual void RunAfterTransition()
+    {
+
     }
 }

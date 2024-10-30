@@ -12,7 +12,7 @@ public static class Noise
 
         for (int i = 0; i < octaves; i++)
         {
-            octaveOffsets[i] = new Vector2(rng.Next(-100000, 100000) + offset.x, rng.Next(-100000, 100000) + offset.y);
+            octaveOffsets[i] = new Vector2(rng.Next(-100000, 100000), rng.Next(-100000, 100000)) + offset;
         }
 
         if (scale <= 0)
@@ -24,6 +24,8 @@ public static class Noise
 
         float amplitude, frequency, noiseHeight, sampleX, sampleY;
 
+        float halfWidth = width / 2, halfHeight = height / 2;
+
         for (int x = 0; x < width; x++)
         {
             for (int y = 0; y < height; y++)
@@ -34,8 +36,8 @@ public static class Noise
 
                 for (int i = 0; i < octaves; i++)
                 {
-                    sampleX = (x - width / 2) / scale * frequency + octaveOffsets[i].x;
-                    sampleY = (y - height / 2) / scale * frequency + octaveOffsets[i].y;
+                    sampleX = (x - halfWidth) / scale * frequency + octaveOffsets[i].x;
+                    sampleY = (y - halfHeight) / scale * frequency + octaveOffsets[i].y;
                     //float sampleX = ((x - halfWidth) / scale * frequency) + (octaveOffsets[i].x / scale * frequency);
                     //float sampleY = ((y - halfHeight) / scale * frequency) + (octaveOffsets[i].y / scale * frequency);
 

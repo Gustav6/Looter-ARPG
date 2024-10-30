@@ -1,6 +1,7 @@
 using NaughtyAttributes;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -27,13 +28,12 @@ public class MapManager : MonoBehaviour
 
     public Room startingRoom;
 
-    public Map currentMap;
-
     public List<Edge> minimumSpanningTree;
     public Room[] rooms;
 
     public readonly Dictionary<TileTexture, TileBase> tilePairs = new();
 
+    public GameObject activeGameObjectsParent;
     public List<GameObject> gameObjectsList = new();
 
     public Dictionary<Vector2Int, List<GameObject>> regions;
@@ -56,9 +56,9 @@ public class MapManager : MonoBehaviour
         Camera camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 
         RegionHeight = (int)(camera.orthographicSize) + 1;
-        RegionWidth = (int)(camera.aspect * RegionHeight * 0.85f);
+        RegionWidth = (int)(camera.aspect * RegionHeight);
 
-        Settings = GetComponent<MapSettings>(); 
+        Settings = GetComponent<MapSettings>();
 
         foreach (TilePair pair in tiles)
         {
@@ -87,48 +87,57 @@ public class MapManager : MonoBehaviour
         currentState.EnterState(this);
     }
 
-    public void LoadMap(Map mapToLoad)
+    public void SpawnPrefab(GameObject prefab, Vector3Int tileSpawnPosition, bool activeStatus = true)
     {
-        Settings.seed = mapToLoad.seed;
-        Settings.spawnFunction = mapToLoad.spawnFunction;
-        Settings.roomMaxSize = mapToLoad.roomMaxSize;
-        Settings.RoomMinSize = mapToLoad.roomMinSize;
-        Settings.totalRoomsCount = mapToLoad.amountOfRooms;
-        Settings.AmountOfMainRooms = mapToLoad.amountOfMainRooms;
-        Settings.amountOfHallwayLoops = mapToLoad.amountOfLoops;
-        Settings.hallwayWidth = mapToLoad.hallwayWidth;
-        Settings.stripSize = mapToLoad.stripSpawnSize;
-        Settings.generationRadius = mapToLoad.spawnRadius;
+        if (startingRoom.groundTiles.Contains(tileSpawnPosition) && Settings.doNotAllowInStartingRoom.Contains(prefab))
+        {
+            return;
+        }
 
-        SwitchState(generationState);
+        GameObject spawnedPrefab = Instantiate(prefab, tileSpawnPosition + new Vector3(0.5f, 0.5f), Quaternion.identity, activeGameObjectsParent.transform);
+        spawnedPrefab.SetActive(activeStatus);
+        gameObjectsList.Add(spawnedPrefab);
     }
 
-    public static T TwoToOneDimensional<T>(Vector2Int position, T[] grid, int width)
+    public void SetGameObjectsRegion(GameObject gameObject)
+    {
+        if (!gameObjectsList.Contains(gameObject))
+        {
+            gameObjectsList.Add(gameObject);
+        }
+
+        Vector2Int region = new((int)(gameObject.transform.position.x / RegionWidth), (int)(gameObject.transform.position.y / RegionHeight));
+
+        if (regions.ContainsKey(region))
+        {
+            regions[region].Add(gameObject);
+        }
+        else
+        {
+            regions.Add(region, new List<GameObject> { gameObject });
+        }
+    }
+
+    public void RemoveGameObject(GameObject g, Vector2Int region)
+    {
+        regions[region].Remove(g);
+        gameObjectsList.Remove(g);
+        Destroy(g);
+    }
+
+    public static T OneToTwoDimensional<T>(Vector2Int position, T[] grid, int width)
     {
         int index = position.x + position.y * width;
 
         return grid[index];
     }
 
-    public static T OneToTwoDimensional<T>(int index, T[,] grid, int width)
+    public static T TwoToOneDimensional<T>(int index, T[,] grid, int width)
     {
         int x = index % width;
         int y = index / width;
 
         return grid[x, y];
-    }
-
-    [Serializable]
-    public struct Map
-    {
-        public int seed;
-        public SpawnFunction spawnFunction;
-        public int spawnRadius;
-        public Vector2Int stripSpawnSize;
-        public int amountOfRooms, amountOfMainRooms;
-        public Vector2Int roomMinSize, roomMaxSize;
-        public float amountOfLoops;
-        public int hallwayWidth;
     }
 }
 

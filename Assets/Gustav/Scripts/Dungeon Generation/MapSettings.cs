@@ -73,6 +73,8 @@ public class MapSettings : MonoBehaviour
 
     [BoxGroup("Room Variables")]
     public bool roundCorners = true;
+    [BoxGroup("Room Variables")]
+    public GameObject[] doNotAllowInStartingRoom;
     #endregion
 
     #region Hallway
@@ -100,9 +102,7 @@ public class MapSettings : MonoBehaviour
     [Foldout("Perlin Noise")]
     public float lacunarity;
     [Foldout("Perlin Noise")]
-    public PrefabType[] interactables;
-    [Foldout("Perlin Noise")]
-    public PrefabType[] enemies;
+    public NoiseRegion[] prefabs;
     #endregion
 
     #region Debug

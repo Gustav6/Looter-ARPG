@@ -8,6 +8,9 @@ public class UIStateManager : MonoBehaviour
 
     public bool GamePaused { get; private set; }
 
+    public float ResolutionScaling { get; private set; }
+
+
     private void Awake()
     {
         if (Instance == null)
@@ -21,12 +24,13 @@ public class UIStateManager : MonoBehaviour
             return;
         }
 
-
+        ResolutionScaling = 1;
+        UnPauseGame();
     }
 
     private void Update()
     {
-        
+        TransitionSystem.Update();
     }
 
     public void PauseGame()

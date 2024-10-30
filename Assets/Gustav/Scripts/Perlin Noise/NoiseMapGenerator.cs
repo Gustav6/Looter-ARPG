@@ -7,9 +7,13 @@ public static class NoiseMapGenerator
 {
     public static float[] GenerateMap(int width, int height, int seed, float scale, int octaves, float persistence, float lacunarity, Vector2 offset)
     {
-        if (lacunarity < 1 || octaves < 0)
+        if (lacunarity < 1)
         {
-            return null;
+            lacunarity = 1;
+        }
+        if (octaves < 0)
+        {
+            octaves = 0;
         }
 
         return Noise.GenerateNoiseMap(width, height, seed, scale, octaves, persistence, lacunarity, offset);
@@ -17,7 +21,7 @@ public static class NoiseMapGenerator
 }
 
 [System.Serializable]
-public struct PrefabType
+public struct NoiseRegion
 {
     public string name;
     public float heightValue;

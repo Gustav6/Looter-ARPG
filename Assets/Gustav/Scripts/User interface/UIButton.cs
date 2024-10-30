@@ -1,34 +1,26 @@
 using NaughtyAttributes;
 using System;
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class UIButton : UIBaseScript, IPointerClickHandler
 {
-    //[BoxGroup("Button variables")]
+    private Dictionary<Function, Action> functionLookup;
 
-    [BoxGroup("Function variables")]
-    [SerializeField] private List<Functions> actions = new();
-    private Dictionary<Functions, Action> functionLookup;
+    [BoxGroup("Button variables")]
+    [SerializeField] private List<Function> actions = new();
 
-    [BoxGroup("Function variables")]
+    [BoxGroup("Button variables")]
     [Scene] [SerializeField] private string scene;
-
-    [Foldout("Button references")]
-    public TextMeshProUGUI textReference;
-    [Foldout("Button references")]
-    public Image backgroundReference;
 
     public override void Start()
     {
-        functionLookup = new Dictionary<Functions, Action>()
+        functionLookup = new Dictionary<Function, Action>()
         {
-            { Functions.QuitGame, Application.Quit },
-            { Functions.ChangeScene, SwitchScene },
+            { Function.QuitGame, Application.Quit },
+            { Function.ChangeScene, SwitchScene },
         };
 
         base.Start();
@@ -43,14 +35,15 @@ public class UIButton : UIBaseScript, IPointerClickHandler
 
     private void ActivateSelectedFunctions()
     {
-        for (int i = 0; i < actions.Count; i++)
+        foreach (Function function in actions)
         {
-            functionLookup[actions[i]]?.Invoke();
+            functionLookup[function]?.Invoke();
         }
     }
 
     public void SwitchScene()
     {
+        TransitionSystem.ClearTransitionList();
         SceneManager.LoadScene(scene);
     }
 
@@ -64,7 +57,7 @@ public class UIButton : UIBaseScript, IPointerClickHandler
         RunOnActivation();
     }
 
-    private enum Functions
+    private enum Function
     {
         QuitGame,
         ChangeScene,

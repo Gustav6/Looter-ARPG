@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Unity.IO.Archive;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -17,7 +18,7 @@ public abstract class MapBaseState
 #region Generation State
 public class GeneratingMapState : MapBaseState
 {
-    public Room[] tempRoomList;
+    public Room[] roomList;
     public List<Room> mainRooms = new();
 
     private List<Triangle> triangulation = new();
@@ -38,9 +39,10 @@ public class GeneratingMapState : MapBaseState
         stopwatch.Start();
         #endregion
 
-        #region Debug game objects
+        #region Game objects
         GameObject.Destroy(triangulationDebug);
         GameObject.Destroy(minimumSpanningTreeDebug);
+        GameObject.Destroy(manager.activeGameObjectsParent);
         #endregion
 
         rng = new System.Random(manager.Settings.seed);
@@ -50,7 +52,15 @@ public class GeneratingMapState : MapBaseState
         groundTilePositions.Clear();
         wallTilePositions.Clear();
 
-        tempRoomList = new Room[manager.Settings.totalRoomsCount];
+        manager.gameObjectsList.Clear();
+        manager.activeGameObjectsParent = new()
+        {
+            name = "Active Game Objects"
+        };
+
+        manager.regions = new();
+
+        roomList = new Room[manager.Settings.totalRoomsCount];
         Heap<Room> roomHeapForSize = new(manager.Settings.totalRoomsCount);
 
         // Generate x amount of rooms
@@ -58,7 +68,7 @@ public class GeneratingMapState : MapBaseState
         {
             Room newRoom = GenerateRoom(manager);
 
-            tempRoomList[i] = newRoom;
+            roomList[i] = newRoom;
             roomHeapForSize.Add(newRoom);
         }
 
@@ -78,7 +88,7 @@ public class GeneratingMapState : MapBaseState
         {
             canMoveRoom = false;
 
-            foreach (Room room in tempRoomList)
+            foreach (Room room in roomList)
             {
                 Vector3Int dir = (Vector3Int)GetDirection(room);
 
@@ -108,8 +118,7 @@ public class GeneratingMapState : MapBaseState
     {
         diagnosticTime = stopwatch.ElapsedMilliseconds;
 
-        Vector3Int noiseMapTopRight = Vector3Int.FloorToInt(tempRoomList.First().TopRight);
-        Vector3Int noiseMapBottomLeft = Vector3Int.FloorToInt(tempRoomList.First().BottomLeft);
+        Vector3Int noiseMapTopRight = Vector3Int.zero, noiseMapBottomLeft = Vector3Int.zero;
 
         foreach (Room room in mainRooms)
         {
@@ -137,16 +146,8 @@ public class GeneratingMapState : MapBaseState
 
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to loop through rooms");
 
-        int noiseMapWidth = Math.Abs(noiseMapBottomLeft.x) + Math.Abs(noiseMapTopRight.x);
-        int noiseMapHeight = Math.Abs(noiseMapBottomLeft.y) + Math.Abs(noiseMapTopRight.y);
-
-        Vector3Int noiseMapCenter = new(noiseMapBottomLeft.x + noiseMapWidth / 2, noiseMapBottomLeft.y + noiseMapHeight / 2);
-
-        GenerateNoiseMap(manager, noiseMapWidth, noiseMapHeight, noiseMapCenter);
-
         manager.rooms = mainRooms.ToArray();
 
-        #region Methods for generation
         diagnosticTime = stopwatch.ElapsedMilliseconds;
         triangulation = GenerateDelaunayTriangulation(manager, mainRooms);
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to triangulate points");
@@ -159,7 +160,13 @@ public class GeneratingMapState : MapBaseState
         diagnosticTime = stopwatch.ElapsedMilliseconds;
         GenerateHallways(manager);
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to generate hallways");
-        #endregion
+
+        int noiseMapWidth = Math.Abs(noiseMapBottomLeft.x) + Math.Abs(noiseMapTopRight.x);
+        int noiseMapHeight = Math.Abs(noiseMapBottomLeft.y) + Math.Abs(noiseMapTopRight.y);
+
+        Vector3Int noiseMapCenter = new(noiseMapBottomLeft.x + noiseMapWidth / 2, noiseMapBottomLeft.y + noiseMapHeight / 2);
+
+        GenerateNoiseMap(manager, noiseMapWidth, noiseMapHeight, noiseMapCenter);
 
         #region Set ground tiles
         diagnosticTime = stopwatch.ElapsedMilliseconds;
@@ -251,7 +258,7 @@ public class GeneratingMapState : MapBaseState
         Vector2 separationVelocity = Vector2.zero;
         Vector2 otherPosition, otherAgentToCurrent, directionToTravel;
 
-        foreach (Room room in tempRoomList)
+        foreach (Room room in roomList)
         {
             if (!RoomIntersects(currentRoom, room))
             {
@@ -693,8 +700,6 @@ public class GeneratingMapState : MapBaseState
                 LineRenderer ln = debug.AddComponent<LineRenderer>();
                 ln.positionCount = 2;
 
-                //ln.SetPosition(0, new Vector3(edges[i].pointA.x, edges[i].pointA.y, -1));
-                //ln.SetPosition(1, new Vector3(edges[i].pointB.x, edges[i].pointB.y, -1));
                 ln.SetPosition(0, new Vector3(minimumSpanningTree[i].pointA.x, minimumSpanningTree[i].pointA.y, -1));
                 ln.SetPosition(1, new Vector3(minimumSpanningTree[i].pointB.x, minimumSpanningTree[i].pointB.y, -1));
             }
@@ -938,20 +943,25 @@ public class GeneratingMapState : MapBaseState
                     continue;
                 }
 
-                occupiedPositions.Add(tilePosition);
-
                 currentHeight = noiseMap[j];
 
-                foreach (PrefabType region in manager.Settings.interactables)
+                foreach (NoiseRegion region in manager.Settings.prefabs)
                 {
                     if (currentHeight <= region.heightValue)
                     {
                         if (region.prefab != null)
                         {
-                            GameObject p = GameObject.Instantiate(region.prefab, tilePosition + (Vector3)(Vector2.one / 2), Quaternion.identity);
-                            p.SetActive(false);
+                            if (manager.startingRoom.groundTiles.Contains(tilePosition) && manager.Settings.doNotAllowInStartingRoom.Contains(region.prefab))
+                            {
+                                break;
+                            }
 
-                            manager.gameObjectsList.Add(p);
+                            GameObject g = GameObject.Instantiate(region.prefab, tilePosition + new Vector3(0.5f, 0.5f), Quaternion.identity, manager.activeGameObjectsParent.transform);
+                            manager.SetGameObjectsRegion(g);
+                            g.SetActive(false);
+
+
+                            occupiedPositions.Add(tilePosition);
                         }
 
                         break;
@@ -967,43 +977,10 @@ public class GeneratingMapState : MapBaseState
 #region Loaded State
 public class LoadedMapState : MapBaseState
 {
-    private Room[] roomList;
     public Camera camera;
 
     public override void EnterState(MapManager manager)
     {
-        manager.currentMap = new()
-        {
-            seed = manager.Settings.seed,
-            spawnFunction = manager.Settings.spawnFunction,
-            roomMaxSize = manager.Settings.roomMaxSize,
-            roomMinSize = manager.Settings.RoomMinSize,
-            amountOfRooms = manager.Settings.totalRoomsCount,
-            amountOfMainRooms = manager.Settings.AmountOfMainRooms,
-            amountOfLoops = manager.Settings.amountOfHallwayLoops,
-            hallwayWidth = manager.Settings.hallwayWidth,
-            stripSpawnSize = manager.Settings.stripSize,
-            spawnRadius = manager.Settings.generationRadius
-        };
-
-        roomList = manager.rooms;
-
-        manager.regions = new();
-
-        foreach (GameObject g in manager.gameObjectsList)
-        {
-            Vector2Int region = new((int)(g.transform.position.x / manager.RegionWidth), (int)(g.transform.position.y / manager.RegionHeight));
-
-            if (manager.regions.ContainsKey(region))
-            {
-                manager.regions[region].Add(g);
-            }
-            else
-            {
-                manager.regions.Add(region, new List<GameObject> { g });
-            }
-        }
-
         Player.Instance.transform.position = manager.startingRoom.WorldPosition;
         Player.Instance.OnRegionSwitch += Player_OnRegionSwitch;
         Player.Instance.UpdateRegion();
@@ -1019,72 +996,47 @@ public class LoadedMapState : MapBaseState
         manager.groundTileMap.ClearAllTiles();
         manager.wallTileMap.ClearAllTiles();
     }
+
     private void Player_OnRegionSwitch(object sender, EventArgs e)
     {
-        EnableRegions();
+        UpdateActiveRegions();
     }
 
-    private void EnableRegions()
+    private void UpdateActiveRegions()
     {
-        DisableNonActiveRegions();
+        Vector2Int currentRegionsNeighbor, previousRegionsNeighbor;
+        int xDistance, yDistance;
 
         for (int x = -1; x < 2; x++)
         {
             for (int y = -1; y < 2; y++)
             {
-                Vector2Int region = new Vector2Int(x, y) + Player.Instance.CurrentRegion;
+                currentRegionsNeighbor = new Vector2Int(x, y) + Player.Instance.CurrentRegion;
+                previousRegionsNeighbor = new Vector2Int(x, y) + Player.Instance.PreviousRegion;
 
-                if (MapManager.Instance.regions.TryGetValue(region, out var gameObjects))
-                {
-                    for (int i = 0; i < gameObjects.Count; i++)
-                    {
-                        gameObjects[i].SetActive(true);
-                    }
-                }
-            }
-        }
-    }
-
-    private void DisableNonActiveRegions()
-    {
-        for (int x = -1; x < 2; x++)
-        {
-            for (int y = -1; y < 2; y++)
-            {
-                Vector2Int region = new Vector2Int(x, y) + Player.Instance.PreviousRegion;
-
-                int xDistance = Math.Abs(region.x - Player.Instance.CurrentRegion.x), yDistance = Math.Abs(region.y - Player.Instance.CurrentRegion.y);
+                xDistance = Math.Abs(previousRegionsNeighbor.x - Player.Instance.CurrentRegion.x);
+                yDistance = Math.Abs(previousRegionsNeighbor.y - Player.Instance.CurrentRegion.y);
 
                 if (xDistance > 1 || yDistance > 1)
                 {
-                    if (MapManager.Instance.regions.TryGetValue(region, out var gameObjects))
+                    if (MapManager.Instance.regions.TryGetValue(previousRegionsNeighbor, out var disableList))
                     {
-                        for (int i = 0; i < gameObjects.Count; i++)
+                        for (int i = 0; i < disableList.Count; i++)
                         {
-                            gameObjects[i].SetActive(false);
+                            disableList[i].SetActive(false);
                         }
+                    }
+                }
+
+                if (MapManager.Instance.regions.TryGetValue(currentRegionsNeighbor, out var enableList))
+                {
+                    for (int i = 0; i < enableList.Count; i++)
+                    {
+                        enableList[i].SetActive(true);
                     }
                 }
             }
         }
-    }
-
-    private bool IsVisible(Vector3 pos, Vector3 boundSize, Camera camera)
-    {
-        return GeometryUtility.TestPlanesAABB(GeometryUtility.CalculateFrustumPlanes(camera), new Bounds(pos, boundSize));
-    }
-
-    private bool PlayerWithin(Room room)
-    {
-        if (room.BottomLeft.x < Player.Instance.transform.position.x && room.TopRight.x > Player.Instance.transform.position.x)
-        {
-            if (room.BottomLeft.y < Player.Instance.transform.position.y && room.TopRight.y > Player.Instance.transform.position.y)
-            {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
 #endregion

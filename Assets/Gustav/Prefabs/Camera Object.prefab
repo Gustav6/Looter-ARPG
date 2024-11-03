@@ -55,7 +55,7 @@ MonoBehaviour:
   m_Follow: {fileID: 0}
   m_Lens:
     FieldOfView: 170
-    OrthographicSize: 5
+    OrthographicSize: 16
     NearClipPlane: 0.3
     FarClipPlane: 1000
     Dutch: 0
@@ -84,7 +84,6 @@ GameObject:
   - component: {fileID: 1689737114163325548}
   - component: {fileID: 2684179200277352419}
   - component: {fileID: 7803869466839225025}
-  - component: {fileID: 5903010207092490315}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -142,7 +141,7 @@ Camera:
   far clip plane: 1000
   field of view: 170
   orthographic: 1
-  orthographic size: 5
+  orthographic size: 16
   m_Depth: 0
   m_CullingMask:
     serializedVersion: 2
@@ -200,26 +199,6 @@ MonoBehaviour:
   m_CameraActivatedEvent:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &5903010207092490315
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 655918508977842321}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6a160d838ff8b4b4693ac20007e008c7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_AssetsPPU: 40
-  m_RefResolutionX: 1920
-  m_RefResolutionY: 1080
-  m_UpscaleRT: 0
-  m_PixelSnapping: 0
-  m_CropFrameX: 0
-  m_CropFrameY: 0
-  m_StretchFill: 0
 --- !u!1 &5707814451367326689
 GameObject:
   m_ObjectHideFlags: 0

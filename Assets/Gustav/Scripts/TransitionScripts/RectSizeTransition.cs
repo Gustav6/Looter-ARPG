@@ -1,23 +1,25 @@
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
-public class RotationTransition : Transition
+public class RectSizeTransition : Transition
 {
-    private Transform transform;
+    private RectTransform rectTransform;
 
-    private Vector3 startingRotation;
-    private Vector3 targetRotation;
+    private Vector2 startingSize;
+    private Vector2 targetSize;
 
     private float t;
 
-    public RotationTransition(Transform t, float time, Vector3 target, TransitionType transition, ExecuteAfterTransition execute = null)
+    public RectSizeTransition(RectTransform rt, float time, Vector2 target, TransitionType transition, ExecuteAfterTransition execute = null)
     {
-        transform = t;
-
+        rectTransform = rt;
+        
         timerMax = time;
         this.transition = transition;
 
-        startingRotation = t.rotation.eulerAngles;
-        targetRotation = target;
+        startingSize = rt.sizeDelta;
+        targetSize = target;
 
         this.execute += execute;
     }
@@ -29,7 +31,7 @@ public class RotationTransition : Transition
 
     public override void Update()
     {
-        if (transform == null)
+        if (rectTransform == null)
         {
             isRemoved = true;
             return;
@@ -46,16 +48,15 @@ public class RotationTransition : Transition
             _ => 0,
         };
 
-        transform.Rotate(Vector3.Lerp(startingRotation, targetRotation, t));
+        rectTransform.sizeDelta = Vector2.Lerp(startingSize, targetSize, t);
 
         base.Update();
     }
-
     public override void RunAfterTransition()
     {
-        if (transform != null)
+        if (rectTransform != null)
         {
-            transform.Rotate(targetRotation);
+            rectTransform.sizeDelta = targetSize;
         }
         else
         {

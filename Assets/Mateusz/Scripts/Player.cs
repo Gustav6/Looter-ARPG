@@ -106,7 +106,7 @@ public class Player : MonoBehaviour
                 UpdateStaminaBar(1);
             }
 
-            if (CurrentRegion != new Vector2Int((int)(transform.position.x / MapManager.Instance.RegionWidth), (int)(transform.position.y / MapManager.Instance.RegionHeight)))
+            if (CurrentRegion != Vector2Int.FloorToInt(new Vector2(transform.position.x / MapManager.Instance.RegionWidth, transform.position.y / MapManager.Instance.RegionHeight)))
             {
                 UpdateRegion();
             }

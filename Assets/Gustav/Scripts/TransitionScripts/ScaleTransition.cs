@@ -53,6 +53,16 @@ public class ScaleTransition : Transition
 
     public override void RunAfterTransition()
     {
+        if (transform != null)
+        {
+            transform.localScale = targetScale;
+        }
+        else
+        {
+            isRemoved = true;
+            return;
+        }
+
         transform.localScale = targetScale;
 
         base.RunAfterTransition();

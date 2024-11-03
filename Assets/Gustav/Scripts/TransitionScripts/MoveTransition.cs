@@ -7,7 +7,7 @@ public class MoveTransition : Transition
     private Vector3 startingPosition;
     private Vector3 targetPosition;
 
-    private bool targetIsInWorldPosition;
+    private readonly bool targetIsInWorldPosition;
 
     private float t;
 
@@ -62,13 +62,21 @@ public class MoveTransition : Transition
 
     public override void RunAfterTransition()
     {
-        if (targetIsInWorldPosition)
+        if (transform)
         {
-            transform.position = targetPosition;
+            if (targetIsInWorldPosition)
+            {
+                transform.position = targetPosition;
+            }
+            else
+            {
+                transform.position = startingPosition + targetPosition;
+            }
         }
         else
         {
-            transform.position = startingPosition + targetPosition;
+            isRemoved = true;
+            return;
         }
 
         base.RunAfterTransition();

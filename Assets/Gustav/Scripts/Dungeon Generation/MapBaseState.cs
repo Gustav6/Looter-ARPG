@@ -988,7 +988,6 @@ public class LoadedMapState : MapBaseState
 
     public override void UpdateState(MapManager manager)
     {
-
     }
 
     public override void ExitState(MapManager manager)

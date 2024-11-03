@@ -85,6 +85,11 @@ public class ColorTransition : Transition
         {
             text.color = targetColor;
         }
+        else
+        {
+            isRemoved = true;
+            return;
+        }
 
         base.RunAfterTransition();
     }

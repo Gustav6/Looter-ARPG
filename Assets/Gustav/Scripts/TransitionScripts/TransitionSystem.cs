@@ -7,7 +7,7 @@ using UnityEngine;
 
 public class TransitionSystem
 {
-    private static readonly Dictionary<GameObject, List<Transition>> transitionPairs = new();
+    public static readonly Dictionary<GameObject, List<Transition>> transitionPairs = new();
 
     public static void Update()
     {

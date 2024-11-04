@@ -262,32 +262,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Active>k__BackingField: 0
-  runTransitionsOnEnable:
-  - transitionVariant: 2
-    transitionType: 3
-    effected: {fileID: 5990565942713337319}
-    timeItTakes: 0.2
+  moveTransitionsOnEnable: []
+  scaleTransitionsOnEnable:
+  - transitionType: 3
+    effected: {fileID: 4771459618284457434}
+    duration: 0.25
     target: {x: 1.1, y: 1.1}
-    newColor: {r: 0, g: 0, b: 0, a: 0}
-  - transitionVariant: 0
-    transitionType: 3
-    effected: {fileID: 1577210225662673714}
-    timeItTakes: 0.2
-    target: {x: 0, y: 0}
-    newColor: {r: 0, g: 0, b: 0, a: 1}
-  runTransitionsOnDisable:
-  - transitionVariant: 2
-    transitionType: 3
-    effected: {fileID: 5990565942713337319}
-    timeItTakes: 0.2
+    targetTransform: {fileID: 0}
+  colorTransitionsOnEnable: []
+  rotationTransitionsOnEnable: []
+  moveTransitionsOnDisable: []
+  scaleTransitionsOnDisable:
+  - transitionType: 3
+    effected: {fileID: 4771459618284457434}
+    duration: 0.25
     target: {x: 1, y: 1}
-    newColor: {r: 0, g: 0, b: 0, a: 0}
-  - transitionVariant: 0
-    transitionType: 3
-    effected: {fileID: 1577210225662673714}
-    timeItTakes: 0.2
-    target: {x: 0, y: 0}
-    newColor: {r: 0, g: 0, b: 0, a: 0.8}
+    targetTransform: {fileID: 0}
+  colorTransitionsOnDisable: []
+  rotationTransitionsOnDisable: []
   canWrite: 0
   standardText: WRITE
   maxAmountOfLetters: 10

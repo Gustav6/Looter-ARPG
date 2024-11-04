@@ -161,12 +161,14 @@ public class GeneratingMapState : MapBaseState
         GenerateHallways(manager);
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to generate hallways");
 
+        diagnosticTime = stopwatch.ElapsedMilliseconds;
         int noiseMapWidth = Math.Abs(noiseMapBottomLeft.x) + Math.Abs(noiseMapTopRight.x);
         int noiseMapHeight = Math.Abs(noiseMapBottomLeft.y) + Math.Abs(noiseMapTopRight.y);
 
         Vector3Int noiseMapCenter = new(noiseMapBottomLeft.x + noiseMapWidth / 2, noiseMapBottomLeft.y + noiseMapHeight / 2);
 
         GenerateNoiseMap(manager, noiseMapWidth, noiseMapHeight, noiseMapCenter);
+        Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to generate noise map");
 
         #region Set ground tiles
         diagnosticTime = stopwatch.ElapsedMilliseconds;
@@ -979,15 +981,25 @@ public class LoadedMapState : MapBaseState
 {
     public Camera camera;
 
+    private readonly HashSet<Vector2Int> previousRegions = new(), currentRegions = new();
+    private Vector2Int cBottomLeft, cTopRight, region;
+
     public override void EnterState(MapManager manager)
     {
+        previousRegions.Clear();
+        currentRegions.Clear();
+
+        camera = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
         Player.Instance.transform.position = manager.startingRoom.WorldPosition;
+        camera.transform.position = Player.Instance.transform.position;
+
         Player.Instance.OnRegionSwitch += Player_OnRegionSwitch;
         Player.Instance.UpdateRegion();
     }
 
     public override void UpdateState(MapManager manager)
     {
+
     }
 
     public override void ExitState(MapManager manager)
@@ -1003,39 +1015,50 @@ public class LoadedMapState : MapBaseState
 
     private void UpdateActiveRegions()
     {
-        Vector2Int currentRegionsNeighbor, previousRegionsNeighbor;
-        int xDistance, yDistance;
+        currentRegions.Clear();
 
-        for (int x = -1; x < 2; x++)
+        cBottomLeft = Vector2Int.FloorToInt(0.0625f * camera.ScreenToWorldPoint(new Vector3(0, 0, camera.nearClipPlane)));
+        cTopRight = Vector2Int.FloorToInt(0.0625f * camera.ScreenToWorldPoint(new Vector3(camera.pixelWidth, camera.pixelHeight, camera.nearClipPlane)));
+
+        for (int x = cBottomLeft.x - 1; x < cTopRight.x + 2; x++)
         {
-            for (int y = -1; y < 2; y++)
+            for (int y = cBottomLeft.y - 1; y < cTopRight.y + 2; y++)
             {
-                currentRegionsNeighbor = new Vector2Int(x, y) + Player.Instance.CurrentRegion;
-                previousRegionsNeighbor = new Vector2Int(x, y) + Player.Instance.PreviousRegion;
+                region = new(x, y);
 
-                xDistance = Math.Abs(previousRegionsNeighbor.x - Player.Instance.CurrentRegion.x);
-                yDistance = Math.Abs(previousRegionsNeighbor.y - Player.Instance.CurrentRegion.y);
-
-                if (xDistance > 1 || yDistance > 1)
+                if (!MapManager.Instance.regions.TryGetValue(region, out var enableList))
                 {
-                    if (MapManager.Instance.regions.TryGetValue(previousRegionsNeighbor, out var disableList))
-                    {
-                        for (int i = 0; i < disableList.Count; i++)
-                        {
-                            disableList[i].SetActive(false);
-                        }
-                    }
+                    continue;
+                }
+                else if (previousRegions.Contains(region))
+                {
+                    previousRegions.Remove(region);
+                    currentRegions.Add(region);
+                    continue;
                 }
 
-                if (MapManager.Instance.regions.TryGetValue(currentRegionsNeighbor, out var enableList))
+                for (int i = 0; i < enableList.Count; i++)
                 {
-                    for (int i = 0; i < enableList.Count; i++)
-                    {
-                        enableList[i].SetActive(true);
-                    }
+                    enableList[i].SetActive(true);
+                }
+
+                currentRegions.Add(region);
+            }
+        }
+
+        foreach (Vector2Int previousRegion in previousRegions)
+        {
+            if (MapManager.Instance.regions.TryGetValue(previousRegion, out var disableList))
+            {
+                for (int i = 0; i < disableList.Count; i++)
+                {
+                    disableList[i].SetActive(false);
                 }
             }
         }
+
+        previousRegions.Clear();
+        previousRegions.UnionWith(currentRegions);
     }
 }
 #endregion

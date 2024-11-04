@@ -6,11 +6,12 @@ using UnityEngine.UI;
 public class UILever : UIBaseScript, IPointerClickHandler
 {
     [BoxGroup("Lever variables")]
-    [SerializeField] private bool leverOn;
+    [SerializeField] private VolumeType volumeEffected;
 
     [BoxGroup("Lever variables")]
     [SerializeField] private GameObject objectIndicator;
 
+    private bool leverOn;
     private Image indicatorsImage;
 
     public override void Start()

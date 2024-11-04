@@ -126,32 +126,24 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Active>k__BackingField: 0
-  runTransitionsOnEnable:
-  - transitionVariant: 2
-    transitionType: 3
-    effected: {fileID: 3384649315512849804}
-    timeItTakes: 0.2
+  moveTransitionsOnEnable: []
+  scaleTransitionsOnEnable:
+  - transitionType: 3
+    effected: {fileID: 8935083257443548591}
+    duration: 0.25
     target: {x: 1.1, y: 1.1}
-    newColor: {r: 0, g: 0, b: 0, a: 0}
-  - transitionVariant: 0
-    transitionType: 3
-    effected: {fileID: 6538655459246721443}
-    timeItTakes: 0.2
-    target: {x: 0, y: 0}
-    newColor: {r: 0, g: 0, b: 0, a: 1}
-  runTransitionsOnDisable:
-  - transitionVariant: 2
-    transitionType: 3
-    effected: {fileID: 3384649315512849804}
-    timeItTakes: 0.2
+    targetTransform: {fileID: 0}
+  colorTransitionsOnEnable: []
+  rotationTransitionsOnEnable: []
+  moveTransitionsOnDisable: []
+  scaleTransitionsOnDisable:
+  - transitionType: 3
+    effected: {fileID: 8935083257443548591}
+    duration: 0.25
     target: {x: 1, y: 1}
-    newColor: {r: 0, g: 0, b: 0, a: 0}
-  - transitionVariant: 0
-    transitionType: 3
-    effected: {fileID: 6538655459246721443}
-    timeItTakes: 0.2
-    target: {x: 0, y: 0}
-    newColor: {r: 0, g: 0, b: 0, a: 0.8}
+    targetTransform: {fileID: 0}
+  colorTransitionsOnDisable: []
+  rotationTransitionsOnDisable: []
   actions: 01000000
   scene: DungeonGen
 --- !u!1 &6538655459246721443

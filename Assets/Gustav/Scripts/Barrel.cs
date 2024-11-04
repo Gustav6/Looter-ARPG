@@ -13,11 +13,10 @@ public class Barrel : MonoBehaviour
     [SerializeField] private Loot[] lootList;
     [SerializeField] private GameObject lootPrefab;
 
-    private Vector2Int region;
 
     private void Start()
     {
-        region = new ((int)(transform.position.x / MapManager.Instance.RegionWidth), (int)(transform.position.y / MapManager.Instance.RegionHeight));
+
     }
 
     private void OnBecameVisible()
@@ -36,7 +35,7 @@ public class Barrel : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            MapManager.Instance.RemoveGameObject(gameObject, region);
+            MapManager.Instance.RemoveGameObject(gameObject, new((int)(transform.position.x / MapManager.Instance.RegionWidth), (int)(transform.position.y / MapManager.Instance.RegionHeight)));
 
             Loot loot = GetLootDrop();
 

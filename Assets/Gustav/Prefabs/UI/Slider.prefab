@@ -201,19 +201,23 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <Active>k__BackingField: 0
-  runTransitionsOnEnable:
-  - transitionVariant: 2
-    transitionType: 3
-    effected: {fileID: 8157885270877922644}
-    timeItTakes: 0.2
+  moveTransitionsOnEnable: []
+  scaleTransitionsOnEnable:
+  - transitionType: 3
+    effected: {fileID: 8218779617624336023}
+    duration: 0.25
     target: {x: 1.1, y: 1.1}
-    newColor: {r: 0, g: 0, b: 0, a: 0}
-  runTransitionsOnDisable:
-  - transitionVariant: 2
-    transitionType: 3
-    effected: {fileID: 8157885270877922644}
-    timeItTakes: 0.2
+    targetTransform: {fileID: 0}
+  colorTransitionsOnEnable: []
+  rotationTransitionsOnEnable: []
+  moveTransitionsOnDisable: []
+  scaleTransitionsOnDisable:
+  - transitionType: 3
+    effected: {fileID: 8218779617624336023}
+    duration: 0.25
     target: {x: 1, y: 1}
-    newColor: {r: 0, g: 0, b: 0, a: 0}
+    targetTransform: {fileID: 0}
+  colorTransitionsOnDisable: []
+  rotationTransitionsOnDisable: []
   volumeEffected: 0
   slidingPart: {fileID: 3523979850197598491}

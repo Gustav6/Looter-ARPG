@@ -53,10 +53,8 @@ public class MapManager : MonoBehaviour
             return;
         }
 
-        Camera cameraReference = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-
-        RegionHeight = (int)cameraReference.orthographicSize + 1;
-        RegionWidth = (int)(cameraReference.aspect * RegionHeight);
+        RegionHeight = 16;
+        RegionWidth = 16;
 
         Settings = GetComponent<MapSettings>();
 

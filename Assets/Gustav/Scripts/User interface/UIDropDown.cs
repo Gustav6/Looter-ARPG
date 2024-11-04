@@ -10,12 +10,12 @@ public class UIDropDown : UIBaseScript, IPointerClickHandler
     [SerializeField] private RectTransform rectTransform;
 
     [BoxGroup("Drop down variables")]
-    [SerializeField] private GameObject contentPrefab;
-
-    [BoxGroup("Drop down variables")]
     [SerializeField] private Transform contentsParent;
 
-    private List<Transform> settings = new();
+    [BoxGroup("Drop down variables")]
+    [SerializeField] private GameObject contentPrefab;
+
+    private readonly List<Transform> settings = new();
 
     public override void Start()
     {

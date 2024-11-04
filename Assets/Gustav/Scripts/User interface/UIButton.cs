@@ -2,6 +2,7 @@ using NaughtyAttributes;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.SceneManagement;
 
@@ -9,18 +10,20 @@ public class UIButton : UIBaseScript, IPointerClickHandler
 {
     private Dictionary<Function, Action> functionLookup;
 
-    [BoxGroup("Button variables")]
-    [SerializeField] private List<Function> actions = new();
+    //[BoxGroup("Button variables")]
+    //[SerializeField] private List<Function> actions = new();
 
-    [BoxGroup("Button variables")]
-    [Scene] [SerializeField] private string scene;
+    //[BoxGroup("Button variables")]
+    //[Scene] [SerializeField] private string scene;
+
+    [SerializeField] private UnityEvent onClickEvent;
 
     public override void Start()
     {
         functionLookup = new Dictionary<Function, Action>()
         {
             { Function.QuitGame, Application.Quit },
-            { Function.ChangeScene, SwitchScene },
+            //{ Function.ChangeScene, SwitchScene },
         };
 
         base.Start();
@@ -28,23 +31,27 @@ public class UIButton : UIBaseScript, IPointerClickHandler
 
     private void RunOnActivation()
     {
-        ActivateSelectedFunctions();
+        //ActivateSelectedFunctions();
 
         Debug.Log("PRESSED");
     }
 
-    private void ActivateSelectedFunctions()
+    //private void ActivateSelectedFunctions()
+    //{
+        //foreach (Function function in actions)
+        //{
+        //    functionLookup[function]?.Invoke();
+        //}
+    //}
+
+    public void SwitchScene(int sceneBuildIndex)
     {
-        foreach (Function function in actions)
-        {
-            functionLookup[function]?.Invoke();
-        }
+        SceneManager.LoadScene(sceneBuildIndex);
     }
 
-    public void SwitchScene()
+    public void QuitGame()
     {
-        TransitionSystem.ClearTransitionList();
-        SceneManager.LoadScene(scene);
+        Application.Quit();
     }
 
     public void OnPointerClick(PointerEventData eventData)
@@ -54,7 +61,7 @@ public class UIButton : UIBaseScript, IPointerClickHandler
             return;
         }
 
-        RunOnActivation();
+        onClickEvent?.Invoke();
     }
 
     private enum Function

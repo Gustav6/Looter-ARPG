@@ -111,7 +111,6 @@ public class MapSettings : MonoBehaviour
     [Foldout("Debug")]
     public bool debugSpanningTree = false;
     #endregion
-
 }
 
 [Serializable]

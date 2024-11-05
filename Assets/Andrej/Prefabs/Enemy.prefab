@@ -339,4 +339,4 @@ MonoBehaviour:
   player: {fileID: 0}
   distanceToPlayer: 0
   speed: 10
-  health: 100
+  <MaxHealth>k__BackingField: 100

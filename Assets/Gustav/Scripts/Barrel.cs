@@ -3,9 +3,31 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Barrel : MonoBehaviour
+public class Barrel : MonoBehaviour, IDamagable
 {
-    [field: SerializeField] public int Health { get; private set; }
+    private int health;
+
+    public int CurrentHealth
+    {
+        get => health;
+        set
+        {
+            if (value > MaxHealth)
+            {
+                health = MaxHealth;
+            }
+            else if (value < 0)
+            {
+                Die();
+            }
+            else
+            {
+                health = value;
+            }
+        } 
+    }
+
+    [field: SerializeField] public int MaxHealth { get; set; }
 
     [SerializeField] private BoxCollider2D colliderComponent;
     [SerializeField] private Rigidbody2D rbComponent;
@@ -35,7 +57,8 @@ public class Barrel : MonoBehaviour
     {
         if (collision.CompareTag("Player"))
         {
-            MapManager.Instance.RemoveGameObject(gameObject, new((int)(transform.position.x / MapManager.Instance.RegionWidth), (int)(transform.position.y / MapManager.Instance.RegionHeight)));
+            MapManager.Instance.RemoveGameObjectFromRegions(gameObject);
+            Die();
 
             Loot loot = GetLootDrop();
 
@@ -80,5 +103,15 @@ public class Barrel : MonoBehaviour
         }
 
         return willDrop;
+    }
+
+    public void Damage(int damageAmount)
+    {
+        CurrentHealth -= damageAmount;
+    }
+
+    public void Die()
+    {
+        Destroy(gameObject);
     }
 }

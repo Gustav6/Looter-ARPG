@@ -116,11 +116,10 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    public void RemoveGameObject(GameObject g, Vector2Int region)
+    public void RemoveGameObjectFromRegions(GameObject g)
     {
-        regions[region].Remove(g);
+        regions[new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight))].Remove(g);
         gameObjectsList.Remove(g);
-        Destroy(g);
     }
 
     public static T OneToTwoDimensional<T>(Vector2Int position, T[] grid, int width)

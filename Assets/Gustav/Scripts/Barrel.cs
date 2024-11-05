@@ -57,17 +57,8 @@ public class Barrel : MonoBehaviour, IDamagable
     {
         if (collision.CompareTag("Player"))
         {
-            MapManager.Instance.RemoveGameObjectFromRegions(gameObject);
+            MapManager.Instance.RemoveGameObjectFromMap(gameObject);
             Die();
-
-            Loot loot = GetLootDrop();
-
-            if (lootList.Length > 0 && loot != null)
-            {
-                GameObject g = Instantiate(lootPrefab, transform.position, Quaternion.identity, MapManager.Instance.activeGameObjectsParent.transform);
-                g.GetComponent<SpriteRenderer>().sprite = loot.lootSprite;
-                MapManager.Instance.SetGameObjectsRegion(g);
-            }
         }
     }
 
@@ -112,6 +103,15 @@ public class Barrel : MonoBehaviour, IDamagable
 
     public void Die()
     {
+        Loot loot = GetLootDrop();
+
+        if (lootList.Length > 0 && loot != null)
+        {
+            GameObject g = Instantiate(lootPrefab, transform.position, Quaternion.identity, MapManager.Instance.activeGameObjectsParent.transform);
+            g.GetComponent<SpriteRenderer>().sprite = loot.lootSprite;
+            MapManager.Instance.SetGameObjectsRegion(g);
+        }
+
         Destroy(gameObject);
     }
 }

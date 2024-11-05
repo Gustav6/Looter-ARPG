@@ -171,7 +171,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5a6920d3576fd8e4aa0402b6b3c5e68f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Health>k__BackingField: 0
+  <MaxHealth>k__BackingField: 100
   colliderComponent: {fileID: 3801104038763376865}
   rbComponent: {fileID: 8051332948224252702}
   lootList:

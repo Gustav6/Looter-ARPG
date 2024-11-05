@@ -116,9 +116,12 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    public void RemoveGameObjectFromRegions(GameObject g)
+    public void RemoveGameObjectFromMap(GameObject g)
     {
-        regions[new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight))].Remove(g);
+        if (regions.ContainsKey(new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight))))
+        {
+            regions[new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight))].Remove(g);
+        }
         gameObjectsList.Remove(g);
     }
 

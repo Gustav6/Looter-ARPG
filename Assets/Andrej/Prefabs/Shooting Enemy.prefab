@@ -196,7 +196,7 @@ MonoBehaviour:
   player: {fileID: 0}
   distanceToPlayer: 0
   speed: 10
-  health: 100
+  <MaxHealth>k__BackingField: 125
 --- !u!1 &7971567648934375795
 GameObject:
   m_ObjectHideFlags: 0

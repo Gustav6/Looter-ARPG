@@ -2,8 +2,9 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IdleState : State
+public class NavigateState : State
 {
+    public Vector2 randomDir;
     public override void Enter()
     {
 

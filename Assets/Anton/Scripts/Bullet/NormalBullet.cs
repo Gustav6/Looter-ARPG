@@ -8,27 +8,53 @@ using UnityEngine;
 public class NormalBullet : Projectile
 {
     public GameObject explosionCiclePrefab;
-    RaycastHit2D hit;
     public LayerMask collidableLayers;
-    Vector2 dir;
+    Vector3 prevPosition;
+
     public override void Start()
     {
-        
+        //RaycastHit2D raycastHit2D = Physics2D.CircleCast(transform.position, 1f, Vector3.right);
+
+        //if (raycastHit2D)
+        //{
+        //    IDamagable damagable = raycastHit2D.transform.GetComponent<IDamagable>();
+
+        //    if (damagable != null)
+        //    {
+        //        damagable.Damage(GunController.Damage);
+        //    }
+
+        //    Debug.Log("Träffade något" + raycastHit2D.collider.tag);
+        //}
+        prevPosition = transform.position;
+    }
+
+    public void FixedUpdate()
+    {
+        float distance = Vector2.Distance(transform.position, transform.position + (Vector3)rb.velocity * Time.fixedDeltaTime);
+        Debug.Log(distance);
+        RaycastHit2D raycastHit2D = Physics2D.Raycast(transform.position, rb.velocity, distance, collidableLayers);
+        Debug.DrawRay(transform.position, rb.velocity.normalized * distance, Color.red);
+
+        if (raycastHit2D)
+        {
+            //IDamagable damagable = raycastHit2D.transform.GetComponent<IDamagable>();
+
+            //if (damagable != null)
+            //{
+            //    damagable.Damage(GunController.Damage);
+            //}
+
+            Destroy(gameObject);
+            Debug.Log("Träffade något" + raycastHit2D.collider.tag);
+        }
+
+        prevPosition = transform.position;
     }
 
     public override void Update()
     {
-        if (Input.GetMouseButton(0))
-        {
-            dir = Camera.main.ScreenToWorldPoint(Input.mousePosition) - transform.position;
-            hit = Physics2D.Raycast(transform.position, dir, 20f, collidableLayers, 1f, 10f);
-            Debug.DrawRay(transform.position, dir, Color.red);
-            Debug.Log("RayCast");
-        }
-        if (hit)
-        {
-            hit.transform.GetComponent<AntonsTemporaryEnemyScript>().TakeDamage(GunController.Damage);
-        }
+
         // amountOfEnemiesHit += 1;
         //if (GunController.explosion)
         //{

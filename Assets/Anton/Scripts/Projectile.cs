@@ -6,7 +6,7 @@ using UnityEngine;
 public class Projectile : MonoBehaviour
 {
     float destroyBulletTimer = 2;
-    Rigidbody2D rb;
+    public Rigidbody2D rb;
     CircleCollider2D colider;
     float angle; 
     [SerializeField] public int amountOfEnemiesHit; 
@@ -20,7 +20,6 @@ public class Projectile : MonoBehaviour
 
     public virtual void Update()
     {
-         
         destroyBulletTimer -= Time.deltaTime;
 
         if (destroyBulletTimer <= 0)

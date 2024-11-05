@@ -33,11 +33,11 @@ public class AntonsPlayerController : MonoBehaviour
                 inputVertical *= speedLimiter;
             }
 
-            rb.velocity = new Vector2(inputHorizontal * walkSpeed, inputVertical * walkSpeed);
+            rb.linearVelocity = new Vector2(inputHorizontal * walkSpeed, inputVertical * walkSpeed);
         }
         else
         {
-            rb.velocity = Vector2.zero;
+            rb.linearVelocity = Vector2.zero;
         }
     }
 }

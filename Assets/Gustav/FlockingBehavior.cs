@@ -33,7 +33,7 @@ public class FlockingBehavior : MonoBehaviour
 
     public void CalculateMove(GameObject agent)
     {
-        agent.GetComponent<Rigidbody2D>().velocity = Test(agent);
+        agent.GetComponent<Rigidbody2D>().linearVelocity = Test(agent);
     }
 
     public Vector2 Test(GameObject agent)

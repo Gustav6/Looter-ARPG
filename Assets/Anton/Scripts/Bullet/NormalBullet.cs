@@ -24,17 +24,17 @@ public class NormalBullet : Projectile
         //        damagable.Damage(GunController.Damage);
         //    }
 
-        //    Debug.Log("Träffade något" + raycastHit2D.collider.tag);
+        //    Debug.Log("Trï¿½ffade nï¿½got" + raycastHit2D.collider.tag);
         //}
         prevPosition = transform.position;
     }
 
     public void FixedUpdate()
     {
-        float distance = Vector2.Distance(transform.position, transform.position + (Vector3)rb.velocity * Time.fixedDeltaTime);
+        float distance = Vector2.Distance(transform.position, transform.position + (Vector3)rb.linearVelocity * Time.fixedDeltaTime);
         Debug.Log(distance);
-        RaycastHit2D raycastHit2D = Physics2D.Raycast(transform.position, rb.velocity, distance, collidableLayers);
-        Debug.DrawRay(transform.position, rb.velocity.normalized * distance, Color.red);
+        RaycastHit2D raycastHit2D = Physics2D.Raycast(transform.position, rb.linearVelocity, distance, collidableLayers);
+        Debug.DrawRay(transform.position, rb.linearVelocity.normalized * distance, Color.red);
 
         if (raycastHit2D)
         {
@@ -46,7 +46,7 @@ public class NormalBullet : Projectile
             //}
 
             Destroy(gameObject);
-            Debug.Log("Träffade något" + raycastHit2D.collider.tag);
+            Debug.Log("Trï¿½ffade nï¿½got" + raycastHit2D.collider.tag);
         }
 
         prevPosition = transform.position;

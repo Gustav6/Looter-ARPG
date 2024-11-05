@@ -27,7 +27,7 @@ public class Projectile : MonoBehaviour
             Destroy(gameObject);
         }
 
-        Vector2 v = rb.velocity;
+        Vector2 v = rb.linearVelocity;
         angle = Mathf.Atan2(v.y, v.x) * Mathf.Rad2Deg;
         transform.rotation = Quaternion.AngleAxis(angle, Vector3.forward);
     }

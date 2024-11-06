@@ -35,12 +35,6 @@ public class Barrel : MonoBehaviour, IDamagable
     [SerializeField] private Loot[] lootList;
     [SerializeField] private GameObject lootPrefab;
 
-
-    private void Start()
-    {
-
-    }
-
     private void OnBecameVisible()
     {
         colliderComponent.enabled = true;

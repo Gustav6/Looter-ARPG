@@ -2,22 +2,34 @@ using UnityEngine;
 
 public class RotationTransition : Transition
 {
-    private Transform transform;
+    private readonly Transform transform;
 
-    private Vector3 startingRotation;
-    private Vector3 targetRotation;
+    private readonly Vector3 startingRotation;
+    private readonly Vector3 targetRotation;
 
-    private float t;
-
-    public RotationTransition(Transform t, float time, Vector3 target, TransitionType transition, ExecuteAfterTransition execute = null)
+    public RotationTransition(Transform t, float time, Vector3 target, TransitionType type, ExecuteAfterTransition execute = null)
     {
         transform = t;
 
         timerMax = time;
-        this.transition = transition;
+        transitionType = type;
 
         startingRotation = t.rotation.eulerAngles;
         targetRotation = target;
+
+        this.execute += execute;
+    }
+
+    public RotationTransition(Transform t, float time, CurveType type, float interval, float amplitude, Vector2 offset, ExecuteAfterTransition execute = null)
+    {
+        transform = t;
+
+        timerMax = time;
+        curveType = type;
+
+        curveInterval = interval;
+        curveAmplitude = amplitude;
+        curveOffset = offset;
 
         this.execute += execute;
     }
@@ -29,40 +41,41 @@ public class RotationTransition : Transition
 
     public override void Update()
     {
+        base.Update();
+
         if (transform == null)
         {
             isRemoved = true;
             return;
         }
 
-        t = transition switch
+        if (transitionType != null)
         {
-            TransitionType.SmoothStart2 => TransitionSystem.SmoothStart2(timer / timerMax),
-            TransitionType.SmoothStart3 => TransitionSystem.SmoothStart3(timer / timerMax),
-            TransitionType.SmoothStart4 => TransitionSystem.SmoothStart4(timer / timerMax),
-            TransitionType.SmoothStop2 => TransitionSystem.SmoothStop2(timer / timerMax),
-            TransitionType.SmoothStop3 => TransitionSystem.SmoothStop3(timer / timerMax),
-            TransitionType.SmoothStop4 => TransitionSystem.SmoothStop4(timer / timerMax),
-            _ => 0,
-        };
-
-        transform.Rotate(Vector3.Lerp(startingRotation, targetRotation, t));
-
-        base.Update();
+            transform.Rotate(Vector3.Lerp(startingRotation, targetRotation, t));
+        }
+        else if (curveType != null)
+        {
+            transform.Rotate(new Vector2(t + curveOffset.x, t + curveOffset.y));
+        }
     }
 
     public override void RunAfterTransition()
+    {
+        SetRotationToTarget();
+    }
+
+    public override void OnInstantTransition()
+    {
+        SetRotationToTarget();
+
+        isRemoved = true;
+    }
+
+    private void SetRotationToTarget()
     {
         if (transform != null)
         {
             transform.Rotate(targetRotation);
         }
-        else
-        {
-            isRemoved = true;
-            return;
-        }
-
-        base.RunAfterTransition();
     }
 }

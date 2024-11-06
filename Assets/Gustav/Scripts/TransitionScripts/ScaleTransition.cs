@@ -2,22 +2,34 @@ using UnityEngine;
 
 public class ScaleTransition : Transition
 {
-    private Transform transform;
+    private readonly Transform transform;
 
-    private Vector3 startingScale;
-    private Vector3 targetScale;
+    private readonly Vector3 startingScale;
+    private readonly Vector3 targetScale;
 
-    private float t;
-
-    public ScaleTransition(Transform t, float time, Vector3 target, TransitionType transition, ExecuteAfterTransition execute = null)
+    public ScaleTransition(Transform t, float time, Vector3 target, TransitionType type, ExecuteAfterTransition execute = null)
     {
         transform = t;
 
         timerMax = time;
-        this.transition = transition;
+        transitionType = type;
 
         startingScale = t.localScale;
         targetScale = target;
+
+        this.execute += execute;
+    }
+
+    public ScaleTransition(Transform t, float time, CurveType type, float interval, float amplitude, Vector2 offset, ExecuteAfterTransition execute = null)
+    {
+        transform = t;
+
+        timerMax = time;
+        curveType = type;
+
+        curveInterval = interval;
+        curveAmplitude = amplitude;
+        curveOffset = offset;
 
         this.execute += execute;
     }
@@ -29,42 +41,40 @@ public class ScaleTransition : Transition
 
     public override void Update()
     {
+        base.Update();
+
         if (transform == null)
         {
             isRemoved = true;
             return;
         }
 
-        t = transition switch
+        if (transitionType != null)
         {
-            TransitionType.SmoothStart2 => TransitionSystem.SmoothStart2(timer / timerMax),
-            TransitionType.SmoothStart3 => TransitionSystem.SmoothStart3(timer / timerMax),
-            TransitionType.SmoothStart4 => TransitionSystem.SmoothStart4(timer / timerMax),
-            TransitionType.SmoothStop2 => TransitionSystem.SmoothStop2(timer / timerMax),
-            TransitionType.SmoothStop3 => TransitionSystem.SmoothStop3(timer / timerMax),
-            TransitionType.SmoothStop4 => TransitionSystem.SmoothStop4(timer / timerMax),
-            _ => 0,
-        };
-
-        transform.localScale = Vector3.Lerp(startingScale, targetScale, t);
-
-        base.Update();
+            transform.localScale = Vector3.Lerp(startingScale, targetScale, t);
+        }
+        else if (curveType != null)
+        {
+            transform.localScale = new Vector2(t + curveOffset.x, t + curveOffset.y);
+        }
     }
 
     public override void RunAfterTransition()
+    {
+        SetScaleToTarget();
+    }
+
+    public override void OnInstantTransition()
+    {
+        SetScaleToTarget();
+
+        isRemoved = true;
+    }
+    private void SetScaleToTarget()
     {
         if (transform != null)
         {
             transform.localScale = targetScale;
         }
-        else
-        {
-            isRemoved = true;
-            return;
-        }
-
-        transform.localScale = targetScale;
-
-        base.RunAfterTransition();
     }
 }

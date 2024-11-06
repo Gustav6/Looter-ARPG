@@ -2,21 +2,19 @@ using UnityEngine;
 
 public class MoveTransition : Transition
 {
-    private Transform transform;
+    private readonly Transform transform;
 
-    private Vector3 startingPosition;
-    private Vector3 targetPosition;
+    private readonly Vector3 startingPosition;
+    private readonly Vector3 targetPosition;
 
     private readonly bool targetIsInWorldPosition;
 
-    private float t;
-
-    public MoveTransition(Transform t, float time, Vector3 target, TransitionType transition, bool targetInWorld = true, ExecuteAfterTransition execute = null)
+    public MoveTransition(Transform t, float time, Vector3 target, TransitionType type, bool targetInWorld = true, ExecuteAfterTransition execute = null)
     {
         transform = t;
 
         timerMax = time;
-        this.transition = transition;
+        transitionType = type;
 
         startingPosition = t.position;
         targetPosition = target;
@@ -24,6 +22,24 @@ public class MoveTransition : Transition
 
         this.execute += execute;
     }
+
+    public MoveTransition(Transform t, float time, CurveType type, float interval, float amplitude, Vector2 offset, bool targetInWorld = true, ExecuteAfterTransition execute = null)
+    {
+        transform = t;
+
+        timerMax = time;
+        curveType = type;
+
+        startingPosition = t.position;
+        targetIsInWorldPosition = targetInWorld;
+
+        curveInterval = interval;
+        curveAmplitude = amplitude;
+        curveOffset = offset;
+
+        this.execute += execute;
+    }
+
     public override void Start()
     {
         base.Start();
@@ -31,38 +47,46 @@ public class MoveTransition : Transition
 
     public override void Update()
     {
+        base.Update();
+
         if (transform == null)
         {
             isRemoved = true;
             return;
         }
 
-        t = transition switch
+        if (transitionType != null)
         {
-            TransitionType.SmoothStart2 => TransitionSystem.SmoothStart2(timer / timerMax),
-            TransitionType.SmoothStart3 => TransitionSystem.SmoothStart3(timer / timerMax),
-            TransitionType.SmoothStart4 => TransitionSystem.SmoothStart4(timer / timerMax),
-            TransitionType.SmoothStop2 => TransitionSystem.SmoothStop2(timer / timerMax),
-            TransitionType.SmoothStop3 => TransitionSystem.SmoothStop3(timer / timerMax),
-            TransitionType.SmoothStop4 => TransitionSystem.SmoothStop4(timer / timerMax),
-            _ => 0,
-        };
-
-        if (targetIsInWorldPosition)
-        {
-            transform.position = Vector3.Lerp(startingPosition, targetPosition, t);
+            if (targetIsInWorldPosition)
+            {
+                transform.position = Vector3.Lerp(startingPosition, targetPosition, t);
+            }
+            else
+            {
+                transform.position = Vector3.Lerp(startingPosition, startingPosition + targetPosition, t);
+            }
         }
-        else
+        else if (curveType != null)
         {
-            transform.position = Vector3.Lerp(startingPosition, startingPosition + targetPosition, t);
+            transform.position = new Vector2(t + curveOffset.x, t + curveOffset.y);
         }
-
-        base.Update();
     }
 
     public override void RunAfterTransition()
     {
-        if (transform)
+        SetPositionToTarget();
+    }
+
+    public override void OnInstantTransition()
+    {
+        SetPositionToTarget();
+
+        isRemoved = true;
+    }
+
+    private void SetPositionToTarget()
+    {
+        if (transform != null)
         {
             if (targetIsInWorldPosition)
             {
@@ -73,12 +97,5 @@ public class MoveTransition : Transition
                 transform.position = startingPosition + targetPosition;
             }
         }
-        else
-        {
-            isRemoved = true;
-            return;
-        }
-
-        base.RunAfterTransition();
     }
 }

@@ -7,7 +7,11 @@ public abstract class Transition
     public delegate void ExecuteAfterTransition();
     public ExecuteAfterTransition execute;
 
-    protected TransitionType transition;
+    protected TransitionType? transitionType;
+    protected CurveType? curveType;
+
+    private protected float curveInterval, curveAmplitude;
+    private protected Vector2 curveOffset;
 
     public bool loop;
 
@@ -16,33 +20,58 @@ public abstract class Transition
     public float timer;
     public float timerMax;
 
+    protected float t;
+
     public virtual void Start()
     {
+        if (timerMax <= 0)
+        {
+            OnInstantTransition();
+        }
+
         execute += RunAfterTransition;
     }
 
     public virtual void Update()
     {
-        if (!loop)
+        if (Time.timeScale > 0)
         {
-            if (Time.timeScale > 0)
-            {
-                timer += Time.deltaTime;
-            }
-            else
-            {
-                timer += Time.unscaledDeltaTime;
-            }
+            timer += Time.deltaTime;
+        }
+        else
+        {
+            timer += Time.unscaledDeltaTime;
+        }
 
-            if (timer > timerMax)
+        if (!loop && timer >= timerMax)
+        {
+            isRemoved = true;
+        }
+
+        if (transitionType != null)
+        {
+            t = transitionType switch
             {
-                isRemoved = true;
-            }
+                TransitionType.SmoothStart2 => TransitionSystem.SmoothStart2(timer / timerMax),
+                TransitionType.SmoothStart3 => TransitionSystem.SmoothStart3(timer / timerMax),
+                TransitionType.SmoothStart4 => TransitionSystem.SmoothStart4(timer / timerMax),
+                TransitionType.SmoothStop2 => TransitionSystem.SmoothStop2(timer / timerMax),
+                TransitionType.SmoothStop3 => TransitionSystem.SmoothStop3(timer / timerMax),
+                TransitionType.SmoothStop4 => TransitionSystem.SmoothStop4(timer / timerMax),
+                _ => 0,
+            };
+        }
+        else if (curveType != null)
+        {
+            t = curveType switch
+            {
+                CurveType.SinCurve => TransitionSystem.SinCurve(timer / timerMax, curveInterval, curveAmplitude),
+                CurveType.CosCurve => TransitionSystem.CosCurve(timer / timerMax, curveInterval, curveAmplitude),
+                _ => 0,
+            };
         }
     }
 
-    public virtual void RunAfterTransition()
-    {
-
-    }
+    public abstract void OnInstantTransition();
+    public abstract void RunAfterTransition();
 }

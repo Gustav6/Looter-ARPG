@@ -4,22 +4,34 @@ using UnityEngine;
 
 public class RectSizeTransition : Transition
 {
-    private RectTransform rectTransform;
+    private readonly RectTransform rectTransform;
 
-    private Vector2 startingSize;
-    private Vector2 targetSize;
+    private readonly Vector2 startingSize;
+    private readonly Vector2 targetSize;
 
-    private float t;
-
-    public RectSizeTransition(RectTransform rt, float time, Vector2 target, TransitionType transition, ExecuteAfterTransition execute = null)
+    public RectSizeTransition(RectTransform rt, float time, Vector2 target, TransitionType type, ExecuteAfterTransition execute = null)
     {
         rectTransform = rt;
         
         timerMax = time;
-        this.transition = transition;
+        transitionType = type;
 
         startingSize = rt.sizeDelta;
         targetSize = target;
+
+        this.execute += execute;
+    }
+
+    public RectSizeTransition(RectTransform rt, float time, CurveType type, float interval, float amplitude, Vector2 offset, ExecuteAfterTransition execute = null)
+    {
+        rectTransform = rt;
+
+        timerMax = time;
+        curveType = type;
+
+        curveInterval = interval;
+        curveAmplitude = amplitude;
+        curveOffset = offset;
 
         this.execute += execute;
     }
@@ -31,39 +43,40 @@ public class RectSizeTransition : Transition
 
     public override void Update()
     {
+        base.Update();
+
         if (rectTransform == null)
         {
             isRemoved = true;
             return;
         }
 
-        t = transition switch
+        if (transitionType != null)
         {
-            TransitionType.SmoothStart2 => TransitionSystem.SmoothStart2(timer / timerMax),
-            TransitionType.SmoothStart3 => TransitionSystem.SmoothStart3(timer / timerMax),
-            TransitionType.SmoothStart4 => TransitionSystem.SmoothStart4(timer / timerMax),
-            TransitionType.SmoothStop2 => TransitionSystem.SmoothStop2(timer / timerMax),
-            TransitionType.SmoothStop3 => TransitionSystem.SmoothStop3(timer / timerMax),
-            TransitionType.SmoothStop4 => TransitionSystem.SmoothStop4(timer / timerMax),
-            _ => 0,
-        };
-
-        rectTransform.sizeDelta = Vector2.Lerp(startingSize, targetSize, t);
-
-        base.Update();
+            rectTransform.sizeDelta = Vector2.Lerp(startingSize, targetSize, t);
+        }
+        else if (curveType != null)
+        {
+            rectTransform.sizeDelta = new Vector2(t + curveOffset.x, t + curveOffset.y);
+        }
     }
     public override void RunAfterTransition()
+    {
+        SetSizeToTarget();
+    }
+
+    public override void OnInstantTransition()
+    {
+        SetSizeToTarget();
+
+        isRemoved = true;
+    }
+
+    private void SetSizeToTarget()
     {
         if (rectTransform != null)
         {
             rectTransform.sizeDelta = targetSize;
         }
-        else
-        {
-            isRemoved = true;
-            return;
-        }
-
-        base.RunAfterTransition();
     }
 }

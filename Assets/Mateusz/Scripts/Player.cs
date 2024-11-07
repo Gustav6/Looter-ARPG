@@ -8,8 +8,6 @@ using UnityEngine.UI;
 public class Player : MonoBehaviour
 {
     public static Player Instance { get; private set; }
-
-    public bool IsMoving { get; private set; }
     public Vector3 Direction { get; private set; }
 
     public float moveSpeed;
@@ -78,10 +76,14 @@ public class Player : MonoBehaviour
         CurrentRegion = Vector2Int.FloorToInt(transform.position);
     }
 
+    private void FixedUpdate()
+    {
+        controller.Move(moveSpeed * Time.fixedDeltaTime * Direction);
+    }
+
     private void Update()
     {
-        IsMoving = false;
-        Direction = new (Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        Direction = new(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
 
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
@@ -95,23 +97,17 @@ public class Player : MonoBehaviour
             sprinting = false;
         }
 
-        if (Direction != Vector3.zero)
+        if (sprinting)
         {
-            IsMoving = true;
-            controller.Move(moveSpeed * Time.deltaTime * Direction);
+            Stamina -= sprintCost * Time.deltaTime;
+            UpdateStaminaBar(1);
+        }
 
-            if (sprinting)
+        if (MapManager.Instance != null)
+        {
+            if (CurrentRegion != Vector2Int.FloorToInt(new Vector2(transform.position.x / (MapManager.Instance.RegionWidth * 0.5f), transform.position.y / (MapManager.Instance.RegionHeight * 0.5f))))
             {
-                Stamina -= sprintCost * Time.deltaTime;
-                UpdateStaminaBar(1);
-            }
-
-            if (MapManager.Instance != null)
-            {
-                if (CurrentRegion != Vector2Int.FloorToInt(new Vector2(transform.position.x / (MapManager.Instance.RegionWidth * 0.5f), transform.position.y / (MapManager.Instance.RegionHeight * 0.5f))))
-                {
-                    UpdateRegion();
-                }
+                UpdateRegion();
             }
         }
 

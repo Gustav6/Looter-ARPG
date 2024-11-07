@@ -170,6 +170,7 @@ public class GeneratingMapState : MapBaseState
         GenerateNoiseMap(manager, noiseMapWidth, noiseMapHeight, noiseMapCenter);
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to generate noise map");
 
+
         #region Set ground tiles
         diagnosticTime = stopwatch.ElapsedMilliseconds;
 
@@ -179,6 +180,16 @@ public class GeneratingMapState : MapBaseState
         manager.groundTileMap.SetTiles(groundTilePositions.ToArray(), tempArray);
 
         Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to set ground tiles");
+        #endregion
+
+        #region Remove unessecery wall tiles
+        foreach (Vector3Int point in groundTilePositions)
+        {
+            if (wallTilePositions.Contains(point))
+            {
+                wallTilePositions.Remove(point);
+            }
+        }
         #endregion
 
         #region Set wall tiles
@@ -228,13 +239,7 @@ public class GeneratingMapState : MapBaseState
         return new Vector2(r * Mathf.Cos(theta), r * Mathf.Sin(theta));
     }
 
-    public Vector2 RandomPositionInStrip(int width, int height)
-    {
-        int x = rng.Next(-width / 2, width / 2);
-        int y = rng.Next(-height / 2, height / 2);
-
-        return new Vector2(x, y);
-    }
+    public Vector2 RandomPositionInStrip(int width, int height) => new(rng.Next(-width / 2, width / 2), rng.Next(-height / 2, height / 2));
     #endregion
 
     #region Seperate rooms
@@ -279,28 +284,26 @@ public class GeneratingMapState : MapBaseState
         {
             return Vector2Int.zero;
         }
-        else
+
+        if (separationVelocity.x > 0 && separationVelocity.x < 1)
         {
-            if (separationVelocity.x > 0 && separationVelocity.x < 1)
-            {
-                separationVelocity.x = 1;
-            }
-            else if (separationVelocity.x < 0 && separationVelocity.x > -1)
-            {
-                separationVelocity.x = -1;
-            }
-
-            if (separationVelocity.y > 0 && separationVelocity.y < 1)
-            {
-                separationVelocity.y = 1;
-            }
-            else if (separationVelocity.y < 0 && separationVelocity.y > -1)
-            {
-                separationVelocity.y = -1;
-            }
-
-            return new Vector2Int((int)separationVelocity.x, (int)separationVelocity.y);
+            separationVelocity.x = 1;
         }
+        else if (separationVelocity.x < 0 && separationVelocity.x > -1)
+        {
+            separationVelocity.x = -1;
+        }
+
+        if (separationVelocity.y > 0 && separationVelocity.y < 1)
+        {
+            separationVelocity.y = 1;
+        }
+        else if (separationVelocity.y < 0 && separationVelocity.y > -1)
+        {
+            separationVelocity.y = -1;
+        }
+
+        return new Vector2Int((int)separationVelocity.x, (int)separationVelocity.y);
     }
     #endregion
 
@@ -744,7 +747,7 @@ public class GeneratingMapState : MapBaseState
 
             // Find a path starting from first room in list towards the connected room.
 
-            List<Vector3Int> hallwayTilePositions = new(AStar.FindPath(startingPosition, targetPosition));
+            List<Vector3Int> hallwayPath = new(AStar.FindPath(startingPosition, targetPosition));
 
             // *Working*s but not very good looking
             #region Room intersection check
@@ -784,112 +787,174 @@ public class GeneratingMapState : MapBaseState
             #endregion
 
             // Add width to the "path", then add path to tile change data list.
-            #region Hallway width
+            #region Add width to hallway
             HashSet<Vector3Int> widthTiles = new();
+            Vector3Int nextPosition;
+            Vector3Int tempWallPosition1, tempWallPosition2;
 
-            for (int i = 0; i < hallwayTilePositions.Count; i++)
+            for (int i = 0; i < hallwayPath.Count; i++)
             {
-                if (i + 1 < hallwayTilePositions.Count)
+                if (i + 1 >= hallwayPath.Count)
                 {
-                    if (hallwayTilePositions[i].x == hallwayTilePositions[i + 1].x)
-                    {
-                        for (int x = -hallwayWidth + 1; x < hallwayWidth; x++)
-                        {
-                            widthTiles.Add(new(hallwayTilePositions[i].x + x, hallwayTilePositions[i].y));
-                        }
+                    break;
+                }
 
-                        for (int j = 0; j < 35; j++)
+                nextPosition = hallwayPath[i + 1];
+
+                if (hallwayPath[i].x == nextPosition.x || hallwayPath[i].y == nextPosition.y)
+                {
+                    for (int j = -hallwayWidth + 1; j < hallwayWidth; j++)
+                    {
+                        if (hallwayPath[i].x == nextPosition.x)
                         {
-                            wallTilePositions.Add(new(hallwayTilePositions[i].x + hallwayWidth + j, hallwayTilePositions[i].y));
-                            wallTilePositions.Add(new(hallwayTilePositions[i].x - hallwayWidth - j, hallwayTilePositions[i].y));
+                            widthTiles.Add(new(hallwayPath[i].x + j, hallwayPath[i].y));
+                        }
+                        else
+                        {
+                            widthTiles.Add(new(hallwayPath[i].x, hallwayPath[i].y + j));
                         }
                     }
-                    else if (hallwayTilePositions[i].y == hallwayTilePositions[i + 1].y)
-                    {
-                        for (int y = -hallwayWidth + 1; y < hallwayWidth; y++)
-                        {
-                            widthTiles.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y + y));
-                        }
 
-                        for (int j = 0; j < 35; j++)
-                        {
-                            wallTilePositions.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y + hallwayWidth + j));
-                            wallTilePositions.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y - hallwayWidth - j));
-                        }
-                    }
-                    else
+                    for (int j = 0; j < 35; j++)
                     {
-                        if (hallwayTilePositions[i].y > hallwayTilePositions[i + 1].y)
+                        if (hallwayPath[i].x == nextPosition.x)
                         {
-                            if (hallwayTilePositions[i].x > hallwayTilePositions[i + 1].x)
+                            tempWallPosition1 = new(hallwayPath[i].x + hallwayWidth + j, hallwayPath[i].y);
+                            tempWallPosition2 = new(hallwayPath[i].x - hallwayWidth - j, hallwayPath[i].y);
+
+                            if (!groundTilePositions.Contains(tempWallPosition1))
                             {
-                                for (int x = 0; x < hallwayWidth; x++)
-                                {
-                                    widthTiles.Add(new(hallwayTilePositions[i].x - x, hallwayTilePositions[i].y));
-                                }
-                                for (int y = 0; y < hallwayWidth; y++)
-                                {
-                                    widthTiles.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y - y));
-                                }
-
-                                for (int j = 0; j < 35; j++)
-                                {
-                                    wallTilePositions.Add(new(hallwayTilePositions[i].x - hallwayWidth - j, hallwayTilePositions[i].y));
-                                    wallTilePositions.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y - hallwayWidth - j));
-                                }
+                                wallTilePositions.Add(tempWallPosition1);
                             }
-                            else
+                            if (!groundTilePositions.Contains(tempWallPosition2))
                             {
-                                for (int x = 0; x < hallwayWidth; x++)
-                                {
-                                    widthTiles.Add(new(hallwayTilePositions[i].x + x, hallwayTilePositions[i].y));
-                                }
-                                for (int y = 0; y < hallwayWidth; y++)
-                                {
-                                    widthTiles.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y - y));
-                                }
+                                wallTilePositions.Add(tempWallPosition2);
+                            }
+                        }
+                        else
+                        {
+                            tempWallPosition1 = new(hallwayPath[i].x, hallwayPath[i].y + hallwayWidth + j);
+                            tempWallPosition2 = new(hallwayPath[i].x, hallwayPath[i].y - hallwayWidth - j);
 
-                                for (int j = 0; j < 35; j++)
+                            if (!groundTilePositions.Contains(tempWallPosition1))
+                            {
+                                wallTilePositions.Add(tempWallPosition1);
+                            }
+                            if (!groundTilePositions.Contains(tempWallPosition2))
+                            {
+                                wallTilePositions.Add(tempWallPosition2);
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    if (hallwayPath[i].y > nextPosition.y)
+                    {
+                        if (hallwayPath[i].x > nextPosition.x)
+                        {
+                            for (int x = 0; x < hallwayWidth; x++)
+                            {
+                                widthTiles.Add(new(hallwayPath[i].x - x, hallwayPath[i].y));
+                            }
+                            for (int y = 0; y < hallwayWidth; y++)
+                            {
+                                widthTiles.Add(new(hallwayPath[i].x, hallwayPath[i].y - y));
+                            }
+
+                            for (int j = 0; j < 35; j++)
+                            {
+                                tempWallPosition1 = new(hallwayPath[i].x - hallwayWidth - j, hallwayPath[i].y);
+                                tempWallPosition2 = new(hallwayPath[i].x, hallwayPath[i].y - hallwayWidth - j);
+
+                                if (!groundTilePositions.Contains(tempWallPosition1))
                                 {
-                                    wallTilePositions.Add(new(hallwayTilePositions[i].x + hallwayWidth + j, hallwayTilePositions[i].y));
-                                    wallTilePositions.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y - hallwayWidth - j));
+                                    wallTilePositions.Add(tempWallPosition1);
+                                }
+                                if (!groundTilePositions.Contains(tempWallPosition2))
+                                {
+                                    wallTilePositions.Add(tempWallPosition2);
                                 }
                             }
                         }
                         else
                         {
-                            if (hallwayTilePositions[i].x > hallwayTilePositions[i + 1].x)
+                            for (int x = 0; x < hallwayWidth; x++)
                             {
-                                for (int x = 0; x < hallwayWidth; x++)
-                                {
-                                    widthTiles.Add(new(hallwayTilePositions[i].x - x, hallwayTilePositions[i].y));
-                                }
-                                for (int y = 0; y < hallwayWidth; y++)
-                                {
-                                    widthTiles.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y + y));
-                                }
+                                widthTiles.Add(new(hallwayPath[i].x + x, hallwayPath[i].y));
+                            }
+                            for (int y = 0; y < hallwayWidth; y++)
+                            {
+                                widthTiles.Add(new(hallwayPath[i].x, hallwayPath[i].y - y));
+                            }
 
-                                for (int j = 0; j < 35; j++)
+                            for (int j = 0; j < 35; j++)
+                            {
+                                tempWallPosition1 = new(hallwayPath[i].x + hallwayWidth + j, hallwayPath[i].y);
+                                tempWallPosition2 = new(hallwayPath[i].x, hallwayPath[i].y - hallwayWidth - j);
+
+                                if (!groundTilePositions.Contains(tempWallPosition1))
                                 {
-                                    wallTilePositions.Add(new(hallwayTilePositions[i].x - hallwayWidth - j, hallwayTilePositions[i].y));
-                                    wallTilePositions.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y + hallwayWidth + j));
+                                    wallTilePositions.Add(tempWallPosition1);
+                                }
+                                if (!groundTilePositions.Contains(tempWallPosition2))
+                                {
+                                    wallTilePositions.Add(tempWallPosition2);
                                 }
                             }
-                            else
+                        }
+                    }
+                    else
+                    {
+                        if (hallwayPath[i].x > nextPosition.x)
+                        {
+                            for (int x = 0; x < hallwayWidth; x++)
                             {
-                                for (int x = 0; x < hallwayWidth; x++)
-                                {
-                                    widthTiles.Add(new(hallwayTilePositions[i].x + x, hallwayTilePositions[i].y));
-                                }
-                                for (int y = 0; y < hallwayWidth; y++)
-                                {
-                                    widthTiles.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y + y));
-                                }
+                                widthTiles.Add(new(hallwayPath[i].x - x, hallwayPath[i].y));
+                            }
+                            for (int y = 0; y < hallwayWidth; y++)
+                            {
+                                widthTiles.Add(new(hallwayPath[i].x, hallwayPath[i].y + y));
+                            }
 
-                                for (int j = 0; j < 35; j++)
+                            for (int j = 0; j < 35; j++)
+                            {
+                                tempWallPosition1 = new(hallwayPath[i].x - hallwayWidth - j, hallwayPath[i].y);
+                                tempWallPosition2 = new(hallwayPath[i].x, hallwayPath[i].y + hallwayWidth + j);
+
+                                if (!groundTilePositions.Contains(tempWallPosition1))
                                 {
-                                    wallTilePositions.Add(new(hallwayTilePositions[i].x + hallwayWidth + j, hallwayTilePositions[i].y));
-                                    wallTilePositions.Add(new(hallwayTilePositions[i].x, hallwayTilePositions[i].y + hallwayWidth + j));
+                                    wallTilePositions.Add(tempWallPosition1);
+                                }
+                                if (!groundTilePositions.Contains(tempWallPosition2))
+                                {
+                                    wallTilePositions.Add(tempWallPosition2);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (int x = 0; x < hallwayWidth; x++)
+                            {
+                                widthTiles.Add(new(hallwayPath[i].x + x, hallwayPath[i].y));
+                            }
+                            for (int y = 0; y < hallwayWidth; y++)
+                            {
+                                widthTiles.Add(new(hallwayPath[i].x, hallwayPath[i].y + y));
+                            }
+
+                            for (int j = 0; j < 35; j++)
+                            {
+                                tempWallPosition1 = new(hallwayPath[i].x + hallwayWidth + j, hallwayPath[i].y);
+                                tempWallPosition2 = new(hallwayPath[i].x, hallwayPath[i].y + hallwayWidth + j);
+
+                                if (!groundTilePositions.Contains(tempWallPosition1))
+                                {
+                                    wallTilePositions.Add(tempWallPosition1);
+                                }
+                                if (!groundTilePositions.Contains(tempWallPosition2))
+                                {
+                                    wallTilePositions.Add(tempWallPosition2);
                                 }
                             }
                         }
@@ -897,26 +962,10 @@ public class GeneratingMapState : MapBaseState
                 }
             }
 
-            hallwayTilePositions.AddRange(widthTiles);
+            hallwayPath.AddRange(widthTiles);
+
+            groundTilePositions.UnionWith(hallwayPath);
             #endregion
-
-            foreach (Vector3Int point in hallwayTilePositions)
-            {
-                if (wallTilePositions.Contains(point))
-                {
-                    wallTilePositions.Remove(point);
-                }
-            }
-
-            foreach (Vector3Int point in groundTilePositions)
-            {
-                if (wallTilePositions.Contains(point))
-                {
-                    wallTilePositions.Remove(point);
-                }
-            }
-
-            groundTilePositions.UnionWith(hallwayTilePositions);
         }
     }
     #endregion
@@ -953,16 +1002,7 @@ public class GeneratingMapState : MapBaseState
                     {
                         if (region.prefab != null)
                         {
-                            if (manager.startingRoom.groundTiles.Contains(tilePosition) && manager.Settings.doNotAllowInStartingRoom.Contains(region.prefab))
-                            {
-                                break;
-                            }
-
-                            GameObject g = GameObject.Instantiate(region.prefab, tilePosition + new Vector3(0.5f, 0.5f), Quaternion.identity, manager.activeGameObjectsParent.transform);
-                            manager.SetGameObjectsRegion(g);
-                            g.SetActive(false);
-
-
+                            manager.SpawnPrefab(region.prefab, tilePosition, false);
                             occupiedPositions.Add(tilePosition);
                         }
 
@@ -970,6 +1010,17 @@ public class GeneratingMapState : MapBaseState
                     }
                 }
             }
+        }
+    }
+    #endregion
+
+    #region Enemies
+    private void SpawnEnemies(MapManager manager)
+    {
+        for (int i = 0; i < manager.Settings.amountOfEnemies; i++)
+        {
+            Vector3Int spawnPosition = groundTilePositions.ElementAt(rng.Next(0, groundTilePositions.Count + 1));
+            manager.SpawnPrefab(manager.Settings.enemyPrefabs[rng.Next(0, manager.Settings.enemyPrefabs.Length)], spawnPosition, false);
         }
     }
     #endregion

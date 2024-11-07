@@ -93,6 +93,7 @@ public class MapManager : MonoBehaviour
         }
 
         GameObject spawnedPrefab = Instantiate(prefab, tileSpawnPosition + new Vector3(0.5f, 0.5f), Quaternion.identity, activeGameObjectsParent.transform);
+        SetGameObjectsRegion(spawnedPrefab);
         spawnedPrefab.SetActive(activeStatus);
         gameObjectsList.Add(spawnedPrefab);
     }

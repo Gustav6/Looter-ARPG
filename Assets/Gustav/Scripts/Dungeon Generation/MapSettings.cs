@@ -90,6 +90,16 @@ public class MapSettings : MonoBehaviour
     [EnableIf("randomizedHallwaySize")] public int hallwayMaxWidth = 15;
     #endregion
 
+    #region Enemies
+
+    [BoxGroup("Enemy Variables")]
+    public GameObject[] enemyPrefabs;
+
+    [BoxGroup("Enemy Variables")]
+    public int amountOfEnemies;
+
+    #endregion
+
     #region Perlin Noise
     [Foldout("Perlin Noise")]
     public int amountOfNoiseLoops;

@@ -88,9 +88,6 @@ public class GeneratingMapState : MapBaseState
 
     public override void ExitState(MapManager manager)
     {
-        manager.StartCoroutine(Test(manager, tileMaps[TileMapType.ground]));
-        //manager.StartCoroutine(Test(manager, tileMaps[TileMapType.wall]));
-
         #region Diagnostic End
         stopwatch.Stop();
 
@@ -101,11 +98,8 @@ public class GeneratingMapState : MapBaseState
     private async void GenerateMapAsync(MapManager manager)
     {
         List<GameObjectPositionPair> gameObjects = new();
-        GameObject wallTileMap = new(), groundTileMap = new();
 
-        TileBase[] wallTiles = null, groundTiles = null;
-
-        List<HashSet<Vector3Int>> result = await Task.Run(() =>
+        Dictionary<TileMapType, HashSet<Vector3Int>> result = await Task.Run(() =>
         {
             bool canMoveRoom;
 
@@ -171,13 +165,7 @@ public class GeneratingMapState : MapBaseState
 
             AddEnemies(manager, gameObjects);
 
-            groundTiles = new TileBase[tileMaps[TileMapType.ground].Count];
-            Array.Fill(groundTiles, manager.tilePairs[TileTexture.ground]);
-
-            wallTiles = new TileBase[tileMaps[TileMapType.wall].Count];
-            Array.Fill(wallTiles, manager.tilePairs[TileTexture.wall]);
-
-            return new List<HashSet<Vector3Int>>() { tileMaps[TileMapType.ground], tileMaps[TileMapType.wall] };
+            return new Dictionary<TileMapType, HashSet<Vector3Int>>();
         }, manager.TokenSource.Token);
 
         if (manager.TokenSource.IsCancellationRequested)
@@ -192,47 +180,44 @@ public class GeneratingMapState : MapBaseState
             manager.SpawnPrefab(pair.gameObject, pair.position, false);
         }
 
-        manager.wallTileMap.SetTiles(tileMaps[TileMapType.wall].ToArray(), wallTiles);
+        Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to add gameObjects");
 
-        //manager.groundTileMap.SetTiles(tileMaps[TileMapType.ground].ToArray(), groundTiles);
-
-        Debug.Log("It took: " + (stopwatch.ElapsedMilliseconds - diagnosticTime) + " MS, to set tile maps and add gameObjects");
+        manager.StartCoroutine(Test(manager, tileMaps[TileMapType.ground], TileTexture.ground, 100));
+        manager.StartCoroutine(Test(manager, tileMaps[TileMapType.wall], TileTexture.wall, 100));
 
         manager.SwitchState(manager.loadedState);
     }
 
-    private IEnumerator Test(MapManager manager, HashSet<Vector3Int> list)
+    private IEnumerator Test(MapManager manager, HashSet<Vector3Int> tiles, TileTexture tileTexture, int tilesSetPerFrame)
     {
-        for (int i = 0; i < list.Count; i++)
+        for (int i = 0; i < tiles.Count; i++)
         {
-            if (i > 0 && i % 1000 == 0)
+            if (i > 0 && i % tilesSetPerFrame == 0)
             {
                 TileBase[] groundTiles;
                 Range range;
 
-                if (i + 1000 <= list.Count)
+                if (i + tilesSetPerFrame <= tiles.Count)
                 {
-                    range = new(-1000 + i, i);
-                    groundTiles = new TileBase[1000];
+                    range = new(-tilesSetPerFrame + i, i);
+                    groundTiles = new TileBase[tilesSetPerFrame];
 
-                    Array.Fill(groundTiles, manager.tilePairs[TileTexture.ground]);
-                    manager.groundTileMap.SetTiles(tileMaps[TileMapType.ground].ToArray()[range], groundTiles);
+                    Array.Fill(groundTiles, manager.tilePairs[tileTexture]);
+                    manager.groundTileMap.SetTiles(tiles.ToArray()[range], groundTiles);
                 }
                 else
                 {
-                    range = new(i - 1000, list.Count);
-                    groundTiles = new TileBase[list.Count - i + 1000];
+                    range = new(i - tilesSetPerFrame, tiles.Count);
+                    groundTiles = new TileBase[tiles.Count - i + tilesSetPerFrame];
 
-                    Array.Fill(groundTiles, manager.tilePairs[TileTexture.ground]);
-                    manager.groundTileMap.SetTiles(tileMaps[TileMapType.ground].ToArray()[range], groundTiles);
+                    Array.Fill(groundTiles, manager.tilePairs[tileTexture]);
+                    manager.groundTileMap.SetTiles(tiles.ToArray()[range], groundTiles);
                     break;
                 }
 
                 yield return null;
             }
         }
-
-        //Debug.Log("OMG DONE");
     }
 
     #region Generate rooms

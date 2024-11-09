@@ -24,10 +24,12 @@ public class TransitionSystem
         {
             for (int j = transitionPairs.ElementAt(i).Value.Count - 1; j >= 0; j--)
             {
-                if (transitionPairs.ElementAt(i).Value.ElementAt(j).isRemoved)
+                Transition currentTransition = transitionPairs.ElementAt(i).Value[j];
+
+                if (currentTransition.isRemoved)
                 {
-                    transitionPairs.ElementAt(i).Value.ElementAt(j).execute?.Invoke();
-                    transitionPairs.ElementAt(i).Value.RemoveAt(j);
+                    currentTransition.execute?.Invoke();
+                    transitionPairs.ElementAt(i).Value.Remove(currentTransition);
 
                     if (transitionPairs.ElementAt(i).Value.Count == 0)
                     {
@@ -36,11 +38,6 @@ public class TransitionSystem
                 }
             }
         }
-    }
-
-    public static void ClearTransitionList()
-    {
-        transitionPairs.Clear();
     }
 
     public static void AddTransition(Transition transition, GameObject id, bool removeTransitionsWithSameID = true, bool loop = false)
@@ -64,10 +61,15 @@ public class TransitionSystem
         }
         else
         {
-            transitionPairs.Add(id, new List<Transition>() { transition });
+            transitionPairs.Add(id, new List<Transition>() { transition } );
         }
 
         transition.Start();
+    }
+
+    public static void ClearTransitionList()
+    {
+        transitionPairs.Clear();
     }
 
     public static float Crossfade(float t, float a, float b) => ((1 - t) * a) + (t * b);

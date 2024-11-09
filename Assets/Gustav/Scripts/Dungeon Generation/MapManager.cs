@@ -2,6 +2,7 @@ using NaughtyAttributes;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -28,9 +29,6 @@ public class MapManager : MonoBehaviour
 
     public Room startingRoom;
 
-    public List<Edge> minimumSpanningTree;
-    public Room[] rooms;
-
     public readonly Dictionary<TileTexture, TileBase> tilePairs = new();
 
     public GameObject activeGameObjectsParent;
@@ -39,6 +37,8 @@ public class MapManager : MonoBehaviour
     public Dictionary<Vector2Int, List<GameObject>> regions;
     public int RegionWidth { get; private set; }
     public int RegionHeight { get; private set; }
+
+    public CancellationTokenSource TokenSource { get; private set; }
 
     private void Start()
     {
@@ -52,6 +52,8 @@ public class MapManager : MonoBehaviour
             Destroy(this);
             return;
         }
+
+        TokenSource = new();
 
         RegionHeight = 16;
         RegionWidth = 16;
@@ -74,6 +76,11 @@ public class MapManager : MonoBehaviour
         }
 
         currentState?.UpdateState(this);
+    }
+
+    private void OnDisable()
+    {
+        TokenSource.Cancel();
     }
 
     public void SwitchState(MapBaseState state)
@@ -140,6 +147,12 @@ public class MapManager : MonoBehaviour
 
         return grid[x, y];
     }
+}
+
+public enum TileMapType
+{
+    ground,
+    wall
 }
 
 public enum SpawnFunction

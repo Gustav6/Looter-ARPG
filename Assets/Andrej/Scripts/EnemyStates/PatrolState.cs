@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class PatrolState : State
 {
-    EnemyProperties enemyProperties;
-
     public IdleState idle;
     public NavigateState navigate;
 

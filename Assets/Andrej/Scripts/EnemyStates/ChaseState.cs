@@ -21,7 +21,6 @@ public class ChaseState : State
     }
     public override void Enter()
     {
-        enemyProperties = GetComponentInParent<EnemyProperties>();
     }
     public override void Do()
     {

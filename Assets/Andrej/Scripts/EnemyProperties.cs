@@ -5,11 +5,13 @@ using UnityEngine;
 public class EnemyProperties : MonoBehaviour, IDamagable
 {
     public GameObject player;
+    public GameObject damagePopupPrefab;
     public float distanceToPlayer;
 
-    public float speed = 10f;
-
+    public float speed;
     private int health;
+
+    Vector2 origin;
     public int CurrentHealth
     {
         get => health; set
@@ -36,6 +38,8 @@ public class EnemyProperties : MonoBehaviour, IDamagable
         CurrentHealth = MaxHealth;
 
         player = GameObject.FindGameObjectWithTag("Player");
+
+        origin = transform.position;
     }
 
     private void Update()
@@ -46,6 +50,7 @@ public class EnemyProperties : MonoBehaviour, IDamagable
     public void Damage(int damageAmount)
     {
         CurrentHealth -= damageAmount;
+        Instantiate(damagePopupPrefab, transform.position, Quaternion.identity);
     }
 
     public void OnDeath()

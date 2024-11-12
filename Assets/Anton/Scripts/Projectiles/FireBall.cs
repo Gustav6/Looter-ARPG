@@ -4,22 +4,23 @@ using UnityEngine;
 
 public class FireBall : Projectile
 {
-    public GameObject FireExplosionCiclePrefab;
+    public GameObject fireExplosionCiclePrefab;
     public override void Start()
     {
-
+        base.Start();
     }
     public override void Update()
     {
-
+        base.Update();
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public override void FixedUpdate()
     {
-        if (collision.tag == "Enemy")
-        {          
-            Instantiate(FireExplosionCiclePrefab, transform.position, Quaternion.identity);
-            Destroy(gameObject);  
-        }     
+        base.FixedUpdate();
+
+        if (raycastHit2D)
+        {
+            Instantiate(fireExplosionCiclePrefab, transform.position, Quaternion.identity);
+        }
     }
 }

@@ -77,7 +77,7 @@ public class Barrel : MonoBehaviour, IDamagable
 
             foreach (Loot loot in possibleLoot)
             {
-                if (!loot.Equals(willDrop))
+                if (loot != willDrop)
                 {
                     if (willDrop.dropChance > loot.dropChance)
                     {
@@ -101,7 +101,9 @@ public class Barrel : MonoBehaviour, IDamagable
 
         if (loot != null)
         {
-            GameObject g = MapManager.Instance.SpawnPrefab(MapManager.Instance.currentMap, lootPrefab, Vector3Int.FloorToInt(transform.position), MapManager.Instance.activeGameObjectsParent.transform);
+            Transform parent = MapManager.Instance.currentMap.transform.GetChild(1);
+
+            GameObject g = MapManager.Instance.SpawnPrefab(MapManager.Instance.currentMap, lootPrefab, Vector3Int.FloorToInt(transform.position), parent);
             g.GetComponent<SpriteRenderer>().sprite = loot.lootSprite;
         }
 

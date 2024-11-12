@@ -55,7 +55,7 @@ public class GeneratingMapState : MapBaseState
         //    name = "Active Game Objects"
         //};
 
-        manager.currentMapRegions = new();
+        //manager.currentMapRegions = new();
 
         roomList = new Room[manager.Settings.totalRoomsCount];
         Heap<Room> roomHeapForSize = new(manager.Settings.totalRoomsCount);
@@ -1085,21 +1085,21 @@ public class LoadedMapState : MapBaseState
             {
                 region = new(x, y);
 
-                if (!MapManager.Instance.currentMapRegions.TryGetValue(region, out var enableList))
-                {
-                    continue;
-                }
-                else if (previousRegions.Contains(region))
-                {
-                    previousRegions.Remove(region);
-                    currentRegions.Add(region);
-                    continue;
-                }
+                //if (!MapManager.Instance.currentMapRegions.TryGetValue(region, out var enableList))
+                //{
+                //    continue;
+                //}
+                //else if (previousRegions.Contains(region))
+                //{
+                //    previousRegions.Remove(region);
+                //    currentRegions.Add(region);
+                //    continue;
+                //}
 
-                for (int i = 0; i < enableList.Count; i++)
-                {
-                    enableList[i].SetActive(true);
-                }
+                //for (int i = 0; i < enableList.Count; i++)
+                //{
+                //    enableList[i].SetActive(true);
+                //}
 
                 currentRegions.Add(region);
             }
@@ -1107,13 +1107,13 @@ public class LoadedMapState : MapBaseState
 
         foreach (Vector2Int previousRegion in previousRegions)
         {
-            if (MapManager.Instance.currentMapRegions.TryGetValue(previousRegion, out var disableList))
-            {
-                for (int i = 0; i < disableList.Count; i++)
-                {
-                    disableList[i].SetActive(false);
-                }
-            }
+            //if (MapManager.Instance.currentMapRegions.TryGetValue(previousRegion, out var disableList))
+            //{
+            //    for (int i = 0; i < disableList.Count; i++)
+            //    {
+            //        disableList[i].SetActive(false);
+            //    }
+            //}
         }
 
         previousRegions.Clear();

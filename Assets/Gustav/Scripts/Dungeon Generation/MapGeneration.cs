@@ -18,29 +18,27 @@ public static class MapGeneration
 
     public static async void GenerateMapAsync(MapManager manager, GameObject mapPrefab)
     {
-        #region Diagnostic Start
-        System.Diagnostics.Stopwatch stopwatch = new();
-        stopwatch.Start();
-        #endregion
-
         // Every game object within map
         List<GameObjectPositionPair> gameObjects = new();
-        manager.activeGameObjectsParent = new() { name = "Active Game Objects" };
 
         // Ranges for how many tiles will be set at the same time
         List<Range> groundTileRanges = new(), wallTileRanges = new();
 
-        // Room related variables
-        Room[] roomList = new Room[manager.Settings.totalRoomsCount], mainRooms = new Room[manager.Settings.AmountOfMainRooms];
-
         tileMaps = await Task.Run(() =>
         {
+            #region Diagnostic Start
+            System.Diagnostics.Stopwatch stopwatch = new();
+            stopwatch.Start();
+            #endregion
+
             // Instantiate tile map dictionary
             tileMaps = new() { { TileMapType.ground, new() }, { TileMapType.wall, new() } };
 
             // Controls what random outcome will appear
             rng = new System.Random(manager.Settings.seed);
 
+            // Room related variables
+            Room[] roomList = new Room[manager.Settings.totalRoomsCount], mainRooms = new Room[manager.Settings.AmountOfMainRooms];
 
             #region Room generation
 
@@ -195,34 +193,30 @@ public static class MapGeneration
         GameObject map = UnityEngine.Object.Instantiate(mapPrefab);
         map.SetActive(false);
 
-        Tilemap groundTileMap = map.transform.GetChild(0).GetChild(0).GetComponent<Tilemap>();
-        Tilemap wallTileMap = map.transform.GetChild(0).GetChild(1).GetComponent<Tilemap>();
+        Map mapScript = map.GetComponent<Map>();
+
+        Tilemap groundTileMap = mapScript.GroundMap;
+        Tilemap wallTileMap = mapScript.WalldMap;
 
         if (manager.currentMap == null)
         {
             manager.currentMap = map;
             map.name = "Active map";
-            manager.activeGameObjectsParent.transform.SetParent(map.transform);
-            manager.currentMapRegions = new();
+            mapScript.MapRegions = new();
         }
         else if (manager.nextMap == null)
         {
             manager.nextMap = map;
             map.name = "Next map";
-            manager.activeGameObjectsParent.transform.SetParent(map.transform);
-            manager.nextMapRegions = new();
+            mapScript.MapRegions = new();
         }
-
-        #region Spawn gameobjects
-        foreach (GameObjectPositionPair pair in gameObjects)
-        {
-            manager.SpawnPrefab(map, pair.gameObject, pair.position, manager.activeGameObjectsParent.transform, false);
-        }
-        #endregion
 
         #region Coroutines
         amountOfCoreroutinesStarted = 0;
         amountOfCoreroutinesFinished = 0;
+
+        manager.StartCoroutine(SpawnGameObjects(manager, map, gameObjects));
+        amountOfCoreroutinesStarted++;
 
         TileBase[] tiles;
         
@@ -240,7 +234,31 @@ public static class MapGeneration
         #endregion
     }
 
-    #region Coroutine for placing tiles on tilemap
+    #region Coroutines
+
+    private static IEnumerator SpawnGameObjects(MapManager manager, GameObject map, List<GameObjectPositionPair> gameObjectPairs)
+    {
+        for (int i = 0; i < gameObjectPairs.Count; i++)
+        {
+            manager.SpawnPrefab(map, gameObjectPairs[i].gameObject, gameObjectPairs[i].position, false);
+
+            if (i > 0 && i % 10 == 0)
+            {
+                yield return null;
+            }
+        }
+
+        amountOfCoreroutinesFinished++;
+
+        if (AllCoreroutinesFinished())
+        {
+            OnGenerationCompleted?.Invoke(null, EventArgs.Empty);
+        }
+
+        Debug.Log("Prefabs have finished spawning");
+    }
+
+    #region placing tiles on tilemap
     private static IEnumerator SetTiles(Tilemap map, TileMapType tileMap, List<Range> ranges, Vector3Int[] mapPositions, TileBase[] tiles)
     {
         foreach (Range range in ranges)
@@ -267,13 +285,25 @@ public static class MapGeneration
 
         amountOfCoreroutinesFinished++;
 
-        if (amountOfCoreroutinesFinished == amountOfCoreroutinesStarted)
+        if (AllCoreroutinesFinished())
         {
             OnGenerationCompleted?.Invoke(null, EventArgs.Empty);
         }
 
         Debug.Log(tileMap + " Is done");
     }
+
+    public static bool AllCoreroutinesFinished()
+    {
+        if (amountOfCoreroutinesFinished == amountOfCoreroutinesStarted)
+        {
+            return true;
+        }
+
+        return false;
+    }
+    #endregion
+
     #endregion
 
     #region Room generation

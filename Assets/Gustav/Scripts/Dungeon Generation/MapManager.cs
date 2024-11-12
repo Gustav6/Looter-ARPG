@@ -22,13 +22,12 @@ public class MapManager : MonoBehaviour
     [field: SerializeField] public int RegionWidth { get; private set; }
     [field: SerializeField] public int RegionHeight { get; private set; }
 
-    public Dictionary<Vector2Int, List<GameObject>> currentMapRegions, nextMapRegions;
+    public Dictionary<Vector2Int, List<GameObject>> mapRegions;
+    //public Dictionary<Vector2Int, List<GameObject>> currentMapRegions, nextMapRegions;
     private readonly HashSet<Vector2Int> previousRegions = new(), currentRegions = new();
 
     private Camera cameraReference;
     private Vector2Int cBottomLeft, cTopRight, region;
-
-    public GameObject activeGameObjectsParent;
 
     [field: SerializeField] public GameObject MapPrefab { get; private set; }
 
@@ -96,6 +95,8 @@ public class MapManager : MonoBehaviour
     {
         currentMap.SetActive(true);
 
+        mapRegions = currentMap.GetComponent<Map>().MapRegions;
+
         Player.Instance.transform.position = startingRoom.WorldPosition;
         cameraReference.transform.position = Player.Instance.transform.position;
         UpdateActiveRegions();
@@ -108,11 +109,9 @@ public class MapManager : MonoBehaviour
             GameObject destroyAfterSwitch = currentMap;
 
             currentMap = nextMap;
-            currentMapRegions = nextMapRegions;
 
             currentMap.name = "Active Map";
 
-            nextMapRegions = null;
             nextMap = null;
 
             Destroy(destroyAfterSwitch);
@@ -145,7 +144,7 @@ public class MapManager : MonoBehaviour
             {
                 region = new(x, y);
 
-                if (!currentMapRegions.TryGetValue(region, out var enableList))
+                if (!mapRegions.TryGetValue(region, out var enableList))
                 {
                     continue;
                 }
@@ -167,7 +166,7 @@ public class MapManager : MonoBehaviour
 
         foreach (Vector2Int previousRegion in previousRegions)
         {
-            if (currentMapRegions.TryGetValue(previousRegion, out var disableList))
+            if (mapRegions.TryGetValue(previousRegion, out var disableList))
             {
                 for (int i = 0; i < disableList.Count; i++)
                 {
@@ -186,14 +185,14 @@ public class MapManager : MonoBehaviour
         TokenSource.Cancel();
     }
 
-    public GameObject SpawnPrefab(GameObject map, GameObject prefab, Vector3Int tileSpawnPosition, Transform parent, bool activeStatus = true)
+    public GameObject SpawnPrefab(GameObject map, GameObject prefab, Vector3Int tileSpawnPosition, bool activeStatus = true)
     {
         if (startingRoom.groundTiles.Contains(tileSpawnPosition) && Settings.doNotAllowInStartingRoom.Contains(prefab))
         {
             return null;
         }
 
-        GameObject spawnedPrefab = Instantiate(prefab, tileSpawnPosition + new Vector3(0.5f, 0.5f), Quaternion.identity, parent);
+        GameObject spawnedPrefab = Instantiate(prefab, tileSpawnPosition + new Vector3(0.5f, 0.5f), Quaternion.identity, map.GetComponent<Map>().ActiveGameObjects.transform);
         SetGameObjectsRegion(spawnedPrefab, map);
         spawnedPrefab.SetActive(activeStatus);
 
@@ -204,45 +203,23 @@ public class MapManager : MonoBehaviour
     {
         Vector2Int region = new((int)(gameObject.transform.position.x / RegionWidth), (int)(gameObject.transform.position.y / RegionHeight));
 
-        if (map == currentMap)
+        Dictionary<Vector2Int, List<GameObject>> regions = map.GetComponent<Map>().MapRegions;
+
+        if (regions.ContainsKey(region))
         {
-            if (currentMapRegions.ContainsKey(region))
-            {
-                currentMapRegions[region].Add(gameObject);
-            }
-            else
-            {
-                currentMapRegions.Add(region, new List<GameObject> { gameObject });
-            }
+            regions[region].Add(gameObject);
         }
-        else if (map == nextMap)
+        else
         {
-            if (nextMapRegions.ContainsKey(region))
-            {
-                nextMapRegions[region].Add(gameObject);
-            }
-            else
-            {
-                nextMapRegions.Add(region, new List<GameObject> { gameObject });
-            }
+            regions.Add(region, new List<GameObject> { gameObject });
         }
     }
 
     public void RemoveGameObjectFromMap(GameObject g, GameObject map)
     {
-        if (map == currentMap)
+        if (map.GetComponent<Map>().MapRegions.TryGetValue(new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight)), out List<GameObject> gameObjects))
         {
-            if (currentMapRegions.ContainsKey(new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight))))
-            {
-                currentMapRegions[new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight))].Remove(g);
-            }
-        }
-        else if (map == nextMap)
-        {
-            if (nextMapRegions.ContainsKey(new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight))))
-            {
-                nextMapRegions[new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight))].Remove(g);
-            }
+            gameObjects.Remove(g);
         }
     }
 }

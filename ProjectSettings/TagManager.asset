@@ -2,7 +2,7 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
+  serializedVersion: 3
   tags:
   - Flock
   - Obstacle
@@ -47,12 +47,14 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Ground
+  - name: GroundTile
     uniqueID: 1807875347
     locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
-  - name: Trap
+  - name: Player
     uniqueID: 2276557581
     locked: 0
+  m_RenderingLayers:
+  - Default

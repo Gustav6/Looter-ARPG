@@ -38,12 +38,12 @@ public class NormalBullet : Projectile
 
         if (raycastHit2D)
         {
-            //IDamagable damagable = raycastHit2D.transform.GetComponent<IDamagable>();
+            IDamagable damagable = raycastHit2D.transform.GetComponent<IDamagable>();
 
-            //if (damagable != null)
-            //{
-            //    damagable.Damage(GunController.Damage);
-            //}
+            if (damagable != null)
+            {
+                damagable.Damage(GunController.Damage);
+            }
 
             Destroy(gameObject);
             Debug.Log("Tr�ffade n�got" + raycastHit2D.collider.tag);

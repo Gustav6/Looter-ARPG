@@ -10,35 +10,30 @@ public class MapManager : MonoBehaviour
 {
     public static MapManager Instance { get; private set; }
 
-    #region States
-    private MapBaseState currentState;
-    public GeneratingMapState generationState = new();
-    public LoadedMapState loadedState = new();
-    #endregion
-
-    #region Tile & TileMap
-    [BoxGroup("TileMap Variables")]
-    [Required("Ground tile map is needed")] public Tilemap groundTileMap;
-    [BoxGroup("TileMap Variables")]
-    [Required("Wall tile map is needed")] public Tilemap wallTileMap;
-    [BoxGroup("TileMap Variables")]
+    #region Tiles
+    [BoxGroup("Tile Variables")]
     public TilePair[] tiles;
     #endregion
 
+    public readonly Dictionary<TileTexture, TileBase> tilePairs = new();
+    public CancellationTokenSource TokenSource { get; private set; }
     public MapSettings Settings { get; private set; }
 
-    public Room startingRoom;
+    [field: SerializeField] public int RegionWidth { get; private set; }
+    [field: SerializeField] public int RegionHeight { get; private set; }
 
-    public readonly Dictionary<TileTexture, TileBase> tilePairs = new();
+    public Dictionary<Vector2Int, List<GameObject>> currentMapRegions, nextMapRegions;
+    private readonly HashSet<Vector2Int> previousRegions = new(), currentRegions = new();
+
+    private Camera cameraReference;
+    private Vector2Int cBottomLeft, cTopRight, region;
 
     public GameObject activeGameObjectsParent;
-    public List<GameObject> gameObjectsList = new();
 
-    public Dictionary<Vector2Int, List<GameObject>> regions;
-    public int RegionWidth { get; private set; }
-    public int RegionHeight { get; private set; }
+    [field: SerializeField] public GameObject MapPrefab { get; private set; }
 
-    public CancellationTokenSource TokenSource { get; private set; }
+    public GameObject currentMap, nextMap;
+    public Room startingRoom;
 
     private void Start()
     {
@@ -60,92 +55,195 @@ public class MapManager : MonoBehaviour
 
         Settings = GetComponent<MapSettings>();
 
+        cameraReference = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+        Player.Instance.OnRegionSwitch += Instance_OnRegionSwitch;
+
         foreach (TilePair pair in tiles)
         {
             tilePairs.Add(pair.type, pair.tile);
         }
 
-        SwitchState(generationState);
+        MapGeneration.GenerateMapAsync(this, MapPrefab);
+
+        MapGeneration.OnGenerationCompleted += MapGeneration_OnGenerationCompleted;
     }
 
     public void Update()
     {
-        if (Input.GetKeyUp(KeyCode.Space) && currentState == loadedState)
+        if (Input.GetKeyDown(KeyCode.M))
         {
-            SwitchState(generationState);
+            ChangeMap();
+        }
+    }
+
+    private void MapGeneration_OnGenerationCompleted(object sender, EventArgs e)
+    {
+        if (currentMap != null && !currentMap.activeInHierarchy)
+        {
+            LoadCurrentMap();
         }
 
-        currentState?.UpdateState(this);
+        Settings.seed++;
+
+        if (nextMap == null)
+        {
+            MapGeneration.GenerateMapAsync(this, MapPrefab);
+        }
     }
+
+    #region Load and change map methods
+    public void LoadCurrentMap()
+    {
+        currentMap.SetActive(true);
+
+        Player.Instance.transform.position = startingRoom.WorldPosition;
+        cameraReference.transform.position = Player.Instance.transform.position;
+        UpdateActiveRegions();
+    }
+
+    public void ChangeMap()
+    {
+        if (currentMap != null && nextMap != null)
+        {
+            GameObject destroyAfterSwitch = currentMap;
+
+            currentMap = nextMap;
+            currentMapRegions = nextMapRegions;
+
+            currentMap.name = "Active Map";
+
+            nextMapRegions = null;
+            nextMap = null;
+
+            Destroy(destroyAfterSwitch);
+            LoadCurrentMap();
+
+            //MapGeneration.GenerateMapAsync(this, MapPrefab);
+        }
+    }
+    #endregion
+
+    #region Update regions status
+    private void Instance_OnRegionSwitch(object sender, EventArgs e)
+    {
+        if (currentMap != null && currentMap.activeInHierarchy)
+        {
+            UpdateActiveRegions();
+        }
+    }
+
+    private void UpdateActiveRegions()
+    {
+        currentRegions.Clear();
+
+        cBottomLeft = Vector2Int.FloorToInt(0.0625f * cameraReference.ScreenToWorldPoint(new Vector3(0, 0, cameraReference.nearClipPlane)));
+        cTopRight = Vector2Int.FloorToInt(0.0625f * cameraReference.ScreenToWorldPoint(new Vector3(cameraReference.pixelWidth, cameraReference.pixelHeight, cameraReference.nearClipPlane)));
+
+        for (int x = cBottomLeft.x - 1; x < cTopRight.x + 2; x++)
+        {
+            for (int y = cBottomLeft.y - 1; y < cTopRight.y + 2; y++)
+            {
+                region = new(x, y);
+
+                if (!currentMapRegions.TryGetValue(region, out var enableList))
+                {
+                    continue;
+                }
+                else if (previousRegions.Contains(region))
+                {
+                    previousRegions.Remove(region);
+                    currentRegions.Add(region);
+                    continue;
+                }
+
+                for (int i = 0; i < enableList.Count; i++)
+                {
+                    enableList[i].SetActive(true);
+                }
+
+                currentRegions.Add(region);
+            }
+        }
+
+        foreach (Vector2Int previousRegion in previousRegions)
+        {
+            if (currentMapRegions.TryGetValue(previousRegion, out var disableList))
+            {
+                for (int i = 0; i < disableList.Count; i++)
+                {
+                    disableList[i].SetActive(false);
+                }
+            }
+        }
+
+        previousRegions.Clear();
+        previousRegions.UnionWith(currentRegions);
+    }
+    #endregion
 
     private void OnDisable()
     {
         TokenSource.Cancel();
     }
 
-    public void SwitchState(MapBaseState state)
-    {
-        currentState?.ExitState(this);
-
-        currentState = state;
-
-        currentState.EnterState(this);
-    }
-
-    public void SpawnPrefab(GameObject prefab, Vector3Int tileSpawnPosition, bool activeStatus = true)
+    public GameObject SpawnPrefab(GameObject map, GameObject prefab, Vector3Int tileSpawnPosition, Transform parent, bool activeStatus = true)
     {
         if (startingRoom.groundTiles.Contains(tileSpawnPosition) && Settings.doNotAllowInStartingRoom.Contains(prefab))
         {
-            return;
+            return null;
         }
 
-        GameObject spawnedPrefab = Instantiate(prefab, tileSpawnPosition + new Vector3(0.5f, 0.5f), Quaternion.identity, activeGameObjectsParent.transform);
-        SetGameObjectsRegion(spawnedPrefab);
+        GameObject spawnedPrefab = Instantiate(prefab, tileSpawnPosition + new Vector3(0.5f, 0.5f), Quaternion.identity, parent);
+        SetGameObjectsRegion(spawnedPrefab, map);
         spawnedPrefab.SetActive(activeStatus);
-        gameObjectsList.Add(spawnedPrefab);
+
+        return spawnedPrefab;
     }
 
-    public void SetGameObjectsRegion(GameObject gameObject)
+    public void SetGameObjectsRegion(GameObject gameObject, GameObject map)
     {
-        if (!gameObjectsList.Contains(gameObject))
-        {
-            gameObjectsList.Add(gameObject);
-        }
-
         Vector2Int region = new((int)(gameObject.transform.position.x / RegionWidth), (int)(gameObject.transform.position.y / RegionHeight));
 
-        if (regions.ContainsKey(region))
+        if (map == currentMap)
         {
-            regions[region].Add(gameObject);
+            if (currentMapRegions.ContainsKey(region))
+            {
+                currentMapRegions[region].Add(gameObject);
+            }
+            else
+            {
+                currentMapRegions.Add(region, new List<GameObject> { gameObject });
+            }
         }
-        else
+        else if (map == nextMap)
         {
-            regions.Add(region, new List<GameObject> { gameObject });
+            if (nextMapRegions.ContainsKey(region))
+            {
+                nextMapRegions[region].Add(gameObject);
+            }
+            else
+            {
+                nextMapRegions.Add(region, new List<GameObject> { gameObject });
+            }
         }
     }
 
-    public void RemoveGameObjectFromMap(GameObject g)
+    public void RemoveGameObjectFromMap(GameObject g, GameObject map)
     {
-        if (regions.ContainsKey(new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight))))
+        if (map == currentMap)
         {
-            regions[new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight))].Remove(g);
+            if (currentMapRegions.ContainsKey(new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight))))
+            {
+                currentMapRegions[new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight))].Remove(g);
+            }
         }
-        gameObjectsList.Remove(g);
-    }
-
-    public static T OneToTwoDimensional<T>(Vector2Int position, T[] grid, int width)
-    {
-        int index = position.x + position.y * width;
-
-        return grid[index];
-    }
-
-    public static T TwoToOneDimensional<T>(int index, T[,] grid, int width)
-    {
-        int x = index % width;
-        int y = index / width;
-
-        return grid[x, y];
+        else if (map == nextMap)
+        {
+            if (nextMapRegions.ContainsKey(new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight))))
+            {
+                nextMapRegions[new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight))].Remove(g);
+            }
+        }
     }
 }
 

@@ -5,7 +5,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Controller2D))]
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IDamagable
 {
     public static Player Instance { get; private set; }
     public Vector3 Direction { get; private set; }
@@ -55,6 +55,28 @@ public class Player : MonoBehaviour
     public Vector2Int CurrentRegion { get; private set; }
     public Vector2Int PreviousRegion { get; private set; }
 
+    private int health;
+
+    public int CurrentHealth
+    {
+        get => health;
+        set
+        {
+            if (value > MaxHealth)
+            {
+                health = MaxHealth;
+            }
+            else if (value < 0)
+            {
+                OnDeath();
+            }
+            else
+            {
+                health = value;
+            }
+        }
+    }
+    [field: SerializeField] public int MaxHealth { get; set; }
 
     private void Awake()
     {
@@ -73,7 +95,12 @@ public class Player : MonoBehaviour
         moveSpeed = 5;
         controller = GetComponent<Controller2D>();
 
-        CurrentRegion = Vector2Int.FloorToInt(transform.position);
+        CurrentHealth = MaxHealth;
+    }
+
+    private void Start()
+    {
+        CurrentRegion = new Vector2Int((int)(transform.position.x / MapManager.Instance.RegionWidth), (int)(transform.position.y / MapManager.Instance.RegionHeight));
     }
 
     private void FixedUpdate()
@@ -178,5 +205,15 @@ public class Player : MonoBehaviour
     private void OnApplicationQuit()
     {
         inventory.Container.Clear();
+    }
+
+    public void Damage(int damageAmount)
+    {
+        CurrentHealth -= damageAmount;
+    }
+
+    public void OnDeath()
+    {
+        Destroy(gameObject);
     }
 }

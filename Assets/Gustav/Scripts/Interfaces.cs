@@ -8,5 +8,5 @@ public interface IDamagable
     public int MaxHealth { get; set; }
 
     public void Damage(int damageAmount);
-    public void Die();
+    public void OnDeath();
 }

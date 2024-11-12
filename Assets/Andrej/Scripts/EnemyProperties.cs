@@ -20,7 +20,7 @@ public class EnemyProperties : MonoBehaviour, IDamagable
             }
             else if (value <= 0)
             {
-                Die();
+                OnDeath();
             }
             else
             {
@@ -48,7 +48,7 @@ public class EnemyProperties : MonoBehaviour, IDamagable
         CurrentHealth -= damageAmount;
     }
 
-    public void Die()
+    public void OnDeath()
     {
         Destroy(gameObject);
     }

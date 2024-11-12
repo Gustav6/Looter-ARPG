@@ -18,7 +18,7 @@ public class Barrel : MonoBehaviour, IDamagable
             }
             else if (value < 0)
             {
-                Die();
+                OnDeath();
             }
             else
             {
@@ -51,8 +51,8 @@ public class Barrel : MonoBehaviour, IDamagable
     {
         if (collision.CompareTag("Player"))
         {
-            MapManager.Instance.RemoveGameObjectFromMap(gameObject);
-            Die();
+            MapManager.Instance.RemoveGameObjectFromMap(gameObject, MapManager.Instance.currentMap);
+            OnDeath();
         }
     }
 
@@ -95,15 +95,14 @@ public class Barrel : MonoBehaviour, IDamagable
         CurrentHealth -= damageAmount;
     }
 
-    public void Die()
+    public void OnDeath()
     {
         Loot loot = GetLootDrop();
 
-        if (lootList.Length > 0 && loot != null)
+        if (loot != null)
         {
-            GameObject g = Instantiate(lootPrefab, transform.position, Quaternion.identity, MapManager.Instance.activeGameObjectsParent.transform);
+            GameObject g = MapManager.Instance.SpawnPrefab(MapManager.Instance.currentMap, lootPrefab, Vector3Int.FloorToInt(transform.position), MapManager.Instance.activeGameObjectsParent.transform);
             g.GetComponent<SpriteRenderer>().sprite = loot.lootSprite;
-            MapManager.Instance.SetGameObjectsRegion(g);
         }
 
         Destroy(gameObject);

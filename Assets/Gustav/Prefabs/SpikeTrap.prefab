@@ -177,7 +177,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   animator: {fileID: -4986558920332152956}
-  <Damage>k__BackingField: 0
+  <Damage>k__BackingField: 15
   colliderComponent: {fileID: 1500368091122763653}
   rbComponent: {fileID: 6499768060245984297}
 --- !u!95 &-4986558920332152956

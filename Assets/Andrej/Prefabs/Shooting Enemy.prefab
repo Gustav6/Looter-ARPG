@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 7039066767658744678}
   - component: {fileID: 5903875924031432166}
   - component: {fileID: 1953963940699207726}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Shooting Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -56,6 +56,9 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -93,7 +96,7 @@ SpriteRenderer:
   m_SpriteSortPoint: 0
 --- !u!50 &158949818363489007
 Rigidbody2D:
-  serializedVersion: 4
+  serializedVersion: 5
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -104,8 +107,8 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 1
-  m_LinearDrag: 0
-  m_AngularDrag: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
   m_GravityScale: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -126,6 +129,7 @@ BoxCollider2D:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4034984483810168527}
   m_Enabled: 1
+  serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -149,7 +153,8 @@ BoxCollider2D:
     m_Bits: 4294967295
   m_IsTrigger: 1
   m_UsedByEffector: 0
-  m_UsedByComposite: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
@@ -160,7 +165,6 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
 --- !u!114 &5903875924031432166
@@ -241,15 +245,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b84ba40cda14a04d852c253a4ac48db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  distance: 21
-  waitTime: 0
-  startWaitTime: 3
-  moveSpots:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
+  idle: {fileID: 0}
+  navigate: {fileID: 0}
 --- !u!1 &8910339427985307057
 GameObject:
   m_ObjectHideFlags: 0

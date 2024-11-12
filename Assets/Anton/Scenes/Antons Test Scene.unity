@@ -13,7 +13,7 @@ OcclusionCullingSettings:
 --- !u!104 &2
 RenderSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 9
+  serializedVersion: 10
   m_Fog: 0
   m_FogColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
   m_FogMode: 3
@@ -42,8 +42,8 @@ RenderSettings:
 --- !u!157 &3
 LightmapSettings:
   m_ObjectHideFlags: 0
-  serializedVersion: 12
-  m_GIWorkflowMode: 1
+  serializedVersion: 13
+  m_BakeOnSceneLoad: 0
   m_GISettings:
     serializedVersion: 2
     m_BounceScale: 1
@@ -66,9 +66,6 @@ LightmapSettings:
     m_LightmapParameters: {fileID: 0}
     m_LightmapsBakeMode: 1
     m_TextureCompression: 1
-    m_FinalGather: 0
-    m_FinalGatherFiltering: 1
-    m_FinalGatherRayCount: 256
     m_ReflectionCompression: 2
     m_MixedBakeMode: 2
     m_BakeBackend: 1
@@ -484,6 +481,9 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -625,32 +625,40 @@ PrefabInstance:
       value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2045918298356660606, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
-      propertyPath: moveSpots.Array.data[0]
+      propertyPath: 'moveSpots.Array.data[0]'
       value: 
       objectReference: {fileID: 1862787927}
     - target: {fileID: 2045918298356660606, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
-      propertyPath: moveSpots.Array.data[1]
+      propertyPath: 'moveSpots.Array.data[1]'
       value: 
       objectReference: {fileID: 48928298}
     - target: {fileID: 2045918298356660606, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
-      propertyPath: moveSpots.Array.data[2]
+      propertyPath: 'moveSpots.Array.data[2]'
       value: 
       objectReference: {fileID: 1424019096}
     - target: {fileID: 2045918298356660606, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
-      propertyPath: moveSpots.Array.data[3]
+      propertyPath: 'moveSpots.Array.data[3]'
       value: 
       objectReference: {fileID: 667394473}
     - target: {fileID: 2045918298356660606, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
-      propertyPath: moveSpots.Array.data[4]
+      propertyPath: 'moveSpots.Array.data[4]'
       value: 
       objectReference: {fileID: 996855128}
     - target: {fileID: 2045918298356660606, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
-      propertyPath: moveSpots.Array.data[5]
+      propertyPath: 'moveSpots.Array.data[5]'
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2552159463489457514, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4321649477641307041, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: speed
       value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4321649477641307041, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
+      propertyPath: distanceToPlayer
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7150605382936732098, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: m_LocalPosition.x
@@ -698,7 +706,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8525698252564195251, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -1065,7 +1073,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ac5104ccd9543a94f8ebe50159834ede, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  gun: {fileID: 11400000, guid: 5950cf9b2f094f345835220248f8da87, type: 2}
+  gun: {fileID: 11400000, guid: 269593c87e578bd4f80b4af796f261da, type: 2}
   firePoint: {fileID: 1468096973}
   firePoint2: {fileID: 939792213}
   sprite: {fileID: 2127833820}
@@ -1090,6 +1098,9 @@ SpriteRenderer:
   m_ReflectionProbeUsage: 1
   m_RayTracingMode: 0
   m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
@@ -1114,7 +1125,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: -1105330770, guid: fee0ac3d32e8b9d40a7958a86b291f18, type: 3}
+  m_Sprite: {fileID: 1862675393, guid: e89a104cc74b80444afa07fa92cd8e81, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

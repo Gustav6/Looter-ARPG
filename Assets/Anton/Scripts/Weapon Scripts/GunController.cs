@@ -22,6 +22,7 @@ public class GunController : MonoBehaviour
     public static bool explosion;
     public static bool dmgOverTime;
     public static float fireForce;
+    public static bool fireDmg;
     #endregion
 
     private float attackTimer;
@@ -38,6 +39,7 @@ public class GunController : MonoBehaviour
         pierce = false;
         explosion = false;
         dmgOverTime = false;
+        fireDmg = false;
         if (gun.effects != null && gun.effects.Length != 0)
         {
             if (gun.effects.Contains(WeaponEffect.pierceShot))
@@ -53,6 +55,11 @@ public class GunController : MonoBehaviour
             if (gun.effects.Contains(WeaponEffect.dmgOverTime))
             {
                 dmgOverTime = true;
+            }
+
+            if (gun.damageTypes.Contains(DmgType.fire))
+            {
+                fireDmg = true;
             }
         }
         #endregion

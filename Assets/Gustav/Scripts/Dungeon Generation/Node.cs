@@ -10,7 +10,8 @@ public class Node : IHeapItem<Node>
 
     public int gCost; // Cost from starting node
     public int hCost; // How far away from end node
-    public int FCost { get { return hCost + gCost; } }
+    public int randomizedCost = 0;
+    public int FCost { get { return hCost + gCost + randomizedCost; } }
 
     public Vector3Int? parent; // What node that "owns" this node
 

@@ -8,10 +8,4 @@ public class Loot : ScriptableObject
     public Sprite lootSprite;
     public string lootName;
     public int dropChance;
-
-    public Loot(string name, int dropChance)
-    {
-        lootName = name;
-        this.dropChance = dropChance;
-    }
 }

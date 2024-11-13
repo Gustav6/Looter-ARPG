@@ -10,8 +10,11 @@ using UnityEngine.Tilemaps;
 public static class MapGeneration
 {
     private static System.Random rng;
+
     private static Dictionary<TileMapType, HashSet<Vector3Int>> tileMaps;
-    private const int tilesSetPerFrame = 100;
+    private static readonly int tilesSetPerFrame = 100;
+
+    private static HashSet<Vector3Int> availableGroundPositions;
 
     public static event EventHandler OnGenerationCompleted;
     private static int amountOfCoreroutinesStarted, amountOfCoreroutinesFinished;
@@ -24,6 +27,28 @@ public static class MapGeneration
         // Ranges for how many tiles will be set at the same time
         List<Range> groundTileRanges = new(), wallTileRanges = new();
 
+        // Spawn map game object
+        GameObject mapGameObject = UnityEngine.Object.Instantiate(mapPrefab);
+        mapGameObject.SetActive(false);
+
+        UnityEngine.Object.DontDestroyOnLoad(mapGameObject);
+
+        // Reference script
+        Map mapReference = mapGameObject.GetComponent<Map>();
+
+        if (manager.currentMap == null)
+        {
+            manager.currentMap = mapReference;
+            mapGameObject.name = "Active map";
+            mapReference.MapRegions = new();
+        }
+        else if (manager.nextMap == null)
+        {
+            manager.nextMap = mapReference;
+            mapGameObject.name = "Next map";
+            mapReference.MapRegions = new();
+        }
+
         tileMaps = await Task.Run(() =>
         {
             #region Diagnostic Start
@@ -33,6 +58,8 @@ public static class MapGeneration
 
             // Instantiate tile map dictionary
             tileMaps = new() { { TileMapType.ground, new() }, { TileMapType.wall, new() } };
+
+            availableGroundPositions = new();
 
             // Controls what random outcome will appear
             rng = new System.Random(manager.Settings.seed);
@@ -57,8 +84,6 @@ public static class MapGeneration
             {
                 mainRooms[i] = roomHeapForSize.RemoveFirst();
             }
-
-            manager.startingRoom = mainRooms.First();
             #endregion
 
             #region Room seperation
@@ -86,6 +111,22 @@ public static class MapGeneration
                 }
             }
             #endregion
+
+            mapReference.startingRoom = mainRooms.First();
+
+            // Add the players spawn position and surrounding tiles as occupied
+            Vector2Int tempTopRightPosition, tempBottomLeftPosition;
+
+            tempTopRightPosition = Vector2Int.CeilToInt(mapReference.startingRoom.WorldPosition) + Vector2Int.one * 2;
+            tempBottomLeftPosition = Vector2Int.FloorToInt(mapReference.startingRoom.WorldPosition) - Vector2Int.one * 2;
+
+            for (int x = tempBottomLeftPosition.x; x < tempTopRightPosition.x; x++)
+            {
+                for (int y = tempBottomLeftPosition.y; y < tempTopRightPosition.y; y++)
+                {
+                    availableGroundPositions.Remove(new(x, y));
+                }
+            }
 
             // Noise maps corner variables
             Vector3Int noiseMapTopRight = Vector3Int.zero, noiseMapBottomLeft = Vector3Int.zero;
@@ -190,32 +231,13 @@ public static class MapGeneration
             return;
         }
 
-        GameObject map = UnityEngine.Object.Instantiate(mapPrefab);
-        map.SetActive(false);
-
-        Map mapScript = map.GetComponent<Map>();
-
-        Tilemap groundTileMap = mapScript.GroundMap;
-        Tilemap wallTileMap = mapScript.WalldMap;
-
-        if (manager.currentMap == null)
-        {
-            manager.currentMap = map;
-            map.name = "Active map";
-            mapScript.MapRegions = new();
-        }
-        else if (manager.nextMap == null)
-        {
-            manager.nextMap = map;
-            map.name = "Next map";
-            mapScript.MapRegions = new();
-        }
+        mapReference.WallMap.transform.GetComponent<TilemapCollider2D>().enabled = false;
 
         #region Coroutines
         amountOfCoreroutinesStarted = 0;
         amountOfCoreroutinesFinished = 0;
 
-        manager.StartCoroutine(SpawnGameObjects(manager, map, gameObjects));
+        manager.StartCoroutine(SpawnGameObjects(manager, mapReference, gameObjects));
         amountOfCoreroutinesStarted++;
 
         TileBase[] tiles;
@@ -223,24 +245,25 @@ public static class MapGeneration
         tiles = new TileBase[1000];
         Array.Fill(tiles, manager.tilePairs[TileTexture.ground]);
 
-        manager.StartCoroutine(SetTiles(groundTileMap, TileMapType.ground, groundTileRanges, tileMaps[TileMapType.ground].ToArray(), tiles));
+        manager.StartCoroutine(SetTiles(mapReference, TileMapType.ground, groundTileRanges, tileMaps[TileMapType.ground].ToArray(), tiles));
         amountOfCoreroutinesStarted++;
 
         tiles = new TileBase[1000];
         Array.Fill(tiles, manager.tilePairs[TileTexture.wall]);
 
-        manager.StartCoroutine(SetTiles(wallTileMap, TileMapType.wall, wallTileRanges, tileMaps[TileMapType.wall].ToArray(), tiles));
+        manager.StartCoroutine(SetTiles(mapReference, TileMapType.wall, wallTileRanges, tileMaps[TileMapType.wall].ToArray(), tiles));
         amountOfCoreroutinesStarted++;
         #endregion
     }
 
     #region Coroutines
 
-    private static IEnumerator SpawnGameObjects(MapManager manager, GameObject map, List<GameObjectPositionPair> gameObjectPairs)
+    #region Spawning game objects
+    private static IEnumerator SpawnGameObjects(MapManager manager, Map map, List<GameObjectPositionPair> gameObjectPairs)
     {
         for (int i = 0; i < gameObjectPairs.Count; i++)
         {
-            manager.SpawnPrefab(map, gameObjectPairs[i].gameObject, gameObjectPairs[i].position, false);
+            manager.SpawnPrefab(gameObjectPairs[i].gameObject, gameObjectPairs[i].position, map, map.ActiveGameObjectsParent.transform, false);
 
             if (i > 0 && i % 10 == 0)
             {
@@ -250,26 +273,28 @@ public static class MapGeneration
 
         amountOfCoreroutinesFinished++;
 
-        if (AllCoreroutinesFinished())
+        if (AllCoreroutinesFinished(map))
         {
+            map.generationComplete = true;
             OnGenerationCompleted?.Invoke(null, EventArgs.Empty);
         }
 
         Debug.Log("Prefabs have finished spawning");
     }
+    #endregion
 
     #region placing tiles on tilemap
-    private static IEnumerator SetTiles(Tilemap map, TileMapType tileMap, List<Range> ranges, Vector3Int[] mapPositions, TileBase[] tiles)
+    private static IEnumerator SetTiles(Map map, TileMapType tileMapType, List<Range> ranges, Vector3Int[] mapPositions, TileBase[] tiles)
     {
         foreach (Range range in ranges)
         {
-            switch (tileMap)
+            switch (tileMapType)
             {
                 case TileMapType.ground:
-                    map.SetTiles(mapPositions[range], tiles);
+                    map.GroundMap.SetTiles(mapPositions[range], tiles);
                     break;
                 case TileMapType.wall:
-                    map.SetTiles(mapPositions[range], tiles);
+                    map.WallMap.SetTiles(mapPositions[range], tiles);
                     break;
                 default:
                     break;
@@ -278,25 +303,27 @@ public static class MapGeneration
             yield return null;
         }
 
-        if (tileMap == TileMapType.wall)
+        if (tileMapType == TileMapType.wall)
         {
-            map.GetComponent<TilemapCollider2D>().enabled = true;
+            map.WallMap.GetComponent<TilemapCollider2D>().enabled = true;
         }
 
         amountOfCoreroutinesFinished++;
 
-        if (AllCoreroutinesFinished())
+        if (AllCoreroutinesFinished(map))
         {
+            map.generationComplete = true;
             OnGenerationCompleted?.Invoke(null, EventArgs.Empty);
         }
 
-        Debug.Log(tileMap + " Is done");
+        Debug.Log(tileMapType + " Is done");
     }
 
-    public static bool AllCoreroutinesFinished()
+    public static bool AllCoreroutinesFinished(Map map)
     {
         if (amountOfCoreroutinesFinished == amountOfCoreroutinesStarted)
         {
+            map.generationComplete = true;
             return true;
         }
 
@@ -685,35 +712,6 @@ public static class MapGeneration
             }
         }
 
-        #region Debug
-        /*GameObject g = new()
-        {
-            name = "MinimumSpanningTree"
-        };
-
-        for (int i = 0; i < minimumSpanningTree.Count; i++)
-        {
-            GameObject debug = new()
-            {
-                name = "Edge " + i
-            };
-            debug.transform.SetParent(g.transform);
-
-            LineRenderer ln = debug.AddComponent<LineRenderer>();
-            ln.positionCount = 2;
-
-            ln.SetPosition(0, new Vector3(minimumSpanningTree[i].pointA.x, minimumSpanningTree[i].pointA.y, -1));
-            ln.SetPosition(1, new Vector3(minimumSpanningTree[i].pointB.x, minimumSpanningTree[i].pointB.y, -1));
-
-            GameObject pA = new();
-            pA.transform.SetParent(debug.transform);
-            pA.transform.position = new Vector3(minimumSpanningTree[i].pointA.x, minimumSpanningTree[i].pointA.y);
-            GameObject pB = new();
-            pB.transform.SetParent(debug.transform);
-            pB.transform.position = new Vector3(minimumSpanningTree[i].pointB.x, minimumSpanningTree[i].pointB.y);
-        }*/
-        #endregion
-
         if (manager.Settings.amountOfHallwayLoops > 0)
         {
             List<Edge> loopedEdges = new();
@@ -825,7 +823,8 @@ public static class MapGeneration
 
             // Find a path starting from first room in list towards the connected room.
 
-            List<Vector3Int> hallwayPath = new(AStar.FindPath(startingPosition, targetPosition));
+            List<Vector3Int> hallwayPath = new(AStar.FindPath(startingPosition, targetPosition, true, manager.Settings.seed));
+            tileMaps[TileMapType.ground].UnionWith(hallwayPath);
 
             for (int i = 0; i < hallwayPath.Count; i++)
             {
@@ -880,11 +879,27 @@ public static class MapGeneration
     #region Expand hallway path
     private static void ExpandHallwayAndAddTiles(Vector3Int current, Vector3Int next, int hallwayWidth)
     {
-        if (current.x == next.x)
+        for (int i = -hallwayWidth + 1; i < hallwayWidth; i++)
         {
-            for (int i = -hallwayWidth + 1; i < hallwayWidth; i++)
+            tileMaps[TileMapType.ground].Add(new(current.x, current.y + i));
+            tileMaps[TileMapType.ground].Add(new(current.x + i, current.y));
+        }
+
+        for (int i = 0; i < 35; i++)
+        {
+            tileMaps[TileMapType.wall].Add(new(current.x, current.y + hallwayWidth + i));
+            tileMaps[TileMapType.wall].Add(new(current.x, current.y - hallwayWidth - i));
+            tileMaps[TileMapType.wall].Add(new(current.x + hallwayWidth + i, current.y));
+            tileMaps[TileMapType.wall].Add(new(current.x - hallwayWidth - i, current.y));
+        }
+
+        return;
+        if (current.y != next.y)
+        {
+            for (int i = -hallwayWidth; i < hallwayWidth; i++)
             {
                 tileMaps[TileMapType.ground].Add(new(current.x + i, current.y));
+                tileMaps[TileMapType.ground].Add(new(current.x, current.y + i));
             }
 
             for (int i = 0; i < 30; i++)
@@ -893,20 +908,23 @@ public static class MapGeneration
                 tileMaps[TileMapType.wall].Add(new(current.x - hallwayWidth - i, current.y));
             }
         }
-        else if (current.y == next.y)
+        else if (current.x != next.x)
         {
-            for (int i = -hallwayWidth + 1; i < hallwayWidth; i++)
+            for (int i = -hallwayWidth; i < hallwayWidth; i++)
             {
                 tileMaps[TileMapType.ground].Add(new(current.x, current.y + i));
+                tileMaps[TileMapType.ground].Add(new(current.x + i, current.y));
             }
 
             for (int i = 0; i < 30; i++)
             {
                 tileMaps[TileMapType.wall].Add(new(current.x, current.y + hallwayWidth + i));
                 tileMaps[TileMapType.wall].Add(new(current.x, current.y - hallwayWidth - i));
+                tileMaps[TileMapType.wall].Add(new(current.x + hallwayWidth + i, current.y));
+                tileMaps[TileMapType.wall].Add(new(current.x - hallwayWidth - i, current.y));
             }
         }
-        else
+        /*else
         {
             for (int i = 0; i < hallwayWidth; i++)
             {
@@ -958,7 +976,7 @@ public static class MapGeneration
                     tileMaps[TileMapType.wall].Add(new(current.x + hallwayWidth + i, current.y));
                 }
             }
-        }
+        }*/
     }
     #endregion
     #endregion
@@ -966,8 +984,6 @@ public static class MapGeneration
     #region Generate noise maps
     private static void GenerateNoiseMap(MapManager manager, int width, int height, Vector3Int center, List<GameObjectPositionPair> gameObjects)
     {
-        HashSet<Vector3Int> occupiedPositions = new();
-
         float currentHeight;
         Vector3Int tilePosition;
         Vector2 offset;
@@ -982,7 +998,7 @@ public static class MapGeneration
             {
                 tilePosition = new((j % width) - (width / 2) + center.x, (j / width) - (height / 2) + center.y);
 
-                if (!tileMaps[TileMapType.ground].Contains(tilePosition) || occupiedPositions.Contains(tilePosition))
+                if (!tileMaps[TileMapType.ground].Contains(tilePosition) || availableGroundPositions.Contains(tilePosition))
                 {
                     continue;
                 }
@@ -996,7 +1012,7 @@ public static class MapGeneration
                         if (region.prefab != null)
                         {
                             gameObjects.Add(new GameObjectPositionPair { gameObject = region.prefab, position = tilePosition });
-                            occupiedPositions.Add(tilePosition);
+                            availableGroundPositions.Remove(tilePosition);
                         }
 
                         break;
@@ -1005,26 +1021,38 @@ public static class MapGeneration
             }
         }
     }
-
-    private struct GameObjectPositionPair
-    {
-        public GameObject gameObject;
-        public Vector3Int position;
-    }
     #endregion
 
     #region Add enemies
     private static void AddEnemiesToList(MapManager manager, List<GameObjectPositionPair> gameObjects)
     {
         GameObject prefab;
-        Vector3Int spawnPosition;
+        Vector3Int tilePosition;
 
         for (int i = 0; i < manager.Settings.amountOfEnemies; i++)
         {
-            spawnPosition = tileMaps[TileMapType.ground].ElementAt(rng.Next(0, tileMaps[TileMapType.ground].Count + 1));
+            if (availableGroundPositions.Count == 0)
+            {
+                break;
+            }
+
+            tilePosition = availableGroundPositions.ElementAt(rng.Next(0, tileMaps[TileMapType.ground].Count + 1));
             prefab = manager.Settings.enemyPrefabs[rng.Next(0, manager.Settings.enemyPrefabs.Length)];
-            gameObjects.Add(new GameObjectPositionPair { gameObject = prefab, position = spawnPosition });
+            gameObjects.Add(new GameObjectPositionPair { gameObject = prefab, position = tilePosition });
+            availableGroundPositions.Remove(tilePosition);
         }
     }
     #endregion
+
+    private struct GameObjectPositionPair
+    {
+        public GameObject gameObject;
+        public Vector3Int position;
+    }
+
+    private enum TileMapType
+    {
+        ground,
+        wall
+    }
 }

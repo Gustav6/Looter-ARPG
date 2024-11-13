@@ -114,13 +114,6 @@ public class MapSettings : MonoBehaviour
     [Foldout("Perlin Noise")]
     public NoiseRegion[] prefabs;
     #endregion
-
-    #region Debug
-    [Foldout("Debug")]
-    public bool debugTriangulation = false;
-    [Foldout("Debug")]
-    public bool debugSpanningTree = false;
-    #endregion
 }
 
 [Serializable]

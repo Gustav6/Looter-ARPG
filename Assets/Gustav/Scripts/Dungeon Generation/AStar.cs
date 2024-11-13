@@ -16,12 +16,14 @@ public static class AStar
     private static HashSet<Node> closedNodes = new();
     private static Heap<Node> openNodes;
 
-    public static List<Vector3Int> FindPath(Vector3Int _start, Vector3Int _target)
+    private static System.Random rng;
+
+    public static List<Vector3Int> FindPath(Vector3Int _start, Vector3Int _target, bool randomize = false, int seed = 0)
     {
-        #region Diagnostic
-        //System.Diagnostics.Stopwatch sw = new();
-        //sw.Start();
-        #endregion
+        if (randomize)
+        {
+            rng = new System.Random(seed);
+        }
 
         gridWidth = Math.Abs(_start.x - _target.x) + 1;
         gridHeight = Math.Abs(_start.y - _target.y) + 1;
@@ -91,9 +93,6 @@ public static class AStar
             {
                 path = RetracePath();
 
-                //sw.Stop();
-                //Debug.Log("Time taken to find path: " + sw.ElapsedMilliseconds + " MS");
-
                 break;
             }
 
@@ -108,10 +107,24 @@ public static class AStar
                     continue;
                 }
 
-                int newPathCost = currentNode.gCost + GetDistance(currentNode, neighbor);
+                int newPathCost;
+
+                if (randomize)
+                {
+                    newPathCost = GetDistance(currentNode, neighbor) + rng.Next(0, 100);
+                }
+                else
+                {
+                    newPathCost = currentNode.gCost + GetDistance(currentNode, neighbor);
+                }
 
                 if (newPathCost < neighbor.gCost || !openNodes.Contains(neighbor))
                 {
+                    if (randomize)
+                    {
+                        neighbor.randomizedCost = rng.Next(0, 100);
+                    }
+
                     neighbor.gCost = newPathCost;
                     neighbor.hCost = GetDistance(neighbor, target);
                     neighbor.parent = currentNode.gridPosition;

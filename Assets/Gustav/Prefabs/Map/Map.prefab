@@ -486,7 +486,7 @@ TilemapCollider2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3775524558530895596}
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
@@ -514,7 +514,7 @@ TilemapCollider2D:
   m_CompositeOperation: 1
   m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
-  m_MaximumTileChangeCount: 1000
+  m_MaximumTileChangeCount: 10000
   m_ExtrusionFactor: 0
   m_UseDelaunayMesh: 0
 --- !u!50 &3984635123283640941
@@ -582,7 +582,9 @@ CompositeCollider2D:
   m_GeometryType: 0
   m_GenerationType: 0
   m_EdgeRadius: 0
-  m_ColliderPaths: []
+  m_ColliderPaths:
+  - m_Collider: {fileID: 2767169191139655636}
+    m_ColliderPaths: []
   m_CompositePaths:
     m_Paths: []
   m_VertexDistance: 0.0005
@@ -667,5 +669,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <GroundMap>k__BackingField: {fileID: 8799963627368727119}
-  <WalldMap>k__BackingField: {fileID: 7312442040768145718}
-  <ActiveGameObjects>k__BackingField: {fileID: 6732061483527339164}
+  <WallMap>k__BackingField: {fileID: 7312442040768145718}
+  <ActiveGameObjectsParent>k__BackingField: {fileID: 6732061483527339164}

@@ -956,11 +956,11 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: seed
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: octaves
-      value: 5
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: lacunarity
@@ -968,7 +968,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseScale
-      value: 7
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: persistence
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: hallwayWidth
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: roomMaxSize.x
@@ -995,20 +1003,24 @@ PrefabInstance:
       value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: hallwayMinWidth
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: totalRoomsCount
-      value: 18
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: generationRadius
-      value: 200
+      value: 250
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: amountOfMainRooms
-      value: 18
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: amountOfNoiseLoops
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: enemies.Array.size
@@ -1024,7 +1036,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: amountOfHallwayLoops
-      value: 0
+      value: 12.5
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: randomizedHallwaySize

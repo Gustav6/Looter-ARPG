@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Barrel : MonoBehaviour, IDamagable
+public class Pot : MonoBehaviour, IDamagable
 {
     private int health;
 
@@ -29,37 +29,29 @@ public class Barrel : MonoBehaviour, IDamagable
 
     [field: SerializeField] public int MaxHealth { get; set; }
 
-    [SerializeField] private BoxCollider2D colliderComponent;
-    [SerializeField] private Rigidbody2D rbComponent;
-
     [SerializeField] private Loot[] lootList;
     [SerializeField] private GameObject lootPrefab;
 
-    private void OnBecameVisible()
-    {
-        colliderComponent.enabled = true;
-        rbComponent.simulated = true;
-    }
+    private readonly List<Loot> possibleLoot = new();
+    private Vector2Int region;
 
-    private void OnBecameInvisible()
+    private void Start()
     {
-        colliderComponent.enabled = false;
-        rbComponent.simulated = false;
+        region = new((int)(transform.position.x / MapManager.Instance.RegionWidth), (int)(transform.position.y / MapManager.Instance.RegionHeight));
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.CompareTag("Player"))
         {
-            MapManager.Instance.RemoveGameObjectFromMap(gameObject, MapManager.Instance.currentMap);
             OnDeath();
+            Debug.Log("Pot Destroyed");
         }
     }
 
     private Loot GetLootDrop()
     {
         int randomNumber = new System.Random().Next(0, 101);
-        List<Loot> possibleLoot = new();
 
         foreach (Loot loot in lootList)
         {
@@ -103,10 +95,10 @@ public class Barrel : MonoBehaviour, IDamagable
         {
             Transform parent = MapManager.Instance.currentMap.transform.GetChild(1);
 
-            GameObject g = MapManager.Instance.SpawnPrefab(MapManager.Instance.currentMap, lootPrefab, Vector3Int.FloorToInt(transform.position), parent);
+            GameObject g = MapManager.Instance.SpawnPrefab(lootPrefab, Vector3Int.FloorToInt(transform.position), MapManager.Instance.currentMap, parent);
             g.GetComponent<SpriteRenderer>().sprite = loot.lootSprite;
         }
 
-        Destroy(gameObject);
+        MapManager.Instance.RemoveGameObject(gameObject, MapManager.Instance.currentMap.MapRegions, region);
     }
 }

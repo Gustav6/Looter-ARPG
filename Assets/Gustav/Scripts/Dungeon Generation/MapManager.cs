@@ -1,5 +1,6 @@
 using NaughtyAttributes;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
@@ -10,29 +11,26 @@ public class MapManager : MonoBehaviour
 {
     public static MapManager Instance { get; private set; }
 
-    #region Tiles
-    [BoxGroup("Tile Variables")]
+    [BoxGroup("Array of tiles")]
     public TilePair[] tiles;
-    #endregion
 
     public readonly Dictionary<TileTexture, TileBase> tilePairs = new();
     public CancellationTokenSource TokenSource { get; private set; }
     public MapSettings Settings { get; private set; }
 
+    [field: SerializeField] public GameObject MapPrefab { get; private set; }
     [field: SerializeField] public int RegionWidth { get; private set; }
     [field: SerializeField] public int RegionHeight { get; private set; }
 
     public Dictionary<Vector2Int, List<GameObject>> mapRegions;
-    //public Dictionary<Vector2Int, List<GameObject>> currentMapRegions, nextMapRegions;
     private readonly HashSet<Vector2Int> previousRegions = new(), currentRegions = new();
 
     private Camera cameraReference;
     private Vector2Int cBottomLeft, cTopRight, region;
 
-    [field: SerializeField] public GameObject MapPrefab { get; private set; }
+    [HideInInspector] public Map currentMap, nextMap;
 
-    public GameObject currentMap, nextMap;
-    public Room startingRoom;
+    private bool tryingToLoadMap = false;
 
     private void Start()
     {
@@ -69,17 +67,22 @@ public class MapManager : MonoBehaviour
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.M))
+        if (Input.GetKeyDown(KeyCode.M) && !tryingToLoadMap)
         {
-            ChangeMap();
+            StartCoroutine(TryToLoadMap(nextMap));
         }
+    }
+
+    private void OnDisable()
+    {
+        TokenSource.Cancel();
     }
 
     private void MapGeneration_OnGenerationCompleted(object sender, EventArgs e)
     {
-        if (currentMap != null && !currentMap.activeInHierarchy)
+        if (!currentMap.gameObject.activeInHierarchy)
         {
-            LoadCurrentMap();
+            StartCoroutine(TryToLoadMap(currentMap));
         }
 
         Settings.seed++;
@@ -90,42 +93,46 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    #region Load and change map methods
-    public void LoadCurrentMap()
+    #region Load map methods
+    public void LoadMap(Map map)
     {
-        currentMap.SetActive(true);
+        map.gameObject.SetActive(true);
 
-        mapRegions = currentMap.GetComponent<Map>().MapRegions;
+        mapRegions = map.GetComponent<Map>().MapRegions;
 
-        Player.Instance.transform.position = startingRoom.WorldPosition;
+        Player.Instance.transform.position = map.startingRoom.WorldPosition;
         cameraReference.transform.position = Player.Instance.transform.position;
         UpdateActiveRegions();
     }
 
-    public void ChangeMap()
+    private IEnumerator TryToLoadMap(Map mapToLoad)
     {
-        if (currentMap != null && nextMap != null)
+        tryingToLoadMap = true;
+
+        while (mapToLoad == null || !mapToLoad.generationComplete)
         {
-            GameObject destroyAfterSwitch = currentMap;
-
-            currentMap = nextMap;
-
-            currentMap.name = "Active Map";
-
-            nextMap = null;
-
-            Destroy(destroyAfterSwitch);
-            LoadCurrentMap();
-
-            //MapGeneration.GenerateMapAsync(this, MapPrefab);
+            yield return null;
         }
+
+        if (mapToLoad != currentMap)
+        {
+            Destroy(currentMap.gameObject);
+            currentMap = mapToLoad;
+            currentMap.name = "Active Map";
+            nextMap = null;
+            MapGeneration.GenerateMapAsync(this, MapPrefab);
+        }
+
+        LoadMap(mapToLoad);
+
+        tryingToLoadMap = false;
     }
     #endregion
 
-    #region Update regions status
+    #region Update active regions
     private void Instance_OnRegionSwitch(object sender, EventArgs e)
     {
-        if (currentMap != null && currentMap.activeInHierarchy)
+        if (currentMap != null && currentMap.gameObject.activeInHierarchy)
         {
             UpdateActiveRegions();
         }
@@ -180,54 +187,43 @@ public class MapManager : MonoBehaviour
     }
     #endregion
 
-    private void OnDisable()
+    public GameObject SpawnPrefab(GameObject prefab, Vector3Int tileSpawnPosition, Map map, Transform parent, bool activeStatus = true)
     {
-        TokenSource.Cancel();
-    }
-
-    public GameObject SpawnPrefab(GameObject map, GameObject prefab, Vector3Int tileSpawnPosition, bool activeStatus = true)
-    {
-        if (startingRoom.groundTiles.Contains(tileSpawnPosition) && Settings.doNotAllowInStartingRoom.Contains(prefab))
+        if (map.startingRoom.groundTiles.Contains(tileSpawnPosition) && Settings.doNotAllowInStartingRoom.Contains(prefab))
         {
             return null;
         }
 
-        GameObject spawnedPrefab = Instantiate(prefab, tileSpawnPosition + new Vector3(0.5f, 0.5f), Quaternion.identity, map.GetComponent<Map>().ActiveGameObjects.transform);
-        SetGameObjectsRegion(spawnedPrefab, map);
+        GameObject spawnedPrefab = Instantiate(prefab, tileSpawnPosition + new Vector3(0.5f, 0.5f), Quaternion.identity, parent);
+        SetGameObjectsRegion(spawnedPrefab, map.MapRegions);
         spawnedPrefab.SetActive(activeStatus);
 
         return spawnedPrefab;
     }
 
-    public void SetGameObjectsRegion(GameObject gameObject, GameObject map)
+    public void SetGameObjectsRegion(GameObject gameObject, Dictionary<Vector2Int, List<GameObject>> regionDictionary)
     {
         Vector2Int region = new((int)(gameObject.transform.position.x / RegionWidth), (int)(gameObject.transform.position.y / RegionHeight));
 
-        Dictionary<Vector2Int, List<GameObject>> regions = map.GetComponent<Map>().MapRegions;
-
-        if (regions.ContainsKey(region))
+        if (regionDictionary.ContainsKey(region))
         {
-            regions[region].Add(gameObject);
+            regionDictionary[region].Add(gameObject);
         }
         else
         {
-            regions.Add(region, new List<GameObject> { gameObject });
+            regionDictionary.Add(region, new List<GameObject> { gameObject });
         }
     }
 
-    public void RemoveGameObjectFromMap(GameObject g, GameObject map)
+    public void RemoveGameObject(GameObject g, Dictionary<Vector2Int, List<GameObject>> regionDictionary, Vector2Int region)
     {
-        if (map.GetComponent<Map>().MapRegions.TryGetValue(new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight)), out List<GameObject> gameObjects))
+        if (regionDictionary.TryGetValue(region, out List<GameObject> gameObjects))
         {
             gameObjects.Remove(g);
         }
-    }
-}
 
-public enum TileMapType
-{
-    ground,
-    wall
+        Destroy(g);
+    }
 }
 
 public enum SpawnFunction

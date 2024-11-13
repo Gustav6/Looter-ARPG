@@ -98,11 +98,6 @@ public class Player : MonoBehaviour, IDamagable
         CurrentHealth = MaxHealth;
     }
 
-    private void Start()
-    {
-        CurrentRegion = new Vector2Int((int)(transform.position.x / MapManager.Instance.RegionWidth), (int)(transform.position.y / MapManager.Instance.RegionHeight));
-    }
-
     private void FixedUpdate()
     {
         controller.Move(moveSpeed * Time.fixedDeltaTime * Direction);

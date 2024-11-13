@@ -31,6 +31,8 @@ public class ScaleTransition : Transition
         curveAmplitude = amplitude;
         curveOffset = offset;
 
+        startingScale = t.localScale;
+
         this.execute += execute;
     }
 
@@ -70,11 +72,19 @@ public class ScaleTransition : Transition
 
         isRemoved = true;
     }
+
     private void SetScaleToTarget()
     {
         if (transform != null)
         {
-            transform.localScale = targetScale;
+            if (transitionType != null)
+            {
+                transform.localScale = targetScale;
+            }
+            else if (curveType != null)
+            {
+                transform.localScale = curveOffset;
+            }
         }
     }
 }

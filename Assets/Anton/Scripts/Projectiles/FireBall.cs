@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class FireBall : Projectile
+public class FireBall : BigProjectile
 {
     public GameObject fireExplosionCiclePrefab;
     public override void Start()
@@ -18,7 +18,7 @@ public class FireBall : Projectile
     {
         base.FixedUpdate();
 
-        if (raycastHit2D)
+        if (raycastHit2D != null)
         {
             Instantiate(fireExplosionCiclePrefab, transform.position, Quaternion.identity);
         }

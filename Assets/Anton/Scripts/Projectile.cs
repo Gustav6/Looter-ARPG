@@ -13,15 +13,22 @@ public class Projectile : MonoBehaviour
     private int dmgTickCounter;
     [SerializeField] public int amountOfEnemiesHit;
     [SerializeField] public RaycastHit2D raycastHit2D;
+    [SerializeField] public RaycastHit2D raycastHit2DTop;
+    [SerializeField] public RaycastHit2D raycastHit2DBottom;
+    private float sprtRendY;
 
     public Rigidbody2D rb;
     public LayerMask collidableLayers;
+    public bool bigProjectile;
 
     public virtual void Start()
-    {
-        colider.radius = 0.5f;
+    {       
         rb = GetComponent<Rigidbody2D>();
         colider = GetComponent<CircleCollider2D>();
+        colider.radius = 0.5f;
+
+        sprtRendY = GetComponent<SpriteRenderer>().bounds.size.y;
+        sprtRendY /= 2;
 
         prevPosition = transform.position;
     }
@@ -46,8 +53,16 @@ public class Projectile : MonoBehaviour
         Debug.Log(distance);
         raycastHit2D = Physics2D.Raycast(transform.position, rb.linearVelocity, distance, collidableLayers);
         Debug.DrawRay(transform.position, rb.linearVelocity.normalized * distance, Color.red);
+        if (bigProjectile)
+        {
+            raycastHit2D = Physics2D.Raycast(transform.position + new Vector3(0, sprtRendY, 0), rb.linearVelocity, distance, collidableLayers);
+            raycastHit2D = Physics2D.Raycast(transform.position - new Vector3(0, sprtRendY, 0), rb.linearVelocity, distance, collidableLayers);
+            Debug.DrawRay(transform.position - new Vector3(0, sprtRendY, 0), rb.linearVelocity.normalized * distance, Color.red);
+            Debug.DrawRay(transform.position + new Vector3(0, sprtRendY, 0), rb.linearVelocity.normalized * distance, Color.red);
+        }
 
-        if (raycastHit2D)
+
+        if (raycastHit2D || raycastHit2DBottom || raycastHit2DTop)
         {
             IDamagable damagable = raycastHit2D.transform.GetComponent<IDamagable>();
 

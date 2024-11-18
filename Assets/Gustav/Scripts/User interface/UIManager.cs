@@ -2,12 +2,13 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class UIStateManager : MonoBehaviour
+public class UIManager : MonoBehaviour
 {
-    public static UIStateManager Instance { get; private set; }
+    public static UIManager Instance { get; private set; }
 
     public bool GamePaused { get; private set; }
 
+    public bool FullScreen { get; private set; }
     public float ResolutionScaling { get; private set; }
 
 
@@ -20,7 +21,7 @@ public class UIStateManager : MonoBehaviour
         }
         else if (Instance != this)
         {
-            Destroy(this);
+            Destroy(gameObject);
             return;
         }
 
@@ -40,5 +41,14 @@ public class UIStateManager : MonoBehaviour
     public void UnPauseGame()
     {
         GamePaused = false;
+    }
+
+    public void DisableFullscreen()
+    {
+        FullScreen = false;
+    }
+    public void EnableFullscreen()
+    {
+        FullScreen = true;
     }
 }

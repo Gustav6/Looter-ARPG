@@ -114,20 +114,6 @@ public static class MapGeneration
 
             mapReference.startingRoom = mainRooms.First();
 
-            // Add the players spawn position and surrounding tiles as occupied
-            Vector2Int tempTopRightPosition, tempBottomLeftPosition;
-
-            tempTopRightPosition = Vector2Int.CeilToInt(mapReference.startingRoom.WorldPosition) + Vector2Int.one * 2;
-            tempBottomLeftPosition = Vector2Int.FloorToInt(mapReference.startingRoom.WorldPosition) - Vector2Int.one * 2;
-
-            for (int x = tempBottomLeftPosition.x; x < tempTopRightPosition.x; x++)
-            {
-                for (int y = tempBottomLeftPosition.y; y < tempTopRightPosition.y; y++)
-                {
-                    availableGroundPositions.Remove(new(x, y));
-                }
-            }
-
             // Noise maps corner variables
             Vector3Int noiseMapTopRight = Vector3Int.zero, noiseMapBottomLeft = Vector3Int.zero;
 
@@ -169,6 +155,23 @@ public static class MapGeneration
 
             // Remove wall tiles that are on the same tile position as any ground tile
             tileMaps[TileMapType.wall].ExceptWith(tileMaps[TileMapType.ground]);
+
+            // Add ground tile positions as available positions for game objects
+            availableGroundPositions.UnionWith(tileMaps[TileMapType.ground]);
+
+            // Remove the players spawn position and surrounding tiles from available list
+            Vector2Int tempTopRightPosition, tempBottomLeftPosition;
+
+            tempTopRightPosition = Vector2Int.CeilToInt(mapReference.startingRoom.WorldPosition) + Vector2Int.one * 2;
+            tempBottomLeftPosition = Vector2Int.FloorToInt(mapReference.startingRoom.WorldPosition) - Vector2Int.one * 2;
+
+            for (int x = tempBottomLeftPosition.x; x < tempTopRightPosition.x; x++)
+            {
+                for (int y = tempBottomLeftPosition.y; y < tempTopRightPosition.y; y++)
+                {
+                    availableGroundPositions.Remove(new(x, y));
+                }
+            }
 
             int noiseMapWidth = Math.Abs(noiseMapBottomLeft.x) + Math.Abs(noiseMapTopRight.x), noiseMapHeight = Math.Abs(noiseMapBottomLeft.y) + Math.Abs(noiseMapTopRight.y);
             Vector3Int noiseMapCenter = new(noiseMapBottomLeft.x + noiseMapWidth / 2, noiseMapBottomLeft.y + noiseMapHeight / 2);
@@ -998,7 +1001,7 @@ public static class MapGeneration
             {
                 tilePosition = new((j % width) - (width / 2) + center.x, (j / width) - (height / 2) + center.y);
 
-                if (!tileMaps[TileMapType.ground].Contains(tilePosition) || availableGroundPositions.Contains(tilePosition))
+                if (!tileMaps[TileMapType.ground].Contains(tilePosition) || !availableGroundPositions.Contains(tilePosition))
                 {
                     continue;
                 }

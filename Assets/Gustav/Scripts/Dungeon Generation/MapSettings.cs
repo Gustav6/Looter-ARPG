@@ -6,25 +6,26 @@ using UnityEngine.Tilemaps;
 public class MapSettings : MonoBehaviour
 {
     #region Generation
-    [BoxGroup("Generation Variables")]
+    [Foldout("Generation Variables")]
     public int seed;
 
-    [BoxGroup("Generation Variables")]
+    [Foldout("Generation Variables")]
     public SpawnFunction spawnFunction = SpawnFunction.Circle;
 
-    [BoxGroup("Generation Variables")]
+    [Foldout("Generation Variables")]
     public int generationRadius = 50;
 
-    [BoxGroup("Generation Variables")]
+    [Foldout("Generation Variables")]
     public Vector2Int stripSize = new(100, 50);
     #endregion
 
     #region Room
-    [BoxGroup("Room Variables")]
+
+    [Foldout("Room Variables")]
     public int totalRoomsCount = 10;
 
     #region Main room variable
-    [BoxGroup("Room Variables")]
+    [Foldout("Room Variables")]
     [SerializeField] private int amountOfMainRooms = 5;
     public int AmountOfMainRooms
     {
@@ -43,10 +44,10 @@ public class MapSettings : MonoBehaviour
     }
     #endregion
 
-    [BoxGroup("Room Variables")]
+    [Foldout("Room Variables")]
     public Vector2Int roomMaxSize = new(10, 10);
 
-    [BoxGroup("Room Variables")]
+    [Foldout("Room Variables")]
     [SerializeField] private Vector2Int roomMinSize = new(5, 5);
     public Vector2Int RoomMinSize
     {
@@ -71,31 +72,34 @@ public class MapSettings : MonoBehaviour
         }
     }
 
-    [BoxGroup("Room Variables")]
+    [Foldout("Room Variables")]
     public bool roundCorners = true;
-    [BoxGroup("Room Variables")]
+    [Foldout("Room Variables")]
     public GameObject[] doNotAllowInStartingRoom;
+
     #endregion
 
     #region Hallway
-    [BoxGroup("Hallway Variables")]
+
+    [Foldout("Hallway Variables")]
     [Range(0, 100)] public float amountOfHallwayLoops = 15;
-    [BoxGroup("Hallway Variables")]
+    [Foldout("Hallway Variables")]
     public bool randomizedHallwaySize = false;
-    [BoxGroup("Hallway Variables")]
+    [Foldout("Hallway Variables")]
     [DisableIf("randomizedHallwaySize")] public int hallwayWidth = 10;
-    [BoxGroup("Hallway Variables")]
+    [Foldout("Hallway Variables")]
     [EnableIf("randomizedHallwaySize")] public int hallwayMinWidth = 10;
-    [BoxGroup("Hallway Variables")]
+    [Foldout("Hallway Variables")]
     [EnableIf("randomizedHallwaySize")] public int hallwayMaxWidth = 15;
+
     #endregion
 
     #region Enemies
 
-    [BoxGroup("Enemy Variables")]
+    [Foldout("Enemy Variables")]
     public GameObject[] enemyPrefabs;
 
-    [BoxGroup("Enemy Variables")]
+    [Foldout("Enemy Variables")]
     public int amountOfEnemies;
 
     #endregion

@@ -6,7 +6,8 @@ public class SoundManager : MonoBehaviour
 {
     public static SoundManager Instance { get; private set; }
 
-    public Dictionary<VolumeType, float> volumePairs;
+    private Dictionary<VolumeType, float> volumePairs;
+    private float maxVolumeValue = 1, minVolumeValue = 0;
 
     private void Awake()
     {
@@ -17,15 +18,15 @@ public class SoundManager : MonoBehaviour
         }
         else if (Instance != this)
         {
-            Destroy(this);
+            Destroy(gameObject);
             return;
         }
 
         volumePairs = new()
         {
-            { VolumeType.MasterVolume, 1 },
-            { VolumeType.MusicVolume, 1 },
-            { VolumeType.SFXVolume, 1 }
+            { VolumeType.MasterVolume, maxVolumeValue },
+            { VolumeType.MusicVolume, maxVolumeValue },
+            { VolumeType.SFXVolume, maxVolumeValue }
         };
     }
 
@@ -37,6 +38,37 @@ public class SoundManager : MonoBehaviour
     private void Update()
     {
         
+    }
+
+    public void SetVolume(VolumeType type, float value)
+    {
+        if (value > maxVolumeValue)
+        {
+            value = maxVolumeValue;
+        }
+        else if (value < minVolumeValue)
+        {
+            value = minVolumeValue;
+        }
+
+        if (volumePairs.ContainsKey(type))
+        {
+            volumePairs[type] = value;
+        }
+        else
+        {
+            volumePairs.Add(type, value);
+        }
+    }
+
+    public float GetVolume(VolumeType type)
+    {
+        if (volumePairs.TryGetValue(type, out float volume))
+        {
+            return volume;
+        }
+
+        return 0;
     }
 }
 

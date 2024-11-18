@@ -16,9 +16,13 @@ public class UIDropDown : UIBaseScript, IPointerClickHandler
     [SerializeField] private GameObject contentPrefab;
 
     private readonly List<Transform> settings = new();
+    public Dictionary<Transform, Resolution> ResolutionTransformPair;
+    [field: SerializeField] public Transform SelectedResolutionTransform { get; private set; }
 
     public override void Start()
     {
+        ResolutionTransformPair = new();
+
         for (int i = 0; i < contentsParent.childCount; i++)
         {
             settings.Add(contentsParent.GetChild(i));
@@ -27,18 +31,26 @@ public class UIDropDown : UIBaseScript, IPointerClickHandler
 
         for (int i = 0; i < Screen.resolutions.Length; i++)
         {
+            string resolution = Screen.resolutions[i].width.ToString() + " x " + Screen.resolutions[i].height.ToString();
+
             if (i < 3)
             {
-                settings[i].GetComponentInChildren<TextMeshProUGUI>().text = Screen.resolutions[i].width.ToString() + " x " + Screen.resolutions[i].height.ToString();
+                settings[i].GetComponentInChildren<TextMeshProUGUI>().text = resolution;
             }
             else
             {
                 GameObject g = Instantiate(contentPrefab, contentsParent);
-                g.GetComponentInChildren<TextMeshProUGUI>().text = Screen.resolutions[i].width.ToString() + " x " + Screen.resolutions[i].height.ToString();
+
+                g.GetComponentInChildren<TextMeshProUGUI>().text = resolution;
 
                 settings.Add(g.transform);
             }
+
+            ResolutionTransformPair.Add(settings[i], Screen.resolutions[i]);
+                settings[i].name = resolution;
         }
+
+        SelectedResolutionTransform = settings[0];
 
         base.Start();
     }
@@ -84,8 +96,12 @@ public class UIDropDown : UIBaseScript, IPointerClickHandler
         }
     }
 
-    private void ChangeResolution(Resolution resolution)
+    public void ChangeResolution(Transform transform)
     {
-        Screen.SetResolution(resolution.width, resolution.height, true);
+        Screen.SetResolution(ResolutionTransformPair[transform].width, ResolutionTransformPair[transform].height, UIManager.Instance.FullScreen);
+
+        SelectedResolutionTransform = transform;
+
+        Debug.Log("Resolution changed to: " + ResolutionTransformPair[transform].ToString());
     }
 }

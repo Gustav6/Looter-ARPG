@@ -1,10 +1,13 @@
 using NaughtyAttributes;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class UILever : UIBaseScript, IPointerClickHandler
 {
+    [SerializeField] private UnityEvent onClickEvent;
+
     [BoxGroup("Lever variables")]
     [SerializeField] private VolumeType volumeEffected;
 
@@ -14,8 +17,12 @@ public class UILever : UIBaseScript, IPointerClickHandler
     private bool leverOn;
     private Image indicatorsImage;
 
+    private float previousValue;
+
     public override void Start()
     {
+        previousValue = SoundManager.Instance.GetVolume(volumeEffected);
+
         indicatorsImage = objectIndicator.GetComponent<Image>();
 
         leverOn = true;
@@ -33,6 +40,7 @@ public class UILever : UIBaseScript, IPointerClickHandler
 
         leverOn = !leverOn;
         UpdateIndicator(0.1f);
+        onClickEvent?.Invoke();
     }
 
     public void UpdateIndicator(float timeItTakes)
@@ -46,7 +54,7 @@ public class UILever : UIBaseScript, IPointerClickHandler
             }
 
             objectIndicator.SetActive(true);
-            TransitionSystem.AddTransition(new ColorTransition(indicatorsImage, timeItTakes, Color.white, TransitionType.SmoothStop2), gameObject);
+            TransitionSystem.AddTransition(new ColorTransition(indicatorsImage, timeItTakes, Color.white, TransitionType.SmoothStart2), gameObject);
         }
         else
         {
@@ -57,6 +65,33 @@ public class UILever : UIBaseScript, IPointerClickHandler
             }
 
             TransitionSystem.AddTransition(new ColorTransition(indicatorsImage, timeItTakes, Color.white * 0, TransitionType.SmoothStop2, DisableIndicator), gameObject);
+        }
+    }
+
+    public void SetFullscreen()
+    {
+        if (leverOn)
+        {
+            UIManager.Instance.EnableFullscreen();
+        }
+        else
+        {
+            UIManager.Instance.DisableFullscreen();
+        }
+
+        Screen.fullScreen = UIManager.Instance.FullScreen;
+    }
+
+    public void SetSoundStatus()
+    {
+        if (leverOn)
+        {
+            SoundManager.Instance.SetVolume(volumeEffected, previousValue);
+        }
+        else
+        {
+            previousValue = SoundManager.Instance.GetVolume(volumeEffected);
+            SoundManager.Instance.SetVolume(volumeEffected, 0);
         }
     }
 

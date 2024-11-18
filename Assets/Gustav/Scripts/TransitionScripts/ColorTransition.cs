@@ -15,10 +15,12 @@ public class ColorTransition : Transition
         if (c.GetComponent<Image>() != null)
         {
             image = c.GetComponent<Image>();
+            startingColor = image.color;
         }
         else if (c.GetComponent<TextMeshProUGUI>() != null)
         {
             text = c.GetComponent<TextMeshProUGUI>();
+            startingColor = text.color;
         }
         else
         {
@@ -29,7 +31,6 @@ public class ColorTransition : Transition
         transitionType = type;
         timerMax = time;
 
-        startingColor = text.color;
         targetColor = target;
 
         this.execute += execute;

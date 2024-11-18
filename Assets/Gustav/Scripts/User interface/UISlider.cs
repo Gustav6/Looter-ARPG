@@ -17,7 +17,7 @@ public class UISlider : UIBaseScript, IPointerDownHandler, IPointerUpHandler
     public override void Start()
     {
         maxMoveValue = Mathf.Abs(slidingPart.transform.localPosition.x);
-        slidingPart.transform.localPosition = PercentageToPosition(SoundManager.Instance.volumePairs[volumeEffected]);
+        slidingPart.transform.localPosition = PercentageToPosition(SoundManager.Instance.GetVolume(volumeEffected));
 
         base.Start();
     }
@@ -40,8 +40,6 @@ public class UISlider : UIBaseScript, IPointerDownHandler, IPointerUpHandler
         }
 
         canMove = true;
-
-        Debug.Log("Activated");
     }
 
     public void OnPointerUp(PointerEventData eventData)
@@ -53,14 +51,19 @@ public class UISlider : UIBaseScript, IPointerDownHandler, IPointerUpHandler
 
         canMove = false;
 
-        SoundManager.Instance.volumePairs[volumeEffected] = TotalSlidingPercentage();
+        SoundManager.Instance.SetVolume(volumeEffected, TotalSlidingPercentage());
+    }
 
-        Debug.Log("Deactivated");
+    public override void RunOnDisable()
+    {
+        base.RunOnDisable();
+
+        SoundManager.Instance.SetVolume(volumeEffected, TotalSlidingPercentage());
     }
 
     public float TotalSlidingPercentage()
     {
-        return ((slidingPart.transform.localPosition.x + maxMoveValue) / (maxMoveValue * 2)) * UIStateManager.Instance.ResolutionScaling;
+        return ((slidingPart.transform.localPosition.x + maxMoveValue) / (maxMoveValue * 2)) * UIManager.Instance.ResolutionScaling;
     }
 
     public Vector3 PercentageToPosition(float value)
@@ -70,11 +73,11 @@ public class UISlider : UIBaseScript, IPointerDownHandler, IPointerUpHandler
 
     private void MoveSliderTowardsMouse(float mouseX)
     {
-        if (mouseX > transform.position.x + (maxMoveValue * UIStateManager.Instance.ResolutionScaling) * transform.localScale.x)
+        if (mouseX > transform.position.x + (maxMoveValue * UIManager.Instance.ResolutionScaling) * transform.localScale.x)
         {
             slidingPart.transform.localPosition = new(maxMoveValue, 0);
         }
-        else if (mouseX < transform.position.x + (-maxMoveValue * UIStateManager.Instance.ResolutionScaling) * transform.localScale.x)
+        else if (mouseX < transform.position.x + (-maxMoveValue * UIManager.Instance.ResolutionScaling) * transform.localScale.x)
         {
             slidingPart.transform.localPosition = new(-maxMoveValue, 0);
         }

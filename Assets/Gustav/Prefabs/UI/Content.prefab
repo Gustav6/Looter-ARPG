@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 8897283092546382025}
   - component: {fileID: 5634949852744493014}
   - component: {fileID: 3804405438243161654}
+  - component: {fileID: 7736582912446601765}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -60,7 +61,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 1, g: 1, b: 1, a: 0.60784316}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -85,6 +86,7 @@ BoxCollider2D:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3758807556089935685}
   m_Enabled: 1
+  serializedVersion: 3
   m_Density: 1
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -108,7 +110,8 @@ BoxCollider2D:
     m_Bits: 4294967295
   m_IsTrigger: 0
   m_UsedByEffector: 0
-  m_UsedByComposite: 0
+  m_CompositeOperation: 0
+  m_CompositeOrder: 0
   m_Offset: {x: 0, y: 0}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
@@ -119,9 +122,45 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  serializedVersion: 2
   m_Size: {x: 1, y: 1}
   m_EdgeRadius: 0
+--- !u!114 &7736582912446601765
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3758807556089935685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 49810bd6a17189a4bbc1899ace5c6966, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Active>k__BackingField: 0
+  moveTransitionsOnEnable: []
+  scaleTransitionsOnEnable: []
+  colorTransitionsOnEnable:
+  - transitionType: 3
+    effected: {fileID: 2301308956579564572}
+    duration: 0.15
+    target: {r: 1, g: 1, b: 1, a: 1}
+  - transitionType: 3
+    effected: {fileID: 7328776487668923989}
+    duration: 0.15
+    target: {r: 0, g: 0, b: 0, a: 1}
+  rotationTransitionsOnEnable: []
+  moveTransitionsOnDisable: []
+  scaleTransitionsOnDisable: []
+  colorTransitionsOnDisable:
+  - transitionType: 0
+    effected: {fileID: 2301308956579564572}
+    duration: 0.15
+    target: {r: 1, g: 1, b: 1, a: 0.60784316}
+  - transitionType: 0
+    effected: {fileID: 7328776487668923989}
+    duration: 0.15
+    target: {r: 0, g: 0, b: 0, a: 0.88235295}
+  rotationTransitionsOnDisable: []
 --- !u!1 &6712176672281343231
 GameObject:
   m_ObjectHideFlags: 0
@@ -196,8 +235,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4278190080
-  m_fontColor: {r: 0, g: 0, b: 0, a: 1}
+    rgba: 3774873600
+  m_fontColor: {r: 0, g: 0, b: 0, a: 0.88235295}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:
@@ -230,15 +269,17 @@ MonoBehaviour:
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
-  m_enableWordWrapping: 1
+  m_TextWrappingMode: 1
   m_wordWrappingRatios: 0.4
   m_overflowMode: 0
   m_linkedTextComponent: {fileID: 0}
   parentLinkedComponent: {fileID: 0}
   m_enableKerning: 1
+  m_ActiveFontFeatures: 6e72656b
   m_enableExtraPadding: 0
   checkPaddingRequired: 0
   m_isRichText: 1
+  m_EmojiFallbackSupport: 1
   m_parseCtrlCharacters: 1
   m_isOrthographic: 1
   m_isCullingEnabled: 0

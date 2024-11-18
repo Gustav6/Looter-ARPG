@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
 public class MapManager : MonoBehaviour
@@ -41,19 +42,16 @@ public class MapManager : MonoBehaviour
         }
         else if (Instance != this)
         {
-            Destroy(this);
+            Destroy(gameObject);
             return;
         }
+
+        Settings = GetComponent<MapSettings>();
 
         TokenSource = new();
 
         RegionHeight = 16;
         RegionWidth = 16;
-
-        Settings = GetComponent<MapSettings>();
-
-        cameraReference = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-        Player.Instance.OnRegionSwitch += Instance_OnRegionSwitch;
 
         foreach (TilePair pair in tiles)
         {
@@ -62,6 +60,7 @@ public class MapManager : MonoBehaviour
 
         MapGeneration.GenerateMapAsync(this, MapPrefab);
 
+        SceneManager.sceneLoaded += OnSceneLoad;
         MapGeneration.OnGenerationCompleted += MapGeneration_OnGenerationCompleted;
     }
 
@@ -75,16 +74,14 @@ public class MapManager : MonoBehaviour
 
     private void OnDisable()
     {
-        TokenSource.Cancel();
+        if (Instance == this)
+        {
+            TokenSource.Cancel();
+        }
     }
 
     private void MapGeneration_OnGenerationCompleted(object sender, EventArgs e)
     {
-        if (!currentMap.gameObject.activeInHierarchy)
-        {
-            StartCoroutine(TryToLoadMap(currentMap));
-        }
-
         Settings.seed++;
 
         if (nextMap == null)
@@ -94,7 +91,7 @@ public class MapManager : MonoBehaviour
     }
 
     #region Load map methods
-    public void LoadMap(Map map)
+    private void LoadMap(Map map)
     {
         map.gameObject.SetActive(true);
 
@@ -105,11 +102,11 @@ public class MapManager : MonoBehaviour
         UpdateActiveRegions();
     }
 
-    private IEnumerator TryToLoadMap(Map mapToLoad)
+    public IEnumerator TryToLoadMap(Map mapToLoad)
     {
         tryingToLoadMap = true;
 
-        while (mapToLoad == null || !mapToLoad.generationComplete)
+        while (Player.Instance == null || mapToLoad == null || !mapToLoad.generationComplete)
         {
             yield return null;
         }
@@ -127,6 +124,19 @@ public class MapManager : MonoBehaviour
 
         tryingToLoadMap = false;
     }
+
+
+    private void OnSceneLoad(Scene scene, LoadSceneMode mode)
+    {
+        cameraReference = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+
+        if (Player.Instance != null)
+        {
+            Player.Instance.OnRegionSwitch -= Instance_OnRegionSwitch;
+            Player.Instance.OnRegionSwitch += Instance_OnRegionSwitch;
+        }
+    }
+
     #endregion
 
     #region Update active regions

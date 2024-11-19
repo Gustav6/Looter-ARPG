@@ -1,25 +1,32 @@
 using JetBrains.Annotations;
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine; 
 
-public class Projectile : MonoBehaviour
+public abstract class Projectile : MonoBehaviour
 {
-    float destroyBulletTimer = 2;
-    CircleCollider2D colider;
-    float angle;
-    Vector3 prevPosition;
-    private float timer;
-    private int dmgTickCounter;
-    [SerializeField] public int amountOfEnemiesHit;
-    [SerializeField] public RaycastHit2D raycastHit2D;
-    [SerializeField] public RaycastHit2D raycastHit2DTop;
-    [SerializeField] public RaycastHit2D raycastHit2DBottom;
+    private float destroyBulletTimer = 2;
+    private CircleCollider2D colider;
+    private float angle;
+    [HideInInspector] public int amountOfEnemiesHit;
+    [HideInInspector] public RaycastHit2D raycastHit;
     private float sprtRendY;
 
     public Rigidbody2D rb;
     public LayerMask collidableLayers;
     public bool bigProjectile;
+
+    private float tickTimer, tickWaitTime = .5f;
+
+    private const float skinWidth = .015f;
+    const float distanceBetweenRays = .25f;
+
+    protected int horizontalRayCount;
+    protected int verticalRayCount;
+
+    private float horizontalRaySpacing;
+    private float verticalRaySpacing;
 
     public virtual void Start()
     {       
@@ -29,8 +36,6 @@ public class Projectile : MonoBehaviour
 
         sprtRendY = GetComponent<SpriteRenderer>().bounds.size.y;
         sprtRendY /= 2;
-
-        prevPosition = transform.position;
     }
 
     public virtual void Update()
@@ -49,52 +54,83 @@ public class Projectile : MonoBehaviour
 
     public virtual void FixedUpdate()
     {
-        float distance = Vector2.Distance(transform.position, transform.position + (Vector3)rb.linearVelocity * Time.fixedDeltaTime);
-        Debug.Log(distance);
-        raycastHit2D = Physics2D.Raycast(transform.position, rb.linearVelocity, distance, collidableLayers);
-        Debug.DrawRay(transform.position, rb.linearVelocity.normalized * distance, Color.red);
-        if (bigProjectile)
+        if (ProjectileHit())
         {
-            raycastHit2D = Physics2D.Raycast(transform.position + new Vector3(0, sprtRendY, 0), rb.linearVelocity, distance, collidableLayers);
-            raycastHit2D = Physics2D.Raycast(transform.position - new Vector3(0, sprtRendY, 0), rb.linearVelocity, distance, collidableLayers);
-            Debug.DrawRay(transform.position - new Vector3(0, sprtRendY, 0), rb.linearVelocity.normalized * distance, Color.red);
-            Debug.DrawRay(transform.position + new Vector3(0, sprtRendY, 0), rb.linearVelocity.normalized * distance, Color.red);
-        }
-
-
-        if (raycastHit2D || raycastHit2DBottom || raycastHit2DTop)
-        {
-            IDamagable damagable = raycastHit2D.transform.GetComponent<IDamagable>();
-
-            if (damagable != null)
+            if (raycastHit.transform.TryGetComponent<IDamagable>(out var damagable))
             {
                 damagable.Damage(GunController.Damage);
-
-                if (GunController.fireDmg)
-                {
-                    timer += Time.deltaTime;
-                    if (timer >= 1)
-                    {
-                        damagable.Damage(GunController.Damage/ 5);
-                        timer = 0;
-                        dmgTickCounter += 1;
-
-                        if (dmgTickCounter >= 10)
-                        {
-                            
-                            dmgTickCounter = 0;
-                        }
-                    }
-                }
+                OnHit(raycastHit, damagable);
             }
              
             Destroy(gameObject);
-            Debug.Log("Träffade något " + raycastHit2D.collider.tag);
+            Debug.Log("Träffade något " + raycastHit.collider.tag);
+        }
+    }
+
+    public virtual void OnHit(RaycastHit2D hit, IDamagable damagable)
+    {
+        DamagePopUpText(hit.transform.position, GunController.Damage);
+    }
+
+    private bool ProjectileHit()
+    {
+        for (int i = 0; i < 3; i++)
+        {
+            float distance = Vector2.Distance(transform.position, transform.position + (Vector3)rb.linearVelocity * Time.fixedDeltaTime);
+            raycastHit = Physics2D.Raycast(transform.position, rb.linearVelocity, distance, collidableLayers);
+            Debug.DrawRay(transform.position, rb.linearVelocity.normalized, Color.red);
+
+            if (raycastHit)
+            {
+                return true;
+            }
+
+            //if (bigProjectile)
+            //{
+            //    raycastHit = Physics2D.Raycast(transform.position + new Vector3(0, sprtRendY, 0), rb.linearVelocity, distance, collidableLayers);
+            //    raycastHit = Physics2D.Raycast(transform.position - new Vector3(0, sprtRendY, 0), rb.linearVelocity, distance, collidableLayers);
+            //    Debug.DrawRay(transform.position - new Vector3(0, sprtRendY, 0), rb.linearVelocity.normalized * distance, Color.green);
+            //    Debug.DrawRay(transform.position + new Vector3(0, sprtRendY, 0), rb.linearVelocity.normalized * distance, Color.green);
+            //}
         }
 
-        prevPosition = transform.position;
+        return false;
+    }
 
+    public IEnumerator TickDamage(Transform hit, IDamagable damagable)
+    {
+        while (tickTimer <= 10)
+        {
+            damagable.Damage(10);
+            tickTimer++;
+            DamagePopUpText(hit.transform.position, 10);
 
+            Debug.Log("Tick dmg");
+            yield return new WaitForSeconds(tickWaitTime);
+        }
+
+        Debug.Log("Tick dmg done");
+    }
+
+    public void DamagePopUpText(Vector3 spawnPosition, int damage)
+    {
+        GameObject textPopUp = Instantiate(GunController.Instance.damagePopupPrefab, spawnPosition, Quaternion.identity);
+        textPopUp.GetComponent<TextMeshPro>().text = damage.ToString();
+    }
+
+    void CalculateRaySpacing()
+    {
+        Bounds bounds = colider.bounds;
+        bounds.Expand(skinWidth * -2);
+
+        float boundsWidth = bounds.size.x;
+        float boundsHeight = bounds.size.y;
+
+        horizontalRayCount = Mathf.Clamp(Mathf.RoundToInt(boundsHeight / distanceBetweenRays), 2, 2 + Mathf.RoundToInt(boundsHeight / distanceBetweenRays));
+        verticalRayCount = Mathf.Clamp(Mathf.RoundToInt(boundsWidth / distanceBetweenRays), 2, 2 + Mathf.RoundToInt(boundsWidth / distanceBetweenRays));
+
+        horizontalRaySpacing = bounds.size.y / (horizontalRayCount - 1);
+        verticalRaySpacing = bounds.size.x / (verticalRayCount - 1);
     }
 }
 

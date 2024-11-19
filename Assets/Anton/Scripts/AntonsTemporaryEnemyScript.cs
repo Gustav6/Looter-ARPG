@@ -3,60 +3,44 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class AntonsTemporaryEnemyScript : MonoBehaviour
+public class AntonsTemporaryEnemyScript : MonoBehaviour, IDamagable
 {
-    public GameObject damagePopupPrefab;   
-    public int maxhealth = 100;
-    [SerializeField] public int currenthealth;
-    private bool startTimer;
-    private float timer;
-    private int dmgTickCounter;
+    private int health;
 
-    public static int dmgTakenEnemy;
+    public int CurrentHealth 
+    { 
+        get => health; 
+        set 
+        {
+            if (value > MaxHealth)
+            {
+                health = MaxHealth;
+            }
+            else if (value < 0)
+            {
+                health = 0;
+                OnDeath();
+            }
+            else
+            {
+                health = value;
+            }
+        } 
+    }
+    [field: SerializeField] public int MaxHealth { get; set; }
 
     private void Start()
     {
-        currenthealth = maxhealth;
+        CurrentHealth = MaxHealth;
     }
 
-    private void Update()
+    public void Damage(int damageAmount)
     {
-        if (startTimer)
-        {
-            timer += Time.deltaTime;
-            if (timer >= 1)
-            {
-                TakeDamage(GunController.Damage / 5);
-                timer = 0;
-                dmgTickCounter += 1;
-
-                if (dmgTickCounter >= 10)
-                {
-                    startTimer = false;
-                    dmgTickCounter = 0;
-                }
-            }
-        }
-
+        CurrentHealth -= damageAmount;
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
-    {   
-            if (collision.tag == "Fire")
-            {
-               startTimer = true;
-            }        
-    }
-
-    public void TakeDamage(int damage)
+    public void OnDeath()
     {
-        currenthealth -= damage;
-        dmgTakenEnemy = damage;
-        Instantiate(damagePopupPrefab, transform.position, Quaternion.identity);
-
-        if (currenthealth <= 0)
-        {
-            Destroy(gameObject);
-        }
+        Destroy(gameObject);
     }
 }

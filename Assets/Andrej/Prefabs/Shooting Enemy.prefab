@@ -151,7 +151,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -250,6 +250,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   idle: {fileID: 4795851339469953032}
   navigate: {fileID: 1740141281623109131}
+  enemyProperties: {fileID: 1953963940699207726}
+  radius: 0
 --- !u!114 &4795851339469953032
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -367,5 +369,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 257c3385f4f62c248b5b1609b23fbe58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  distance: 22
+  enemyProperties: {fileID: 1953963940699207726}
+  radius: 10
   attackRange: 10

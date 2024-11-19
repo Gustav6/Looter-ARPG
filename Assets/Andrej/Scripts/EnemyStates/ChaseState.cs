@@ -4,8 +4,8 @@ using UnityEngine;
 
 public class ChaseState : State
 {
-    EnemyProperties enemyProperties;
-    public float distance = 10;
+    public EnemyProperties enemyProperties;
+    public float radius = 12;
     public float attackRange = 0.1f;
 
     public void Chase()
@@ -26,7 +26,7 @@ public class ChaseState : State
     {
 
         Chase();
-        if (enemyProperties.distanceToPlayer > distance)
+        if (enemyProperties.distanceToPlayer > radius)
         {
             isComplete = true;
             Debug.Log("chase complete");
@@ -36,5 +36,14 @@ public class ChaseState : State
     public override void Exit()
     {
 
+    }
+
+    private void OnDrawGizmos()
+    {
+        if(!isComplete)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, radius);
+        }
     }
 }

@@ -34,13 +34,16 @@ public class EnemyBehaviour : Core
             {
                 Set(chaseState);
             }
-            else if (state == chaseState && enemyProperties.distanceToPlayer < 1.5 && state.time > 2)
+            else if (state == chaseState)
             {
-                Set(attackState, true);
-            }
-            else if(state == chaseState && state.time > 3) 
-            {
-                Set(patrolState);
+                if (enemyProperties.distanceToPlayer < 1.5 && state.time > 1)
+                {
+                    Set(attackState, true);
+                }
+                else if (state.time > 1.5)
+                {
+                    Set(patrolState);
+                }
             }
 
         }

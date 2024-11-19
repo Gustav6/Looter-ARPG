@@ -4,10 +4,11 @@ using UnityEngine;
 
 public class AttackState : State
 {
+    EnemyProperties enemyProperties;
     public override void Enter() 
     {
-        Debug.Log("is attacking");
         isComplete = true;
+        Debug.Log("attacking");
     }
     public override void Do() 
     {

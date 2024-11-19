@@ -288,6 +288,10 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2045918298356660606, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
+      propertyPath: radius
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 2045918298356660606, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: 'moveSpots.Array.data[0]'
       value: 
       objectReference: {fileID: 0}
@@ -307,6 +311,10 @@ PrefabInstance:
       propertyPath: 'moveSpots.Array.data[4]'
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 2552159463489457514, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 4239414238914401201, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: enemyProperties
       value: 
@@ -314,6 +322,10 @@ PrefabInstance:
     - target: {fileID: 4321649477641307041, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: speed
       value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 4321649477641307041, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
+      propertyPath: distanceToPlayer
+      value: 999999
       objectReference: {fileID: 0}
     - target: {fileID: 7150605382936732098, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: m_LocalPosition.x
@@ -362,6 +374,10 @@ PrefabInstance:
     - target: {fileID: 8525698252564195251, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: m_IsActive
       value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8767022211466439376, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
+      propertyPath: radius
+      value: 12
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -593,9 +609,25 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2707309682483615198, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
+      propertyPath: radius
+      value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 2707309682483615198, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
+      propertyPath: attackRange
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 4034984483810168527, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
       propertyPath: m_Name
       value: Shooting Enemy
+      objectReference: {fileID: 0}
+    - target: {fileID: 4034984483810168527, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7164286031740124167, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
+      propertyPath: radius
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 7164286031740124167, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
       propertyPath: 'moveSpots.Array.data[0]'
@@ -754,7 +786,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4432005165935021020, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 10
+      value: 23.34
       objectReference: {fileID: 0}
     - target: {fileID: 4432005165935021020, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: m_LocalPosition.y

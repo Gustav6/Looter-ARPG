@@ -44,7 +44,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 257c3385f4f62c248b5b1609b23fbe58, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  distance: 15
+  enemyProperties: {fileID: 4321649477641307041}
+  radius: 12
   attackRange: 1
 --- !u!1 &6020918913694519885
 GameObject:
@@ -138,6 +139,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   idle: {fileID: 7270396774483703595}
   navigate: {fileID: 4239414238914401201}
+  enemyProperties: {fileID: 4321649477641307041}
+  radius: 0
 --- !u!114 &7270396774483703595
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -163,7 +166,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   randomDir: {x: 0, y: 0}
-  enemyProperties: {fileID: 0}
+  enemyProperties: {fileID: 4321649477641307041}
 --- !u!1 &8525698252564195251
 GameObject:
   m_ObjectHideFlags: 0
@@ -315,7 +318,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0

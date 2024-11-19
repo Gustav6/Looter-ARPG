@@ -93,9 +93,8 @@ public class Pot : MonoBehaviour, IDamagable
 
         if (loot != null)
         {
-            Transform parent = MapManager.Instance.currentMap.transform.GetChild(1);
 
-            GameObject g = MapManager.Instance.SpawnPrefab(lootPrefab, Vector3Int.FloorToInt(transform.position), MapManager.Instance.currentMap, parent);
+            GameObject g = MapManager.Instance.SpawnPrefab(lootPrefab, Vector3Int.FloorToInt(transform.position), MapManager.Instance.currentMap);
             g.GetComponent<SpriteRenderer>().sprite = loot.lootSprite;
         }
 

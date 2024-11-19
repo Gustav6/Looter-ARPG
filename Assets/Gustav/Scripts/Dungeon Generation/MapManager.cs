@@ -197,14 +197,14 @@ public class MapManager : MonoBehaviour
     }
     #endregion
 
-    public GameObject SpawnPrefab(GameObject prefab, Vector3Int tileSpawnPosition, Map map, Transform parent, bool activeStatus = true)
+    public GameObject SpawnPrefab(GameObject prefab, Vector3Int tileSpawnPosition, Map map, bool activeStatus = true)
     {
         if (map.startingRoom.groundTiles.Contains(tileSpawnPosition) && Settings.doNotAllowInStartingRoom.Contains(prefab))
         {
             return null;
         }
 
-        GameObject spawnedPrefab = Instantiate(prefab, tileSpawnPosition + new Vector3(0.5f, 0.5f), Quaternion.identity, parent);
+        GameObject spawnedPrefab = Instantiate(prefab, tileSpawnPosition + new Vector3(0.5f, 0.5f), Quaternion.identity, map.ActiveGameObjectsParent.transform);
         SetGameObjectsRegion(spawnedPrefab, map.MapRegions);
         spawnedPrefab.SetActive(activeStatus);
 

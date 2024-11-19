@@ -13,7 +13,7 @@ GameObject:
   - component: {fileID: 3801104038763376865}
   - component: {fileID: 8051332948224252702}
   - component: {fileID: 7290404244658454857}
-  m_Layer: 0
+  m_Layer: 3
   m_Name: Pot
   m_TagString: Destructible
   m_Icon: {fileID: 0}

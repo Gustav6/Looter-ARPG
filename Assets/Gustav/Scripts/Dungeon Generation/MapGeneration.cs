@@ -266,7 +266,7 @@ public static class MapGeneration
     {
         for (int i = 0; i < gameObjectPairs.Count; i++)
         {
-            manager.SpawnPrefab(gameObjectPairs[i].gameObject, gameObjectPairs[i].position, map, map.ActiveGameObjectsParent.transform, false);
+            manager.SpawnPrefab(gameObjectPairs[i].gameObject, gameObjectPairs[i].position, map, false);
 
             if (i > 0 && i % 10 == 0)
             {
@@ -354,7 +354,7 @@ public static class MapGeneration
             position = RandomPositionInStrip(manager.Settings.stripSize.x, manager.Settings.stripSize.y) - offset;
         }
 
-        return new Room(roomWidth, roomHeight, position, manager.Settings.roundCorners);
+        return new Room(roomWidth, roomHeight, position, rng, manager.Settings.roundCorners);
     }
 
     #region Random Position
@@ -991,34 +991,37 @@ public static class MapGeneration
         Vector3Int tilePosition;
         Vector2 offset;
 
-        for (int i = 0; i < manager.Settings.amountOfNoiseLoops; i++)
+        foreach (PerlinNoiseMap noiseMapSettings in manager.Settings.perlinNoiseMaps)
         {
-            offset = new(rng.Next(-100000, 100000), rng.Next(-100000, 100000));
-
-            float[] noiseMap = NoiseMapGenerator.GenerateMap(width, height, manager.Settings.seed, manager.Settings.noiseScale, manager.Settings.octaves, manager.Settings.persistence, manager.Settings.lacunarity, offset);
-
-            for (int j = 0; j < noiseMap.Length; j++)
+            for (int i = 0; i < noiseMapSettings.amountOfNoiseLoops; i++)
             {
-                tilePosition = new((j % width) - (width / 2) + center.x, (j / width) - (height / 2) + center.y);
+                offset = new(rng.Next(-100000, 100000), rng.Next(-100000, 100000));
 
-                if (!tileMaps[TileMapType.ground].Contains(tilePosition) || !availableGroundPositions.Contains(tilePosition))
+                float[] noiseMap = NoiseMapGenerator.GenerateMap(width, height, manager.Settings.seed, noiseMapSettings.noiseScale, noiseMapSettings.octaves, noiseMapSettings.persistence, noiseMapSettings.lacunarity, offset);
+
+                for (int j = 0; j < noiseMap.Length; j++)
                 {
-                    continue;
-                }
+                    tilePosition = new((j % width) - (width / 2) + center.x, (j / width) - (height / 2) + center.y);
 
-                currentHeight = noiseMap[j];
-
-                foreach (NoiseRegion region in manager.Settings.prefabs)
-                {
-                    if (currentHeight <= region.heightValue)
+                    if (!tileMaps[TileMapType.ground].Contains(tilePosition) || !availableGroundPositions.Contains(tilePosition))
                     {
-                        if (region.prefab != null)
-                        {
-                            gameObjects.Add(new GameObjectPositionPair { gameObject = region.prefab, position = tilePosition });
-                            availableGroundPositions.Remove(tilePosition);
-                        }
+                        continue;
+                    }
 
-                        break;
+                    currentHeight = noiseMap[j];
+
+                    foreach (NoiseRegion region in noiseMapSettings.prefabs)
+                    {
+                        if (currentHeight <= region.heightValue)
+                        {
+                            if (region.prefab != null)
+                            {
+                                gameObjects.Add(new GameObjectPositionPair { gameObject = region.prefab, position = tilePosition });
+                                availableGroundPositions.Remove(tilePosition);
+                            }
+
+                            break;
+                        }
                     }
                 }
             }

@@ -105,19 +105,20 @@ public class MapSettings : MonoBehaviour
     #endregion
 
     #region Perlin Noise
-    [Foldout("Perlin Noise")]
-    public int amountOfNoiseLoops;
-    [Foldout("Perlin Noise")]
-    public float noiseScale;
-    [Foldout("Perlin Noise")]
-    public int octaves;
-    [Foldout("Perlin Noise")]
-    [Range(0, 1)] public float persistence;
-    [Foldout("Perlin Noise")]
-    public float lacunarity;
-    [Foldout("Perlin Noise")]
-    public NoiseRegion[] prefabs;
+    [Foldout("Perlin Noise Map")]
+    public PerlinNoiseMap[] perlinNoiseMaps;
     #endregion
+}
+
+[Serializable]
+public struct PerlinNoiseMap
+{
+    public int amountOfNoiseLoops;
+    public float noiseScale;
+    public int octaves;
+    [Range(0, 1)] public float persistence;
+    public float lacunarity;
+    public NoiseRegion[] prefabs;
 }
 
 [Serializable]

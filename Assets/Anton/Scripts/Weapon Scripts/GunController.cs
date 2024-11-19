@@ -7,6 +7,9 @@ using UnityEngine;
 
 public class GunController : MonoBehaviour
 {
+    public static GunController Instance { get; private set; }
+
+    public GameObject damagePopupPrefab;
     [SerializeField] public ScriptableObjectsGuns gun;
     public Transform firePoint;
     public Transform firePoint2;
@@ -26,6 +29,20 @@ public class GunController : MonoBehaviour
     #endregion
 
     private float attackTimer;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+    }
+
     void Start()
     {
         Damage = gun.damage;
@@ -96,6 +113,7 @@ public class GunController : MonoBehaviour
     {
         GameObject bullet = Instantiate(gun.bulletPrefab, firePoint.transform.position, Quaternion.identity);
         bullet.GetComponent<Rigidbody2D>().AddForce(firePoint.right * gun.fireForce, ForceMode2D.Impulse);
+        CameraShake.ShakeCamera();
 
         if (gun.effects != null && gun.effects.Length != 0)
         {
@@ -106,6 +124,7 @@ public class GunController : MonoBehaviour
             }
         }
         ammo -= 1;
+        CameraShake.StopShake();
     }
 
     void Reload()

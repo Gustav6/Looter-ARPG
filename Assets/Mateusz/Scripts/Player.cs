@@ -66,7 +66,7 @@ public class Player : MonoBehaviour, IDamagable
             {
                 health = MaxHealth;
             }
-            else if (value < 0)
+            else if (value <= 0)
             {
                 OnDeath();
             }

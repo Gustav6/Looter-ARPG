@@ -1,35 +1,35 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class ChaseState : State
 {
     public EnemyProperties enemyProperties;
     public float radius = 12;
-    public float attackRange = 0.1f;
-
     public void Chase()
     {
-        if (Vector2.Distance(transform.position, enemyProperties.player.transform.position) > attackRange)
+        enemyProperties.transform.position = Vector2.MoveTowards(transform.position, enemyProperties.player.transform.position, enemyProperties.speed * Time.deltaTime);
+    }
+    public override void Enter()
+    {
+
+    }
+    public override void Do()
+    {
+        if (!enemyProperties.isHit)
         {
-            enemyProperties.transform.position = Vector2.MoveTowards(transform.position, enemyProperties.player.transform.position, enemyProperties.speed * Time.deltaTime);
+            Chase();
         }
         else
         {
             isComplete = true;
         }
-    }
-    public override void Enter()
-    {
-    }
-    public override void Do()
-    {
 
-        Chase();
         if (enemyProperties.distanceToPlayer > radius)
         {
             isComplete = true;
-            Debug.Log("chase complete");
         }
     }
 

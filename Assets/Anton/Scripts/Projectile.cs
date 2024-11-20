@@ -6,7 +6,7 @@ using UnityEngine;
 
 public abstract class Projectile : MonoBehaviour
 {
-    private float destroyBulletTimer = 2;
+    private float destroyBulletTimer = 1;
     private CircleCollider2D colider;
     private float angle;
     [HideInInspector] public int amountOfEnemiesHit;
@@ -78,7 +78,7 @@ public abstract class Projectile : MonoBehaviour
         {
             float distance = Vector2.Distance(transform.position, transform.position + (Vector3)rb.linearVelocity * Time.fixedDeltaTime);
             raycastHit = Physics2D.Raycast(transform.position, rb.linearVelocity, distance, collidableLayers);
-            Debug.DrawRay(transform.position, rb.linearVelocity.normalized, Color.red);
+            Debug.DrawRay(transform.position, rb.linearVelocity.normalized * distance, Color.red);
 
             if (raycastHit)
             {

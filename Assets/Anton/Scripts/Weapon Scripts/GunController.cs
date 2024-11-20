@@ -52,6 +52,8 @@ public class GunController : MonoBehaviour
         pierceAmount = gun.amountOfPircableEnemies;
         fireForce = gun.fireForce;
 
+        
+
         #region Set Static Variables
         pierce = false;
         explosion = false;
@@ -93,8 +95,16 @@ public class GunController : MonoBehaviour
                 {
                     Attack();
                     attackTimer = 0;                 
-                }              
+                }
+                else
+                {
+                    CameraShake.StopShakeCamera();
+                }   
             }
+            else
+            {
+                CameraShake.StopShakeCamera();
+            }         
         }
 
         if (Input.GetKeyDown(KeyCode.R))
@@ -113,7 +123,7 @@ public class GunController : MonoBehaviour
     {
         GameObject bullet = Instantiate(gun.bulletPrefab, firePoint.transform.position, Quaternion.identity);
         bullet.GetComponent<Rigidbody2D>().AddForce(firePoint.right * gun.fireForce, ForceMode2D.Impulse);
-        CameraShake.ShakeCamera();
+        CameraShake.ShakeCamera(3);
 
         if (gun.effects != null && gun.effects.Length != 0)
         {
@@ -123,8 +133,7 @@ public class GunController : MonoBehaviour
                 bullet2.GetComponent<Rigidbody2D>().AddForce(firePoint.right * gun.fireForce, ForceMode2D.Impulse);
             }
         }
-        ammo -= 1;
-        CameraShake.StopShake();
+        ammo -= 1;    
     }
 
     void Reload()

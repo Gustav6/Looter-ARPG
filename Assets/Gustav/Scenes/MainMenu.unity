@@ -408,6 +408,14 @@ PrefabInstance:
       value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: perlinNoiseMaps.Array.data[0].name
+      value: Breakable Cover
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: perlinNoiseMaps.Array.data[1].name
+      value: Prefabs
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].octaves
       value: 5
       objectReference: {fileID: 0}
@@ -453,7 +461,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.size
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.data[0].name
@@ -473,7 +481,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[1].name
-      value: Barbed Wire
+      value: Trap
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[2].name
@@ -498,14 +506,14 @@ PrefabInstance:
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[1].prefab
       value: 
-      objectReference: {fileID: 8548155712904617770, guid: 178d85451fffb4649904d21284ae247f, type: 3}
+      objectReference: {fileID: 7687138853657912553, guid: f5fbfca504f544347a5c2c54d12a41ed, type: 3}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[2].prefab
       value: 
       objectReference: {fileID: 1068416146607333672, guid: 10a86bf65cd7a6d47a88f8aa21c75727, type: 3}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.data[0].heightValue
-      value: 0.225
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.data[1].heightValue
@@ -517,16 +525,24 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[0].heightValue
-      value: 0.1
+      value: 0.15
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[1].heightValue
-      value: 0.135
+      value: 0.195
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[2].heightValue
       value: 0.15
       objectReference: {fileID: 0}
+    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: tiles.Array.data[0].tile
+      value: 
+      objectReference: {fileID: 11400000, guid: 00a767e073315744ca30b088cf81ffce, type: 2}
+    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: tiles.Array.data[1].tile
+      value: 
+      objectReference: {fileID: 11400000, guid: f01ce3f1289e516448379e45243aa6e4, type: 2}
     - target: {fileID: 3649946842529648313, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0

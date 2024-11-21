@@ -113,6 +113,7 @@ public class MapSettings : MonoBehaviour
 [Serializable]
 public struct PerlinNoiseMap
 {
+    public string name;
     public int amountOfNoiseLoops;
     public float noiseScale;
     public int octaves;

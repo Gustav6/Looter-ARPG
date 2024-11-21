@@ -24,6 +24,6 @@ public static class NoiseMapGenerator
 public struct NoiseRegion
 {
     public string name;
-    public float heightValue;
+    [Range(0, 1)] public float heightValue;
     public GameObject prefab;
 }

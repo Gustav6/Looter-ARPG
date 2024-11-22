@@ -10,7 +10,7 @@ public class Map : MonoBehaviour
 
     public Dictionary<Vector2Int, List<GameObject>> MapRegions { get; set; }
 
-    public Room startingRoom;
+    public Room startRoom, endRoom;
 
     public bool generationComplete = false;
 }

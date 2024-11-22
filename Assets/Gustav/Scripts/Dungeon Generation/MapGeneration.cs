@@ -112,7 +112,8 @@ public static class MapGeneration
             }
             #endregion
 
-            mapReference.startingRoom = mainRooms.First();
+            mapReference.startRoom = mainRooms.First();
+            mapReference.endRoom = mainRooms.ElementAt(1);
 
             // Noise maps corner variables
             Vector3Int noiseMapTopRight = Vector3Int.zero, noiseMapBottomLeft = Vector3Int.zero;
@@ -120,6 +121,17 @@ public static class MapGeneration
             // Add rooms tiles to dictionary tiles and set noise maps corner variables
             foreach (Room room in mainRooms)
             {
+                if (room != mapReference.startRoom || room != mapReference.endRoom)
+                {
+                    float distanceFromStartToEnd = Vector2.Distance(mapReference.startRoom.WorldPosition, mapReference.endRoom.WorldPosition);
+                    float distanceFromStartToCurrentRoom = Vector2.Distance(mapReference.startRoom.WorldPosition, room.WorldPosition);
+
+                    if (distanceFromStartToEnd < distanceFromStartToCurrentRoom)
+                    {
+                        mapReference.endRoom = room;
+                    }
+                }
+
                 tileMaps[TileMapType.ground].UnionWith(room.groundTiles);
                 tileMaps[TileMapType.wall].UnionWith(room.walls);
 
@@ -162,8 +174,8 @@ public static class MapGeneration
             // Remove the players spawn position and surrounding tiles from available list
             Vector2Int tempTopRightPosition, tempBottomLeftPosition;
 
-            tempTopRightPosition = Vector2Int.CeilToInt(mapReference.startingRoom.WorldPosition) + Vector2Int.one * 2;
-            tempBottomLeftPosition = Vector2Int.FloorToInt(mapReference.startingRoom.WorldPosition) - Vector2Int.one * 2;
+            tempTopRightPosition = Vector2Int.CeilToInt(mapReference.startRoom.WorldPosition) + Vector2Int.one * 2;
+            tempBottomLeftPosition = Vector2Int.FloorToInt(mapReference.startRoom.WorldPosition) - Vector2Int.one * 2;
 
             for (int x = tempBottomLeftPosition.x; x < tempTopRightPosition.x; x++)
             {

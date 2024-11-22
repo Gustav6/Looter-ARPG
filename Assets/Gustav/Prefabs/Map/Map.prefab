@@ -671,3 +671,4 @@ MonoBehaviour:
   <GroundMap>k__BackingField: {fileID: 8799963627368727119}
   <WallMap>k__BackingField: {fileID: 7312442040768145718}
   <ActiveGameObjectsParent>k__BackingField: {fileID: 6732061483527339164}
+  generationComplete: 0

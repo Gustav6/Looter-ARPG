@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 1973434700837603721}
   - component: {fileID: -1524297855155508964}
   - component: {fileID: 722525287799612800}
+  - component: {fileID: 4497735635958541380}
   m_Layer: 0
   m_Name: LootPrefab
   m_TagString: Untagged
@@ -120,7 +121,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -144,25 +145,25 @@ Rigidbody2D:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5256574376307800}
-  m_BodyType: 1
+  m_BodyType: 0
   m_Simulated: 1
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDamping: 0
+  m_Mass: 50
+  m_LinearDamping: 1
   m_AngularDamping: 0.05
-  m_GravityScale: 1
+  m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
   m_ExcludeLayers:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 383
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
-  m_Constraints: 7
+  m_Constraints: 4
 --- !u!114 &722525287799612800
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -175,3 +176,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: be058c55b3006be48ae99cabcbd011c8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  rb: {fileID: -1524297855155508964}
+--- !u!114 &4497735635958541380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5256574376307800}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 757f1c79b2d86674e99d68d115928efb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 128
+  horizontalRayCount: 0
+  verticalRayCount: 0

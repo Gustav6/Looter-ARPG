@@ -20,7 +20,7 @@ MonoBehaviour:
   Ammo: 5
   critChanse: 0
   fireRate: 0.7
-  fireForce: 200
+  fireForce: 100
   reloadTime: 0
   effects: 03000000
   amountOfPircableEnemies: 2

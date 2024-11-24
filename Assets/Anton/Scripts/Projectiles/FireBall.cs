@@ -1,26 +1,19 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Data;
 using UnityEngine;
 
-public class FireBall : BigProjectile
+public class FireBall : Projectile
 {
     public GameObject fireExplosionCiclePrefab;
-    public override void Start()
-    {
-        base.Start();
-    }
-    public override void Update()
-    {
-        base.Update();
-    }
+    private float timer;
 
-    public override void FixedUpdate()
+    public override void OnHit(RaycastHit2D hit, IDamagable damagable)
     {
-        base.FixedUpdate();
+        timer = 0;
+        GunController.Instance.StartCoroutine(TickDamage(hit.transform, damagable));
+        Instantiate(fireExplosionCiclePrefab, transform.position, Quaternion.identity);
 
-        if (raycastHit2D != null)
-        {
-            Instantiate(fireExplosionCiclePrefab, transform.position, Quaternion.identity);
-        }
+        base.OnHit(hit, damagable);
     }
 }

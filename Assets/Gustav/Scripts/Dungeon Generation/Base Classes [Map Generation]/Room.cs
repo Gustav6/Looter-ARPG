@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,7 +49,7 @@ public class Room : IHeapItem<Room>
     public List<Vector3Int> groundTiles = new();
     public readonly int tileCount = 0;
 
-    public Room(int width, int height, Vector2 position, bool roundCorners = false)
+    public Room(int width, int height, Vector2 position, System.Random rng, bool roundCorners = false)
     {
         this.width = width;
         this.height = height;
@@ -102,9 +103,21 @@ public class Room : IHeapItem<Room>
                 }
                 else
                 {
+                    int randomNumber = rng.Next(0, 101);
+
                     if (c1.Intersects(tilePos + (Vector2.one / 2)) || c2.Intersects(tilePos + (Vector2.one / 2)))
                     {
-                        canAdd = true;
+                        if (i % width == 0 || i % width == width || i / width == 0 || i / width == height)
+                        {
+                            if (randomNumber > 50)
+                            {
+                                canAdd = true;
+                            }
+                        }
+                        else
+                        {
+                            canAdd = true;
+                        }
                     }
                 }
             }

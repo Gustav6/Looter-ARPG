@@ -112,7 +112,8 @@ public static class MapGeneration
             }
             #endregion
 
-            mapReference.startingRoom = mainRooms.First();
+            mapReference.startRoom = mainRooms.First();
+            mapReference.endRoom = mainRooms.ElementAt(1);
 
             // Noise maps corner variables
             Vector3Int noiseMapTopRight = Vector3Int.zero, noiseMapBottomLeft = Vector3Int.zero;
@@ -120,6 +121,17 @@ public static class MapGeneration
             // Add rooms tiles to dictionary tiles and set noise maps corner variables
             foreach (Room room in mainRooms)
             {
+                if (room != mapReference.startRoom || room != mapReference.endRoom)
+                {
+                    float distanceFromStartToEnd = Vector2.Distance(mapReference.startRoom.WorldPosition, mapReference.endRoom.WorldPosition);
+                    float distanceFromStartToCurrentRoom = Vector2.Distance(mapReference.startRoom.WorldPosition, room.WorldPosition);
+
+                    if (distanceFromStartToEnd < distanceFromStartToCurrentRoom)
+                    {
+                        mapReference.endRoom = room;
+                    }
+                }
+
                 tileMaps[TileMapType.ground].UnionWith(room.groundTiles);
                 tileMaps[TileMapType.wall].UnionWith(room.walls);
 
@@ -162,8 +174,8 @@ public static class MapGeneration
             // Remove the players spawn position and surrounding tiles from available list
             Vector2Int tempTopRightPosition, tempBottomLeftPosition;
 
-            tempTopRightPosition = Vector2Int.CeilToInt(mapReference.startingRoom.WorldPosition) + Vector2Int.one * 2;
-            tempBottomLeftPosition = Vector2Int.FloorToInt(mapReference.startingRoom.WorldPosition) - Vector2Int.one * 2;
+            tempTopRightPosition = Vector2Int.CeilToInt(mapReference.startRoom.WorldPosition) + Vector2Int.one * 2;
+            tempBottomLeftPosition = Vector2Int.FloorToInt(mapReference.startRoom.WorldPosition) - Vector2Int.one * 2;
 
             for (int x = tempBottomLeftPosition.x; x < tempTopRightPosition.x; x++)
             {
@@ -266,7 +278,7 @@ public static class MapGeneration
     {
         for (int i = 0; i < gameObjectPairs.Count; i++)
         {
-            manager.SpawnPrefab(gameObjectPairs[i].gameObject, gameObjectPairs[i].position, map, map.ActiveGameObjectsParent.transform, false);
+            manager.SpawnPrefab(gameObjectPairs[i].gameObject, gameObjectPairs[i].position, map, false);
 
             if (i > 0 && i % 10 == 0)
             {
@@ -354,7 +366,7 @@ public static class MapGeneration
             position = RandomPositionInStrip(manager.Settings.stripSize.x, manager.Settings.stripSize.y) - offset;
         }
 
-        return new Room(roomWidth, roomHeight, position, manager.Settings.roundCorners);
+        return new Room(roomWidth, roomHeight, position, rng, manager.Settings.roundCorners);
     }
 
     #region Random Position
@@ -991,34 +1003,37 @@ public static class MapGeneration
         Vector3Int tilePosition;
         Vector2 offset;
 
-        for (int i = 0; i < manager.Settings.amountOfNoiseLoops; i++)
+        foreach (PerlinNoiseMap noiseMapSettings in manager.Settings.perlinNoiseMaps)
         {
-            offset = new(rng.Next(-100000, 100000), rng.Next(-100000, 100000));
-
-            float[] noiseMap = NoiseMapGenerator.GenerateMap(width, height, manager.Settings.seed, manager.Settings.noiseScale, manager.Settings.octaves, manager.Settings.persistence, manager.Settings.lacunarity, offset);
-
-            for (int j = 0; j < noiseMap.Length; j++)
+            for (int i = 0; i < noiseMapSettings.amountOfNoiseLoops; i++)
             {
-                tilePosition = new((j % width) - (width / 2) + center.x, (j / width) - (height / 2) + center.y);
+                offset = new(rng.Next(-100000, 100000), rng.Next(-100000, 100000));
 
-                if (!tileMaps[TileMapType.ground].Contains(tilePosition) || !availableGroundPositions.Contains(tilePosition))
+                float[] noiseMap = NoiseMapGenerator.GenerateMap(width, height, manager.Settings.seed, noiseMapSettings.noiseScale, noiseMapSettings.octaves, noiseMapSettings.persistence, noiseMapSettings.lacunarity, offset);
+
+                for (int j = 0; j < noiseMap.Length; j++)
                 {
-                    continue;
-                }
+                    tilePosition = new((j % width) - (width / 2) + center.x, (j / width) - (height / 2) + center.y);
 
-                currentHeight = noiseMap[j];
-
-                foreach (NoiseRegion region in manager.Settings.prefabs)
-                {
-                    if (currentHeight <= region.heightValue)
+                    if (!tileMaps[TileMapType.ground].Contains(tilePosition) || !availableGroundPositions.Contains(tilePosition))
                     {
-                        if (region.prefab != null)
-                        {
-                            gameObjects.Add(new GameObjectPositionPair { gameObject = region.prefab, position = tilePosition });
-                            availableGroundPositions.Remove(tilePosition);
-                        }
+                        continue;
+                    }
 
-                        break;
+                    currentHeight = noiseMap[j];
+
+                    foreach (NoiseRegion region in noiseMapSettings.prefabs)
+                    {
+                        if (currentHeight <= region.heightValue)
+                        {
+                            if (region.prefab != null)
+                            {
+                                gameObjects.Add(new GameObjectPositionPair { gameObject = region.prefab, position = tilePosition });
+                                availableGroundPositions.Remove(tilePosition);
+                            }
+
+                            break;
+                        }
                     }
                 }
             }

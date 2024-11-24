@@ -12,24 +12,31 @@ public class ShotgunShell : MonoBehaviour
     private void Start()
     {      
         gunAngle = GameObject.FindWithTag("Gun").GetComponent<Transform>();
-        startTransform.position = gunAngle.transform.position;
+        startTransform = GameObject.FindWithTag("Gun").GetComponent<Transform>();
 
         var mouseWorldPos = Camera.main.ScreenToWorldPoint(Input.mousePosition);
         mouseWorldPos -= transform.position;
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 3; i++)
         {
             if (mouseWorldPos.y > transform.position.y)
             {
-                float rndF = Random.Range(-0.4f, 0.3f);
-                GameObject bullet1 = Instantiate(pelletPrefab, transform.position, Quaternion.identity);
-                bullet1.GetComponent<Rigidbody2D>().AddForce((gunAngle.transform.right - new Vector3(rndF, 0, 0)) * GunController.fireForce, ForceMode2D.Impulse);
+                for (int a = 0; a < 5; a++)
+                {
+                    GameObject bullet1 = Instantiate(pelletPrefab, transform.position, Quaternion.identity);
+                    bullet1.GetComponent<Rigidbody2D>().AddForce((gunAngle.transform.right -= new Vector3(0.5f, 0, 0)) * GunController.fireForce, ForceMode2D.Impulse);
+                }
+                gunAngle.transform.position = startTransform.position;
+                for (int t = 0; t < 5; t++)
+                {
+                    GameObject bullet2 = Instantiate(pelletPrefab, transform.position, Quaternion.identity);
+                    bullet2.GetComponent<Rigidbody2D>().AddForce((gunAngle.transform.right += new Vector3(0.5f, 0, 0)) * GunController.fireForce, ForceMode2D.Impulse);
+                }
             }
             else if (mouseWorldPos.y <= transform.position.y)
-            {
-                float rndF = Random.Range(-0.4f, 0.3f);
+            {           
                 GameObject bullet1 = Instantiate(pelletPrefab, transform.position, Quaternion.identity);
-                bullet1.GetComponent<Rigidbody2D>().AddForce((gunAngle.transform.right - new Vector3(0, rndF, 0)) * GunController.fireForce, ForceMode2D.Impulse);
+                bullet1.GetComponent<Rigidbody2D>().AddForce((gunAngle.transform.right - new Vector3(0, 0.5f, 0)) * GunController.fireForce, ForceMode2D.Impulse);
             }            
         }
         gunAngle.transform.position = startTransform.position;

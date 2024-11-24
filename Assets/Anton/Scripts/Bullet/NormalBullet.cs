@@ -7,8 +7,6 @@ using UnityEngine;
 
 public class NormalBullet : Projectile
 {
-    public GameObject explosionCiclePrefab;
-
     public override void Start()
     {
         base.Start();

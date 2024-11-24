@@ -9,7 +9,11 @@ public class EnemyProperties : MonoBehaviour, IDamagable
     public float distanceToPlayer;
 
     public float speed;
-    private int health;
+    public int health;
+    public int damage;
+    public int knockback;
+
+    public bool isHit;
 
     Vector2 origin;
     public int CurrentHealth
@@ -47,7 +51,21 @@ public class EnemyProperties : MonoBehaviour, IDamagable
         distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
     }
 
-    public void Damage(int damageAmount)
+    public void OnTriggerEnter2D(Collider2D other)
+    {
+        if (!other.CompareTag("Player"))
+        {
+            return;
+        }
+
+        if (other.TryGetComponent<IDamagable>(out IDamagable damagable))
+        {
+            damagable.Damage(damage);
+            isHit = true;
+        }
+    }
+
+public void Damage(int damageAmount)
     {
         CurrentHealth -= damageAmount;
         Instantiate(damagePopupPrefab, transform.position, Quaternion.identity);

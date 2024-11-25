@@ -13,7 +13,7 @@ public class EnemyProperties : MonoBehaviour, IDamagable
     public int damage;
     public int knockback;
 
-    public bool isHit;
+    public bool isAttacking;
 
     Vector2 origin;
     public int CurrentHealth
@@ -49,20 +49,6 @@ public class EnemyProperties : MonoBehaviour, IDamagable
     private void Update()
     {
         distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
-    }
-
-    public void OnTriggerEnter2D(Collider2D other)
-    {
-        if (!other.CompareTag("Player"))
-        {
-            return;
-        }
-
-        if (other.TryGetComponent<IDamagable>(out IDamagable damagable))
-        {
-            damagable.Damage(damage);
-            isHit = true;
-        }
     }
 
 public void Damage(int damageAmount)

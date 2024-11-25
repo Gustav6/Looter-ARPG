@@ -313,7 +313,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2552159463489457514, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: m_IsTrigger
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4239414238914401201, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: enemyProperties
@@ -321,11 +321,15 @@ PrefabInstance:
       objectReference: {fileID: 940314720}
     - target: {fileID: 4321649477641307041, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: speed
-      value: 3
+      value: 3.05
       objectReference: {fileID: 0}
     - target: {fileID: 4321649477641307041, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: damage
       value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4321649477641307041, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
+      propertyPath: health
+      value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 4321649477641307041, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: distanceToPlayer

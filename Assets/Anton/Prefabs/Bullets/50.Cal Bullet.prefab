@@ -107,7 +107,7 @@ MonoBehaviour:
   rb: {fileID: 3637908344632344400}
   collidableLayers:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 136
   bigProjectile: 0
 --- !u!50 &3637908344632344400
 Rigidbody2D:

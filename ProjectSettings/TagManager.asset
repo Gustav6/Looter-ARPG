@@ -53,6 +53,9 @@ TagManager:
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Loot
+    uniqueID: 943644933
+    locked: 0
   - name: Player
     uniqueID: 2276557581
     locked: 0

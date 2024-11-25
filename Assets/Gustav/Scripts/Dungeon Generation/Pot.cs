@@ -33,12 +33,6 @@ public class Pot : MonoBehaviour, IDamagable
     [SerializeField] private GameObject lootPrefab;
 
     private readonly List<Loot> possibleLoot = new();
-    private Vector2Int region;
-
-    private void Start()
-    {
-        region = new((int)(transform.position.x / MapManager.Instance.RegionWidth), (int)(transform.position.y / MapManager.Instance.RegionHeight));
-    }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
@@ -98,6 +92,6 @@ public class Pot : MonoBehaviour, IDamagable
             g.GetComponent<SpriteRenderer>().sprite = loot.lootSprite;
         }
 
-        MapManager.Instance.RemoveGameObject(gameObject, MapManager.Instance.currentMap.MapRegions, region);
+        MapManager.Instance.RemoveGameObject(gameObject, MapManager.Instance.currentMap.MapRegions);
     }
 }

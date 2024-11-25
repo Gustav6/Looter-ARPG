@@ -178,8 +178,15 @@ public class MapManager : MonoBehaviour
                     continue;
                 }
 
-                for (int i = 0; i < enableList.Count; i++)
+                for (int i = enableList.Count - 1; i >= 0; i--)
                 {
+                    if (enableList[i] == null)
+                    {
+                        Debug.Log("Region had no referance to object");
+                        mapRegions[region].RemoveAt(i);
+                        continue;
+                    }
+
                     enableList[i].SetActive(true);
                 }
 
@@ -191,8 +198,15 @@ public class MapManager : MonoBehaviour
         {
             if (mapRegions.TryGetValue(previousRegion, out var disableList))
             {
-                for (int i = 0; i < disableList.Count; i++)
+                for (int i = disableList.Count - 1; i >= 0; i--)
                 {
+                    if (disableList[i] == null)
+                    {
+                        Debug.Log("Region had no referance to object");
+                        mapRegions[previousRegion].RemoveAt(i);
+                        continue;
+                    }
+
                     disableList[i].SetActive(false);
                 }
             }
@@ -231,11 +245,18 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    public void RemoveGameObject(GameObject g, Dictionary<Vector2Int, List<GameObject>> regionDictionary, Vector2Int region)
+    public void RemoveGameObject(GameObject g, Dictionary<Vector2Int, List<GameObject>> regionDictionary)
     {
+        Vector2Int region = new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y /RegionHeight));
+
         if (regionDictionary.TryGetValue(region, out List<GameObject> gameObjects))
         {
             gameObjects.Remove(g);
+
+            if (gameObjects.Count <= 0)
+            {
+                regionDictionary.Remove(region);
+            }
         }
 
         Destroy(g);

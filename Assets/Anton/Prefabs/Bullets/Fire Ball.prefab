@@ -341,8 +341,6 @@ MonoBehaviour:
   rb: {fileID: 3637908344632344400}
   collidableLayers:
     serializedVersion: 2
-    m_Bits: 8
+    m_Bits: 136
   bigProjectile: 1
-  topRayPos: {fileID: 2743491353204933481}
-  bottomRayPos: {fileID: 1390186940184582223}
   fireExplosionCiclePrefab: {fileID: 3246453459513043161, guid: 7db1d548e2a60e942a268ad191d89ecc, type: 3}

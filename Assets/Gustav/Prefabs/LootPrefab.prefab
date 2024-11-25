@@ -13,7 +13,6 @@ GameObject:
   - component: {fileID: 1973434700837603721}
   - component: {fileID: -1524297855155508964}
   - component: {fileID: 722525287799612800}
-  - component: {fileID: 4497735635958541380}
   m_Layer: 0
   m_Name: LootPrefab
   m_TagString: Untagged
@@ -77,8 +76,8 @@ SpriteRenderer:
   m_AutoUVMaxDistance: 0.5
   m_AutoUVMaxAngle: 89
   m_LightmapParameters: {fileID: 0}
-  m_SortingLayerID: 0
-  m_SortingLayer: 0
+  m_SortingLayerID: 943644933
+  m_SortingLayer: 1
   m_SortingOrder: 0
   m_Sprite: {fileID: -2413806693520163455, guid: ebe73ca9363db456bacf42c025bb4847, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
@@ -150,8 +149,8 @@ Rigidbody2D:
   m_UseFullKinematicContacts: 0
   m_UseAutoMass: 0
   m_Mass: 50
-  m_LinearDamping: 1
-  m_AngularDamping: 0.05
+  m_LinearDamping: 0
+  m_AngularDamping: 1
   m_GravityScale: 0
   m_Material: {fileID: 0}
   m_IncludeLayers:
@@ -162,7 +161,7 @@ Rigidbody2D:
     m_Bits: 383
   m_Interpolate: 0
   m_SleepingMode: 1
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
   m_Constraints: 4
 --- !u!114 &722525287799612800
 MonoBehaviour:
@@ -177,20 +176,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rb: {fileID: -1524297855155508964}
---- !u!114 &4497735635958541380
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5256574376307800}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 757f1c79b2d86674e99d68d115928efb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  collisionMask:
-    serializedVersion: 2
-    m_Bits: 128
-  horizontalRayCount: 0
-  verticalRayCount: 0
+  boxCollider: {fileID: 1973434700837603721}

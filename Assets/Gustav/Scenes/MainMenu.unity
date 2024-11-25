@@ -302,10 +302,6 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIManager
       objectReference: {fileID: 0}
-    - target: {fileID: 6007536782413481001, guid: 06747a0b8372b4649b069ee3b69e655c, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 8185893460374732403, guid: 06747a0b8372b4649b069ee3b69e655c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -360,193 +356,101 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: stripSize.x
-      value: 150
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: roundCorners
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: roomMaxSize.x
-      value: 32
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: roomMaxSize.y
-      value: 28
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: roomMinSize.x
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: roomMinSize.y
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: hallwayMinWidth
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabs.Array.size
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: perlinNoiseMaps.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabs.Array.data[1].name
-      value: Barbed Wire
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabs.Array.data[3].name
-      value: Cover
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabs.Array.data[3].prefab
-      value: 
-      objectReference: {fileID: 8740092898635350770, guid: e77099fea85d40a4cb1cf1a5e89752cf, type: 3}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabs.Array.data[3].heightValue
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: perlinNoiseMaps.Array.data[0].name
-      value: Breakable Cover
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: perlinNoiseMaps.Array.data[1].name
-      value: Prefabs
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: perlinNoiseMaps.Array.data[0].octaves
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].octaves
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: perlinNoiseMaps.Array.data[0].lacunarity
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: perlinNoiseMaps.Array.data[0].noiseScale
-      value: 6
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].lacunarity
-      value: 2
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].noiseScale
-      value: 8
+      value: 7
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].persistence
-      value: 0.2
+      value: 0.45
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].persistence
-      value: 1
+      value: 0.75
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].amountOfNoiseLoops
-      value: 2
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.size
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].amountOfNoiseLoops
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.size
-      value: 2
+      value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.data[0].name
-      value: Wall
+      value: Empty
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.data[1].name
-      value: Barbed Wire
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.data[2].name
-      value: Bush
+      value: Wall
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[0].name
-      value: Barrel
+      value: Cactus
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[1].name
-      value: Trap
+      value: Empty
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[2].name
-      value: Bush
+      value: Barrel
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.data[0].prefab
       value: 
-      objectReference: {fileID: 8740092898635350770, guid: e77099fea85d40a4cb1cf1a5e89752cf, type: 3}
+      objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.data[1].prefab
       value: 
-      objectReference: {fileID: 8548155712904617770, guid: 178d85451fffb4649904d21284ae247f, type: 3}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.data[2].prefab
-      value: 
-      objectReference: {fileID: 1068416146607333672, guid: 10a86bf65cd7a6d47a88f8aa21c75727, type: 3}
+      objectReference: {fileID: 8740092898635350770, guid: e77099fea85d40a4cb1cf1a5e89752cf, type: 3}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[0].prefab
       value: 
-      objectReference: {fileID: 4889750398875816261, guid: 46289d76540a0724e9abe84559d0610c, type: 3}
+      objectReference: {fileID: 5964063023200584229, guid: 911133c5d8bf06445ba6686da926fee6, type: 3}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[1].prefab
       value: 
-      objectReference: {fileID: 7687138853657912553, guid: f5fbfca504f544347a5c2c54d12a41ed, type: 3}
+      objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[2].prefab
       value: 
-      objectReference: {fileID: 1068416146607333672, guid: 10a86bf65cd7a6d47a88f8aa21c75727, type: 3}
+      objectReference: {fileID: 4889750398875816261, guid: 46289d76540a0724e9abe84559d0610c, type: 3}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.data[0].heightValue
-      value: 0
+      value: 0.2
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.data[1].heightValue
-      value: 0.135
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.data[2].heightValue
-      value: 0.15
+      value: 0.3
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[0].heightValue
-      value: 0.1
+      value: 0.085
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[1].heightValue
-      value: 0.145
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[2].heightValue
-      value: 0.15
+      value: 0.125
       objectReference: {fileID: 0}
-    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: tiles.Array.data[0].tile
-      value: 
-      objectReference: {fileID: 11400000, guid: 00a767e073315744ca30b088cf81ffce, type: 2}
-    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: tiles.Array.data[1].tile
-      value: 
-      objectReference: {fileID: 11400000, guid: f01ce3f1289e516448379e45243aa6e4, type: 2}
     - target: {fileID: 3649946842529648313, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -738,6 +642,63 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 1d0b7d2cbca754746887e373d3f919d4, type: 3}
+--- !u!1001 &6579773062978212214
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6780329507980714199, guid: 51fbf7eeb4ea1674c87f1d713c33b584, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 41.084167
+      objectReference: {fileID: 0}
+    - target: {fileID: 6780329507980714199, guid: 51fbf7eeb4ea1674c87f1d713c33b584, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0.56381446
+      objectReference: {fileID: 0}
+    - target: {fileID: 6780329507980714199, guid: 51fbf7eeb4ea1674c87f1d713c33b584, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: -0.21197604
+      objectReference: {fileID: 0}
+    - target: {fileID: 6780329507980714199, guid: 51fbf7eeb4ea1674c87f1d713c33b584, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6780329507980714199, guid: 51fbf7eeb4ea1674c87f1d713c33b584, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6780329507980714199, guid: 51fbf7eeb4ea1674c87f1d713c33b584, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6780329507980714199, guid: 51fbf7eeb4ea1674c87f1d713c33b584, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6780329507980714199, guid: 51fbf7eeb4ea1674c87f1d713c33b584, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6780329507980714199, guid: 51fbf7eeb4ea1674c87f1d713c33b584, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6780329507980714199, guid: 51fbf7eeb4ea1674c87f1d713c33b584, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7192014239374397492, guid: 51fbf7eeb4ea1674c87f1d713c33b584, type: 3}
+      propertyPath: m_Name
+      value: DeadTree
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 51fbf7eeb4ea1674c87f1d713c33b584, type: 3}
 --- !u!1001 &7925014438239649635
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -862,3 +823,4 @@ SceneRoots:
   - {fileID: 7925014438239649635}
   - {fileID: 1347763821}
   - {fileID: 1263983011}
+  - {fileID: 6579773062978212214}

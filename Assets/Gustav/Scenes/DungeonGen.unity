@@ -178,7 +178,7 @@ Transform:
   m_GameObject: {fileID: 136904133}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.46, y: 0.51, z: 0.05133289}
+  m_LocalPosition: {x: 2.46, y: 0.51, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -802,12 +802,16 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4939972271045843890, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
+      propertyPath: m_Size.y
+      value: 2.5
+      objectReference: {fileID: 0}
+    - target: {fileID: 4939972271045843890, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: m_SpriteTilingProperty.oldSize.x
-      value: 1
+      value: 1.25
       objectReference: {fileID: 0}
     - target: {fileID: 4939972271045843890, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: m_SpriteTilingProperty.oldSize.y
-      value: 1
+      value: 2.6666667
       objectReference: {fileID: 0}
     - target: {fileID: 6208955808344946615, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: verticalRayCount
@@ -826,8 +830,12 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8146332157051368663, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 5857286545299137921, guid: 635dc315566e49e48a3588e7ab21d7b8, type: 3}
+    - target: {fileID: 8146332157051368663, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: m_SortingLayer
-      value: 1
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 8146332157051368663, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: m_SortingLayerID

@@ -1026,11 +1026,13 @@ public static class MapGeneration
                     {
                         if (currentHeight <= region.heightValue)
                         {
-                            if (region.prefab != null)
+                            if (region.name == "Empty")
                             {
-                                gameObjects.Add(new GameObjectPositionPair { gameObject = region.prefab, position = tilePosition });
-                                availableGroundPositions.Remove(tilePosition);
+                                break;
                             }
+
+                            gameObjects.Add(new GameObjectPositionPair { gameObject = region.prefab, position = tilePosition });
+                            availableGroundPositions.Remove(tilePosition);
 
                             break;
                         }

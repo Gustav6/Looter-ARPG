@@ -12,6 +12,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 828f49a5081eef44ea41a573971ccfef, type: 3}
   m_Name: Health Potion
   m_EditorClassIdentifier: 
-  lootSprite: {fileID: -1048976394, guid: 623daefd2e8347f4bbad637d8a8a021a, type: 3}
+  lootSprite: {fileID: 5770743209833236987, guid: a27b2b5dda4a64d44a99cff616593265, type: 3}
   lootName: Health Potion
   dropChance: 25

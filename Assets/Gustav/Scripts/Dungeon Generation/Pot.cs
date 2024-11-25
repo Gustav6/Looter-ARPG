@@ -29,6 +29,8 @@ public class Pot : MonoBehaviour, IDamagable
 
     [field: SerializeField] public int MaxHealth { get; set; }
 
+    [SerializeField] private Loot[] guaranteedToDrop;
+
     [SerializeField] private Loot[] lootList;
     [SerializeField] private GameObject lootPrefab;
 
@@ -84,12 +86,20 @@ public class Pot : MonoBehaviour, IDamagable
     public void OnDeath()
     {
         Loot loot = GetLootDrop();
+        GameObject g;
 
         if (loot != null)
         {
-
-            GameObject g = MapManager.Instance.SpawnPrefab(lootPrefab, Vector3Int.FloorToInt(transform.position), MapManager.Instance.currentMap);
+            g = MapManager.Instance.SpawnPrefab(lootPrefab, Vector3Int.FloorToInt(transform.position), MapManager.Instance.currentMap);
             g.GetComponent<SpriteRenderer>().sprite = loot.lootSprite;
+        }
+
+        foreach (Loot guaranteedDrop in guaranteedToDrop)
+        {
+            g = MapManager.Instance.SpawnPrefab(lootPrefab, Vector3Int.FloorToInt(transform.position), MapManager.Instance.currentMap);
+            g.GetComponent<SpriteRenderer>().sprite = guaranteedDrop.lootSprite;
+
+            g.GetComponent<BoxCollider2D>().size = guaranteedDrop.lootSprite.rect.size / 32;
         }
 
         MapManager.Instance.RemoveGameObject(gameObject, MapManager.Instance.currentMap.MapRegions);

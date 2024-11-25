@@ -176,8 +176,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   <MaxHealth>k__BackingField: 100
-  lootList:
-  - {fileID: 11400000, guid: cdb3f50acafbdd142a9425d97099de43, type: 2}
+  guaranteedToDrop:
   - {fileID: 11400000, guid: 3a1339224f824964a992c21427888b4b, type: 2}
+  - {fileID: 11400000, guid: 3a1339224f824964a992c21427888b4b, type: 2}
+  - {fileID: 11400000, guid: 3a1339224f824964a992c21427888b4b, type: 2}
+  lootList:
+  - {fileID: 11400000, guid: 3a1339224f824964a992c21427888b4b, type: 2}
+  - {fileID: 11400000, guid: cdb3f50acafbdd142a9425d97099de43, type: 2}
   - {fileID: 11400000, guid: efc060f5eb044fb46b4fcb22109ca711, type: 2}
   lootPrefab: {fileID: 5256574376307800, guid: 244f191609b6ed04cba28d5e089ff6c6, type: 3}

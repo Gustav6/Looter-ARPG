@@ -19,9 +19,9 @@ MonoBehaviour:
   damage: 150
   Ammo: 3
   critChanse: 0
-  fireRate: 2
+  fireRate: 1.5
   fireForce: 200
   reloadTime: 0
   effects: 03000000
-  amountOfPircableEnemies: 5
+  amountOfPircableEnemies: 2
   damageTypes: 00000000

@@ -19,7 +19,7 @@ MonoBehaviour:
   damage: 50
   Ammo: 12
   critChanse: 0
-  fireRate: 0.2
+  fireRate: 0.8
   fireForce: 150
   reloadTime: 0
   effects: 

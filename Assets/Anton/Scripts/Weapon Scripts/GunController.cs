@@ -18,6 +18,7 @@ public class GunController : MonoBehaviour
     public TextMeshPro ammoCount;
     int ammo;
     float timer;
+    float timerShake;
     #region Public Static Variables
     public static int Damage;
     public static int pierceAmount;
@@ -52,8 +53,6 @@ public class GunController : MonoBehaviour
         pierceAmount = gun.amountOfPircableEnemies;
         fireForce = gun.fireForce;
 
-        
-
         #region Set Static Variables
         pierce = false;
         explosion = false;
@@ -64,7 +63,8 @@ public class GunController : MonoBehaviour
             if (gun.effects.Contains(WeaponEffect.pierceShot))
             {
                 pierce = true;
-            }
+                Projectile.amountOfPiercableObjects = gun.amountOfPircableEnemies;
+            } 
 
             if (gun.effects.Contains(WeaponEffect.expolsiveOnImpact))
             {
@@ -94,18 +94,14 @@ public class GunController : MonoBehaviour
                 if (ammo > 0)
                 {
                     Attack();
-                    attackTimer = 0;                 
-                }
-                else
-                {
-                    CameraShake.StopShakeCamera();
-                }   
+                }  
             }
-            else
-            {
-                CameraShake.StopShakeCamera();
-            }         
         }
+        else if (attackTimer >= gun.fireRate / 4)
+        {
+            CameraShake.StopShakeCamera();
+        }
+       
 
         if (Input.GetKeyDown(KeyCode.R))
         {
@@ -121,10 +117,9 @@ public class GunController : MonoBehaviour
 
     void Attack()
     {
+        CameraShake.ShakeCamera(2);
         GameObject bullet = Instantiate(gun.bulletPrefab, firePoint.transform.position, Quaternion.identity);
         bullet.GetComponent<Rigidbody2D>().AddForce(firePoint.right * gun.fireForce, ForceMode2D.Impulse);
-        CameraShake.ShakeCamera(3);
-
         if (gun.effects != null && gun.effects.Length != 0)
         {
             if (gun.effects.Contains(WeaponEffect.dubbelShot))
@@ -133,7 +128,8 @@ public class GunController : MonoBehaviour
                 bullet2.GetComponent<Rigidbody2D>().AddForce(firePoint.right * gun.fireForce, ForceMode2D.Impulse);
             }
         }
-        ammo -= 1;    
+        ammo -= 1;
+        attackTimer = 0;
     }
 
     void Reload()

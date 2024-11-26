@@ -209,18 +209,18 @@ public class Player : MonoBehaviour, IDamagable
     public void OnTriggerEnter2D(Collider2D other)
     {
         Debug.Log("henlo");
-        var item = other.GetComponent<Item>();
+        var item = other.GetComponent<GroundItem>();
         if (item)
         {
             Debug.Log("henlo2");
-            inventory.AddItem(item.item, 1);
+            inventory.AddItem(new Item(item.item), 1);
             Destroy(other.gameObject);
         }
     }
 
     private void OnApplicationQuit()
     {
-        inventory.Container.Clear();
+        inventory.Container.Items.Clear();
     }
 
     public void Damage(int damageAmount)

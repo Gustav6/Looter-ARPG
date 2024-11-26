@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d661a2c076454b48a6e8b3f01883e04, type: 3}
   m_Name: MegaItem
   m_EditorClassIdentifier: 
-  prefab: {fileID: 2675457018120043439, guid: 2163607ce9ab92b4898429343216b613, type: 3}
+  Id: 0
+  UiDisplay: {fileID: 7873444928579934181, guid: 2d1ce12da9c8eac4885f14e5c986d2e8, type: 3}
   type: 2
   description: Best Item

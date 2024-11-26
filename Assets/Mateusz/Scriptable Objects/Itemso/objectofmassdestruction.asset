@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6d661a2c076454b48a6e8b3f01883e04, type: 3}
   m_Name: objectofmassdestruction
   m_EditorClassIdentifier: 
-  prefab: {fileID: 4123911313103157201, guid: 6ce5b31287b0aa24c920ce50b76f84ce, type: 3}
+  Id: 1
+  UiDisplay: {fileID: -1081035513, guid: eb1c37c4efa0d124792ba35f4aa1df47, type: 3}
   type: 2
   description: 

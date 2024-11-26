@@ -5,12 +5,12 @@ using UnityEngine;
 public class ShootingState : State
 {
     public GameObject projectile;
-    EnemyProperties enemyProperties;
+    public EnemyProperties enemyProperties;
 
     private float timeBtwShots;
     public float startTimeBtwShots;
 
-    public float distance;
+    public float shootDistance;
 
     public void Shoot()
     {
@@ -27,8 +27,6 @@ public class ShootingState : State
     public override void Enter()
     {
         Debug.Log("is attacking");
-        enemyProperties = GetComponentInParent<EnemyProperties>();
-
         timeBtwShots = startTimeBtwShots;
     }
     public override void Do()
@@ -42,8 +40,9 @@ public class ShootingState : State
             timeBtwShots -= Time.deltaTime;
         }
 
-        if (enemyProperties.distanceToPlayer > distance)
+        if (enemyProperties.distanceToPlayer > shootDistance)
         {
+            enemyProperties.isAttacking = false;
             isComplete = true;
         }
     }
@@ -51,5 +50,14 @@ public class ShootingState : State
     public override void Exit()
     {
 
+    }
+
+    private void OnDrawGizmos()
+    {
+        if (!isComplete)
+        {
+            Gizmos.color = Color.red;
+            Gizmos.DrawWireSphere(transform.position, shootDistance);
+        }
     }
 }

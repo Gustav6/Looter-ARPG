@@ -35,13 +35,16 @@ public class ShootingEnemyBehaviour : Core
             {
                 Set(chaseState);
             }
-            else if (state == chaseState && enemyProperties.distanceToPlayer < 30 && state.time > 2)
+            else
             {
-                Set(shootingState, true);
-            }
-            else if (state == chaseState && state.time > 3)
-            {
-                Set(patrolState);
+                if (enemyProperties.isAttacking)
+                {
+                    Set(shootingState);
+                }
+                else
+                {
+                    Set(patrolState);
+                }
             }
         }
         state.DoBranch();

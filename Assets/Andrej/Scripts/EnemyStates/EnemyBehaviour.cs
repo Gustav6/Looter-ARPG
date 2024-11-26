@@ -39,7 +39,6 @@ public class EnemyBehaviour : Core
                 if (enemyProperties.isAttacking)
                 {
                     Set(attackState);
-                    enemyProperties.isAttacking = false;
                 }
                 else
                 {

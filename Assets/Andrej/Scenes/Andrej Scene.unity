@@ -211,6 +211,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2092717768}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &447254344 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 8060619667817851746, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
+  m_PrefabInstance: {fileID: 2092717767}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &737315276
 GameObject:
   m_ObjectHideFlags: 0
@@ -311,8 +316,16 @@ PrefabInstance:
       propertyPath: 'moveSpots.Array.data[4]'
       value: 
       objectReference: {fileID: 0}
+    - target: {fileID: 2492629119233037791, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
+      propertyPath: enemyProperties
+      value: 
+      objectReference: {fileID: 940314720}
     - target: {fileID: 2552159463489457514, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2552159463489457514, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
+      propertyPath: m_UsedByEffector
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4239414238914401201, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
@@ -332,8 +345,16 @@ PrefabInstance:
       value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 4321649477641307041, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
+      propertyPath: knockback
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 4321649477641307041, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: distanceToPlayer
       value: 999999
+      objectReference: {fileID: 0}
+    - target: {fileID: 4690625219934385929, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
+      propertyPath: m_Radius
+      value: 0.8
       objectReference: {fileID: 0}
     - target: {fileID: 7150605382936732098, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: m_LocalPosition.x
@@ -386,6 +407,10 @@ PrefabInstance:
     - target: {fileID: 8767022211466439376, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: radius
       value: 12
+      objectReference: {fileID: 0}
+    - target: {fileID: 8767022211466439376, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
+      propertyPath: attackRange
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -622,8 +647,12 @@ PrefabInstance:
       value: 12
       objectReference: {fileID: 0}
     - target: {fileID: 2707309682483615198, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
+      propertyPath: exitRange
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 2707309682483615198, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
       propertyPath: attackRange
-      value: 5
+      value: 8
       objectReference: {fileID: 0}
     - target: {fileID: 4034984483810168527, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
       propertyPath: m_Name
@@ -633,9 +662,13 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 7039066767658744678, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
+      propertyPath: m_IsTrigger
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7164286031740124167, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
       propertyPath: radius
-      value: 10
+      value: 13
       objectReference: {fileID: 0}
     - target: {fileID: 7164286031740124167, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
       propertyPath: 'moveSpots.Array.data[0]'
@@ -656,6 +689,14 @@ PrefabInstance:
     - target: {fileID: 7164286031740124167, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
       propertyPath: 'moveSpots.Array.data[4]'
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8775378345776500649, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
+      propertyPath: distance
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 8775378345776500649, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
+      propertyPath: shootDistance
+      value: 10
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -798,7 +839,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4432005165935021020, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 23.34
+      value: -24.06
       objectReference: {fileID: 0}
     - target: {fileID: 4432005165935021020, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: m_LocalPosition.y
@@ -858,13 +899,43 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4432005165935021020, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       insertIndex: -1
       addedObject: {fileID: 306148182}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 8060619667817851746, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 2092717772}
   m_SourcePrefab: {fileID: 100100000, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
 --- !u!4 &2092717768 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4432005165935021020, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
   m_PrefabInstance: {fileID: 2092717767}
   m_PrefabAsset: {fileID: 0}
+--- !u!50 &2092717772
+Rigidbody2D:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 447254344}
+  m_BodyType: 0
+  m_Simulated: 1
+  m_UseFullKinematicContacts: 0
+  m_UseAutoMass: 0
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_GravityScale: 0
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_Interpolate: 0
+  m_SleepingMode: 1
+  m_CollisionDetection: 0
+  m_Constraints: 4
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

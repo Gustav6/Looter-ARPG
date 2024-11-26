@@ -5,6 +5,8 @@ using UnityEngine;
 public class EnemyProjectile : MonoBehaviour
 {
     public float speed;
+    public int damage;
+    private float timer;
 
     private Transform player;
     private Vector2 target;
@@ -24,14 +26,23 @@ public class EnemyProjectile : MonoBehaviour
         {
             DestroyProjectile();
         }
+
+        timer = +Time.deltaTime;
     }
 
     private void OnTriggerEnter2D(Collider2D other)
     {
-        if(other.CompareTag("Player")) 
+        if (other.CompareTag("Player"))
+        {
+            if (other.TryGetComponent<IDamagable>(out IDamagable damagable))
+            {
+                damagable.Damage(damage);
+                DestroyProjectile();
+            }
+        }
+        else if(timer  > 0.3)
         {
             DestroyProjectile();
-            Debug.Log("player hit");
         }
     }
 

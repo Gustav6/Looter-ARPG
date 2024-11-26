@@ -51,7 +51,7 @@ public class EnemyProperties : MonoBehaviour, IDamagable
         distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
     }
 
-public void Damage(int damageAmount)
+    public void Damage(int damageAmount)
     {
         CurrentHealth -= damageAmount;
         Instantiate(damagePopupPrefab, transform.position, Quaternion.identity);

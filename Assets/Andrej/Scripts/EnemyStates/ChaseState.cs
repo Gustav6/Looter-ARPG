@@ -27,7 +27,7 @@ public class ChaseState : State
             isComplete = true;
         }
 
-        if(attackRange > enemyProperties.distanceToPlayer && time < 0.5)
+        if(attackRange > enemyProperties.distanceToPlayer && time > 0.5)
         {
             enemyProperties.isAttacking = true;
             isComplete = true;

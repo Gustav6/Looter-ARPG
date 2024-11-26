@@ -151,7 +151,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -201,6 +201,10 @@ MonoBehaviour:
   damagePopupPrefab: {fileID: 5801573854073587537, guid: 46d9f7e137d7efb4c84315a58e250950, type: 3}
   distanceToPlayer: 0
   speed: 10
+  health: 0
+  damage: 0
+  knockback: 0
+  isAttacking: 0
   <MaxHealth>k__BackingField: 125
 --- !u!1 &7971567648934375795
 GameObject:
@@ -323,8 +327,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   projectile: {fileID: 3567864485848625532, guid: 8c8c4874abdb08d41938aca9948e57e9, type: 3}
+  enemyProperties: {fileID: 1953963940699207726}
   startTimeBtwShots: 1
-  distance: 11
+  shootDistance: 0
 --- !u!1 &8925373790125790470
 GameObject:
   m_ObjectHideFlags: 0
@@ -370,5 +375,5 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyProperties: {fileID: 1953963940699207726}
-  radius: 10
+  exitRange: 12
   attackRange: 10

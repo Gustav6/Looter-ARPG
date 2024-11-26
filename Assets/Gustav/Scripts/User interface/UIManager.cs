@@ -29,11 +29,6 @@ public class UIManager : MonoBehaviour
         UnPauseGame();
     }
 
-    private void Update()
-    {
-        TransitionSystem.Update();
-    }
-
     public void PauseGame()
     {
         GamePaused = true;

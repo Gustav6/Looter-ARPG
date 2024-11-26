@@ -99,6 +99,7 @@ public class MapManager : MonoBehaviour
 
         Player.Instance.transform.position = map.startRoom.WorldPosition;
         cameraReference.transform.position = Player.Instance.transform.position;
+
         UpdateActiveRegions();
 
         GameObject g1 = new() { name = "Start Room" };
@@ -159,11 +160,11 @@ public class MapManager : MonoBehaviour
         currentRegions.Clear();
 
         cBottomLeft = Vector2Int.FloorToInt(0.0625f * cameraReference.ScreenToWorldPoint(new Vector3(0, 0, cameraReference.nearClipPlane)));
-        cTopRight = Vector2Int.FloorToInt(0.0625f * cameraReference.ScreenToWorldPoint(new Vector3(cameraReference.pixelWidth, cameraReference.pixelHeight, cameraReference.nearClipPlane)));
+        cTopRight = Vector2Int.CeilToInt(0.0625f * cameraReference.ScreenToWorldPoint(new Vector3(cameraReference.pixelWidth, cameraReference.pixelHeight, cameraReference.nearClipPlane)));
 
-        for (int x = cBottomLeft.x - 1; x < cTopRight.x + 2; x++)
+        for (int x = cBottomLeft.x; x < cTopRight.x + 1; x++)
         {
-            for (int y = cBottomLeft.y - 1; y < cTopRight.y + 2; y++)
+            for (int y = cBottomLeft.y; y < cTopRight.y + 1; y++)
             {
                 region = new(x, y);
 

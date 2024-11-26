@@ -22,11 +22,15 @@ public class WeaponRotate : MonoBehaviour
         {
             // Flip the GameObject's Y scale
             transform.localScale = new Vector3(transform.localScale.x, -Mathf.Abs(transform.localScale.y), transform.localScale.z);
+
+            TransitionSystem.AddTransition(new ScaleTransition(Player.Instance.SpriteTransform, 0.1f, new Vector3(1, 1), TransitionType.SmoothStop2), gameObject);
         }
         else
         {
             // Ensure the Y scale is positive when the rotation is not in the flip range
             transform.localScale = new Vector3(transform.localScale.x, Mathf.Abs(transform.localScale.y), transform.localScale.z);
+
+            TransitionSystem.AddTransition(new ScaleTransition(Player.Instance.SpriteTransform, 0.1f, new Vector3(-1, 1), TransitionType.SmoothStop2), gameObject);
         }
     }
 

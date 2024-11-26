@@ -1,3 +1,4 @@
+using NaughtyAttributes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -8,10 +9,14 @@ using UnityEngine.UI;
 public class Player : MonoBehaviour, IDamagable
 {
     public static Player Instance { get; private set; }
+
+    #region Movement
     public Vector3 Direction { get; private set; }
 
+    [BoxGroup("Movement")]
     public float moveSpeed;
 
+    [BoxGroup("Movement")]
     [SerializeField] private float currentStamina;
     public float Stamina
     {
@@ -33,29 +38,34 @@ public class Player : MonoBehaviour, IDamagable
         }
     }
 
+    [BoxGroup("Movement")]
     public float maxStamina = 100f;
+    [BoxGroup("Movement")]
     public float sprintCost = 25f;
+    [BoxGroup("Movement")]
     public float rechargeTime = 1f;
+    [BoxGroup("Movement")]
+    [SerializeField] private Image staminaProgressUI = null;
 
+    private bool sprinting;
+    #endregion
+
+    #region Invenroty
+    [BoxGroup("Inventory")]
     public InventoryObject inventory;
 
-    [SerializeField]
-    private Image staminaProgressUI = null;
-    [SerializeField]
-    private CanvasGroup sliderCanvasGroup = null;
+    [BoxGroup("Inventory")]
+    [SerializeField] private CanvasGroup sliderCanvasGroup = null;
 
+    [BoxGroup("Inventory")]
     public GameObject inventoryCanvas;
 
-    bool inventoryOpen;
-    bool sprinting;
+    private bool inventoryOpen;
+    #endregion
 
-    Controller2D controller;
-
-    public event EventHandler OnRegionSwitch;
-    public Vector2Int CurrentRegion { get; private set; }
-    public Vector2Int PreviousRegion { get; private set; }
-
-    private int health;
+    #region Health
+    [SerializeField] private int health;
+    [field: SerializeField] public int MaxHealth { get; set; }
 
     public int CurrentHealth
     {
@@ -76,7 +86,18 @@ public class Player : MonoBehaviour, IDamagable
             }
         }
     }
-    [field: SerializeField] public int MaxHealth { get; set; }
+    #endregion
+
+    Controller2D controller;
+
+    private bool facingRight = false;
+    [field: SerializeField] public Transform SpriteTransform { get; private set; }
+
+    public Vector2Int CurrentRegion { get; private set; }
+    public Vector2Int PreviousRegion { get; private set; }
+
+    public event EventHandler OnRegionSwitch;
+
 
     private void Awake()
     {
@@ -119,35 +140,35 @@ public class Player : MonoBehaviour, IDamagable
             sprinting = false;
         }
 
+        if (Direction != Vector3.zero)
+        {
+            if (MapManager.Instance != null)
+            {
+                if (CurrentRegion != Vector2Int.FloorToInt(new Vector2(transform.position.x / (MapManager.Instance.RegionWidth * 0.5f), transform.position.y / (MapManager.Instance.RegionHeight * 0.5f))))
+                {
+                    UpdateRegion();
+                }
+            }
+        }
+
         if (sprinting)
         {
             Stamina -= sprintCost * Time.deltaTime;
             UpdateStaminaBar(1);
         }
-
-        if (MapManager.Instance != null)
-        {
-            if (CurrentRegion != Vector2Int.FloorToInt(new Vector2(transform.position.x / (MapManager.Instance.RegionWidth * 0.5f), transform.position.y / (MapManager.Instance.RegionHeight * 0.5f))))
-            {
-                UpdateRegion();
-            }
-        }
-
-        if (!sprinting && Stamina < maxStamina)
+        else if (!sprinting && Stamina < maxStamina)
         {
             Stamina += Time.deltaTime * rechargeTime;
             UpdateStaminaBar(1);
         }
 
-        if (Input.GetKeyDown(KeyCode.Tab) && !inventoryOpen)
+        if (Input.GetKeyDown(KeyCode.Tab))
         {
-            inventoryCanvas.SetActive(true);
-            inventoryOpen = true;
-        }
-        else if (Input.GetKeyDown(KeyCode.Tab) && inventoryOpen)
-        {
-            inventoryCanvas.SetActive(false);
-            inventoryOpen = false;
+            if (inventoryCanvas != null)
+            {
+                inventoryOpen = !inventoryOpen;
+                inventoryCanvas.SetActive(inventoryOpen);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Space))

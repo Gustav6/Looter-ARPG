@@ -48,13 +48,7 @@ public class TransitionSystem
         {
             if (removeTransitionsWithSameID)
             {
-                for (int i = transitionPairs[id].Count - 1; i >= 0; i--)
-                {
-                    if (transition.GetType() == transitionPairs[id].ElementAt(i).GetType())
-                    {
-                        transitionPairs[id].RemoveAt(i);
-                    }
-                }
+                RemoveTransitionsWithSameID(id, transition);
             }
 
             transitionPairs[id].Add(transition);
@@ -65,6 +59,17 @@ public class TransitionSystem
         }
 
         transition.Start();
+    }
+
+    public static void RemoveTransitionsWithSameID(GameObject id, Transition transition)
+    {
+        for (int i = transitionPairs[id].Count - 1; i >= 0; i--)
+        {
+            if (transition.GetType() == transitionPairs[id].ElementAt(i).GetType())
+            {
+                transitionPairs[id].RemoveAt(i);
+            }
+        }
     }
 
     public static void ClearTransitionList()

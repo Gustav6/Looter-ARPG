@@ -90,7 +90,7 @@ public class Player : MonoBehaviour, IDamagable
 
     Controller2D controller;
 
-    private bool facingRight = false;
+    public bool facingRight = false;
     [field: SerializeField] public Transform SpriteTransform { get; private set; }
 
     public Vector2Int CurrentRegion { get; private set; }

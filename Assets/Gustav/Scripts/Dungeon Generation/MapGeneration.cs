@@ -14,7 +14,7 @@ public static class MapGeneration
     private static Dictionary<TileMapType, HashSet<Vector3Int>> tileMaps;
     private static readonly int tilesSetPerFrame = 100;
 
-    private static HashSet<Vector3Int> availableGroundPositions;
+    private static HashSet<Vector3Int> availableGroundPositions, availableWallPositions;
 
     public static event EventHandler OnGenerationCompleted;
     private static int amountOfCoreroutinesStarted, amountOfCoreroutinesFinished;
@@ -60,6 +60,7 @@ public static class MapGeneration
             tileMaps = new() { { TileMapType.ground, new() }, { TileMapType.wall, new() } };
 
             availableGroundPositions = new();
+            availableWallPositions = new();
 
             // Controls what random outcome will appear
             rng = new System.Random(manager.Settings.seed);
@@ -168,8 +169,9 @@ public static class MapGeneration
             // Remove wall tiles that are on the same tile position as any ground tile
             tileMaps[TileMapType.wall].ExceptWith(tileMaps[TileMapType.ground]);
 
-            // Add ground tile positions as available positions for game objects
+            // Add ground and wall tile positions as available positions for game objects
             availableGroundPositions.UnionWith(tileMaps[TileMapType.ground]);
+            availableWallPositions.UnionWith(tileMaps[TileMapType.wall]);
 
             // Remove the players spawn position and surrounding tiles from available list
             Vector2Int tempTopRightPosition, tempBottomLeftPosition;
@@ -1015,9 +1017,30 @@ public static class MapGeneration
                 {
                     tilePosition = new((j % width) - (width / 2) + center.x, (j / width) - (height / 2) + center.y);
 
-                    if (!tileMaps[TileMapType.ground].Contains(tilePosition) || !availableGroundPositions.Contains(tilePosition))
+                    switch (noiseMapSettings.tileMapEffected)
                     {
-                        continue;
+                        case TileMapType.ground:
+                            if (availableGroundPositions.Contains(tilePosition))
+                            {
+                                availableGroundPositions.Remove(tilePosition);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            break;
+                        case TileMapType.wall:
+                            if (availableWallPositions.Contains(tilePosition))
+                            {
+                                availableWallPositions.Remove(tilePosition);
+                            }
+                            else
+                            {
+                                continue;
+                            }
+                            break;
+                        default:
+                            break;
                     }
 
                     currentHeight = noiseMap[j];
@@ -1032,7 +1055,6 @@ public static class MapGeneration
                             }
 
                             gameObjects.Add(new GameObjectPositionPair { gameObject = region.prefab, position = tilePosition });
-                            availableGroundPositions.Remove(tilePosition);
 
                             break;
                         }
@@ -1069,10 +1091,9 @@ public static class MapGeneration
         public GameObject gameObject;
         public Vector3Int position;
     }
-
-    private enum TileMapType
-    {
-        ground,
-        wall
-    }
+}
+public enum TileMapType
+{
+    ground,
+    wall
 }

@@ -114,6 +114,8 @@ public class MapSettings : MonoBehaviour
 public struct PerlinNoiseMap
 {
     public string name;
+    public TileMapType tileMapEffected;
+
     public int amountOfNoiseLoops;
     public float noiseScale;
     public int octaves;

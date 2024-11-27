@@ -171,6 +171,7 @@ MonoBehaviour:
   rectTransform: {fileID: 5374043290226065742}
   contentsParent: {fileID: 7747041605792648258}
   contentPrefab: {fileID: 3758807556089935685, guid: 8e2488007a219bf46a9e2b70a7bc81cc, type: 3}
+  <SelectedResolutionTransform>k__BackingField: {fileID: 0}
 --- !u!1 &6106175222482083518
 GameObject:
   m_ObjectHideFlags: 0

@@ -51,8 +51,8 @@ MonoBehaviour:
   stripSize: {x: 150, y: 125}
   totalRoomsCount: 15
   amountOfMainRooms: 15
-  roomMaxSize: {x: 32, y: 28}
-  roomMinSize: {x: 15, y: 15}
+  roomMaxSize: {x: 25, y: 22}
+  roomMinSize: {x: 12, y: 10}
   roundCorners: 1
   doNotAllowInStartingRoom:
   - {fileID: 7687138853657912553, guid: f5fbfca504f544347a5c2c54d12a41ed, type: 3}
@@ -67,6 +67,7 @@ MonoBehaviour:
   amountOfEnemies: 25
   perlinNoiseMaps:
   - name: Breakable Cover
+    tileMapEffected: 0
     amountOfNoiseLoops: 2
     noiseScale: 6
     octaves: 5
@@ -77,6 +78,7 @@ MonoBehaviour:
       heightValue: 0
       prefab: {fileID: 8740092898635350770, guid: e77099fea85d40a4cb1cf1a5e89752cf, type: 3}
   - name: Prefabs
+    tileMapEffected: 0
     amountOfNoiseLoops: 2
     noiseScale: 8
     octaves: 4

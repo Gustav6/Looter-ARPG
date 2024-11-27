@@ -1373,7 +1373,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3687264886809854717, guid: 942e3af373769b142b457e2c1a42e57e, type: 3}
       propertyPath: m_text
-      value: WINDOOW
+      value: WINDOW
       objectReference: {fileID: 0}
     - target: {fileID: 3687264886809854717, guid: 942e3af373769b142b457e2c1a42e57e, type: 3}
       propertyPath: 'm_ActiveFontFeatures.Array.data[0]'

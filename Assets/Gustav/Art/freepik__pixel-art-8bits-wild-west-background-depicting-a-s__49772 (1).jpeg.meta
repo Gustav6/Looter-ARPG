@@ -1,10 +1,10 @@
 fileFormatVersion: 2
-guid: 7ecab7d04aee2b649a58a2be9e2082ed
+guid: 1f31ec2b4e5159a47bd41eb154b16ea1
 TextureImporter:
   internalIDToNameTable:
   - first:
-      213: -4466716864379916969
-    second: freepik__pixel-art-8bits-wild-west-background-depicting-a-s__49772_0
+      213: 9141456673382163403
+    second: freepik__pixel-art-8bits-wild-west-background-depicting-a-s__49772 (1)_0
   externalObjects: {}
   serializedVersion: 13
   mipmaps:
@@ -100,13 +100,13 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: freepik__pixel-art-8bits-wild-west-background-depicting-a-s__49772_0
+      name: freepik__pixel-art-8bits-wild-west-background-depicting-a-s__49772 (1)_0
       rect:
         serializedVersion: 2
         x: 0
         y: 0
-        width: 1344
-        height: 768
+        width: 5376
+        height: 3072
       alignment: 0
       pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
@@ -115,8 +115,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: -1
       bones: []
-      spriteID: 75d63627da80302c0800000000000000
-      internalID: -4466716864379916969
+      spriteID: bc36192396afcde70800000000000000
+      internalID: 9141456673382163403
       vertices: []
       indices: 
       edges: []
@@ -135,7 +135,7 @@ TextureImporter:
     spriteCustomMetadata:
       entries: []
     nameFileIdTable:
-      freepik__pixel-art-8bits-wild-west-background-depicting-a-s__49772_0: -4466716864379916969
+      freepik__pixel-art-8bits-wild-west-background-depicting-a-s__49772 (1)_0: 9141456673382163403
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

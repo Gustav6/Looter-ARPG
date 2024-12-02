@@ -85,6 +85,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8824430463957306578}
   - component: {fileID: 2408401370497712329}
+  - component: {fileID: 4718268714068109820}
   m_Layer: 5
   m_Name: DropDown
   m_TagString: Untagged
@@ -125,26 +126,45 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a2a02c85dc2105e48b38a6d88cc3140b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Active>k__BackingField: 0
+  rectTransform: {fileID: 5374043290226065742}
+  contentsParent: {fileID: 7747041605792648258}
+  contentPrefab: {fileID: 3758807556089935685, guid: 8e2488007a219bf46a9e2b70a7bc81cc, type: 3}
+  <SelectedResolutionTransform>k__BackingField: {fileID: 0}
+--- !u!114 &4718268714068109820
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4429895738955898105}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5cb1972cf6a38641a805e878315a60a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Selected>k__BackingField: 0
   moveTransitionsOnEnable:
   - transitionType: 3
     effected: {fileID: 8691540081844770997}
     duration: 0.25
-    target: {x: 0, y: -85}
-    targetTransform: {fileID: 8824430463957306578}
-    targetInWorldPosition: 1
+    target: {x: 0, y: -100}
+    targetTransform: {fileID: 0}
+    targetInWorldPosition: 0
+    overrideExistingTransitions: 1
   - transitionType: 3
-    effected: {fileID: 5374043290226065742}
+    effected: {fileID: 505436086002464741}
     duration: 0.25
-    target: {x: 0, y: -85}
-    targetTransform: {fileID: 8824430463957306578}
-    targetInWorldPosition: 1
+    target: {x: 0, y: -100}
+    targetTransform: {fileID: 0}
+    targetInWorldPosition: 0
+    overrideExistingTransitions: 1
   scaleTransitionsOnEnable:
   - transitionType: 3
     effected: {fileID: 8691540081844770997}
     duration: 0.25
-    target: {x: 1, y: 2.7}
+    target: {x: 1, y: 3}
     targetTransform: {fileID: 0}
+    overrideExistingTransitions: 1
   colorTransitionsOnEnable: []
   rotationTransitionsOnEnable: []
   moveTransitionsOnDisable:
@@ -154,24 +174,23 @@ MonoBehaviour:
     target: {x: 0, y: 0}
     targetTransform: {fileID: 8824430463957306578}
     targetInWorldPosition: 1
+    overrideExistingTransitions: 1
   - transitionType: 0
-    effected: {fileID: 5374043290226065742}
+    effected: {fileID: 505436086002464741}
     duration: 0.25
     target: {x: 0, y: 0}
     targetTransform: {fileID: 8824430463957306578}
     targetInWorldPosition: 1
+    overrideExistingTransitions: 1
   scaleTransitionsOnDisable:
   - transitionType: 0
     effected: {fileID: 8691540081844770997}
     duration: 0.25
     target: {x: 1, y: 1}
     targetTransform: {fileID: 0}
+    overrideExistingTransitions: 1
   colorTransitionsOnDisable: []
   rotationTransitionsOnDisable: []
-  rectTransform: {fileID: 5374043290226065742}
-  contentsParent: {fileID: 7747041605792648258}
-  contentPrefab: {fileID: 3758807556089935685, guid: 8e2488007a219bf46a9e2b70a7bc81cc, type: 3}
-  <SelectedResolutionTransform>k__BackingField: {fileID: 0}
 --- !u!1 &6106175222482083518
 GameObject:
   m_ObjectHideFlags: 0

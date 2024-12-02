@@ -34,8 +34,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 75, y: 75}
+  m_AnchoredPosition: {x: -3, y: 0}
+  m_SizeDelta: {x: 65, y: 65}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &7535128954543498646
 CanvasRenderer:
@@ -110,7 +110,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 65, y: 65}
+  m_SizeDelta: {x: 100, y: 100}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &1058374157593010275
 CanvasRenderer:
@@ -133,14 +133,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.8396226, g: 0.7010057, b: 0.7010057, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: -2413806693520163455, guid: ebe73ca9363db456bacf42c025bb4847, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 5eec56b7bfb8a284ab16742188af6b92, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -160,6 +160,7 @@ GameObject:
   m_Component:
   - component: {fileID: 3497513233196469189}
   - component: {fileID: 323605306474926908}
+  - component: {fileID: 1267865932860516554}
   m_Layer: 5
   m_Name: Lever
   m_TagString: Untagged
@@ -200,24 +201,41 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5fcc154aa871e654785c1cc15d2f7169, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Active>k__BackingField: 0
+  onClickEvent:
+    m_PersistentCalls:
+      m_Calls: []
+  volumeEffected: 0
+  objectIndicator: {fileID: 580003435350890046}
+--- !u!114 &1267865932860516554
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6391501787185619630}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5cb1972cf6a38641a805e878315a60a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Selected>k__BackingField: 0
   moveTransitionsOnEnable: []
   scaleTransitionsOnEnable:
-  - transitionType: 3
+  - transitionType: 0
     effected: {fileID: 3497513233196469189}
-    duration: 0.25
+    duration: 0.2
     target: {x: 1.1, y: 1.1}
     targetTransform: {fileID: 0}
+    overrideExistingTransitions: 1
   colorTransitionsOnEnable: []
   rotationTransitionsOnEnable: []
   moveTransitionsOnDisable: []
   scaleTransitionsOnDisable:
-  - transitionType: 3
+  - transitionType: 0
     effected: {fileID: 3497513233196469189}
-    duration: 0.25
+    duration: 0.2
     target: {x: 1, y: 1}
     targetTransform: {fileID: 0}
+    overrideExistingTransitions: 1
   colorTransitionsOnDisable: []
   rotationTransitionsOnDisable: []
-  leverOn: 0
-  objectIndicator: {fileID: 580003435350890046}

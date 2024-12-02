@@ -193,6 +193,8 @@ public static class MapGeneration
             // Generate game objects within dungeon using noise map
             GenerateNoiseMap(manager, noiseMapWidth, noiseMapHeight, noiseMapCenter, gameObjects);
 
+            AddEnemiesToList(manager, gameObjects);
+
             #region Set ranges for coroutine
             foreach (TileMapType tileMap in tileMaps.Keys)
             {
@@ -1017,32 +1019,6 @@ public static class MapGeneration
                 {
                     tilePosition = new((j % width) - (width / 2) + center.x, (j / width) - (height / 2) + center.y);
 
-                    switch (noiseMapSettings.tileMapEffected)
-                    {
-                        case TileMapType.ground:
-                            if (availableGroundPositions.Contains(tilePosition))
-                            {
-                                availableGroundPositions.Remove(tilePosition);
-                            }
-                            else
-                            {
-                                continue;
-                            }
-                            break;
-                        case TileMapType.wall:
-                            if (availableWallPositions.Contains(tilePosition))
-                            {
-                                availableWallPositions.Remove(tilePosition);
-                            }
-                            else
-                            {
-                                continue;
-                            }
-                            break;
-                        default:
-                            break;
-                    }
-
                     currentHeight = noiseMap[j];
 
                     foreach (NoiseRegion region in noiseMapSettings.prefabs)
@@ -1052,6 +1028,32 @@ public static class MapGeneration
                             if (region.name == "Empty")
                             {
                                 break;
+                            }
+
+                            switch (noiseMapSettings.tileMapEffected)
+                            {
+                                case TileMapType.ground:
+                                    if (availableGroundPositions.Contains(tilePosition))
+                                    {
+                                        availableGroundPositions.Remove(tilePosition);
+                                    }
+                                    else
+                                    {
+                                        continue;
+                                    }
+                                    break;
+                                case TileMapType.wall:
+                                    if (availableWallPositions.Contains(tilePosition))
+                                    {
+                                        availableWallPositions.Remove(tilePosition);
+                                    }
+                                    else
+                                    {
+                                        continue;
+                                    }
+                                    break;
+                                default:
+                                    break;
                             }
 
                             gameObjects.Add(new GameObjectPositionPair { gameObject = region.prefab, position = tilePosition });
@@ -1078,7 +1080,7 @@ public static class MapGeneration
                 break;
             }
 
-            tilePosition = availableGroundPositions.ElementAt(rng.Next(0, tileMaps[TileMapType.ground].Count + 1));
+            tilePosition = availableGroundPositions.ElementAt(rng.Next(0, availableGroundPositions.Count + 1));
             prefab = manager.Settings.enemyPrefabs[rng.Next(0, manager.Settings.enemyPrefabs.Length)];
             gameObjects.Add(new GameObjectPositionPair { gameObject = prefab, position = tilePosition });
             availableGroundPositions.Remove(tilePosition);

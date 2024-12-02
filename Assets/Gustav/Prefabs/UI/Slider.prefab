@@ -160,6 +160,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8218779617624336023}
   - component: {fileID: 3441250804765080758}
+  - component: {fileID: 9137657701591637122}
   m_Layer: 5
   m_Name: Slider
   m_TagString: Untagged
@@ -200,24 +201,38 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b4d682ed57dd7ed48aa11f13daf93d9c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Active>k__BackingField: 0
+  volumeEffected: 0
+  slidingPart: {fileID: 3523979850197598491}
+--- !u!114 &9137657701591637122
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8157885270877922644}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5cb1972cf6a38641a805e878315a60a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Selected>k__BackingField: 0
   moveTransitionsOnEnable: []
   scaleTransitionsOnEnable:
-  - transitionType: 3
+  - transitionType: 0
     effected: {fileID: 8218779617624336023}
-    duration: 0.25
+    duration: 0.2
     target: {x: 1.1, y: 1.1}
     targetTransform: {fileID: 0}
+    overrideExistingTransitions: 1
   colorTransitionsOnEnable: []
   rotationTransitionsOnEnable: []
   moveTransitionsOnDisable: []
   scaleTransitionsOnDisable:
-  - transitionType: 3
+  - transitionType: 0
     effected: {fileID: 8218779617624336023}
-    duration: 0.25
+    duration: 0.2
     target: {x: 1, y: 1}
     targetTransform: {fileID: 0}
+    overrideExistingTransitions: 1
   colorTransitionsOnDisable: []
   rotationTransitionsOnDisable: []
-  volumeEffected: 0
-  slidingPart: {fileID: 3523979850197598491}

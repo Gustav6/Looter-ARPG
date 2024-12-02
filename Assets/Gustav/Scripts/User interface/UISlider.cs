@@ -20,6 +20,16 @@ public class UISlider : UIBaseScript, IPointerDownHandler, IPointerUpHandler
         slidingPart.transform.localPosition = PercentageToPosition(SoundManager.Instance.GetVolume(volumeEffected));
 
         base.Start();
+
+        if (SelectableScript != null)
+        {
+            SelectableScript.PointerExit += SelectableScript_PointerExit;
+        }
+    }
+
+    private void SelectableScript_PointerExit(object sender, PointerEventData e)
+    {
+        SoundManager.Instance.SetVolume(volumeEffected, TotalSlidingPercentage());
     }
 
     public override void Update()
@@ -50,13 +60,6 @@ public class UISlider : UIBaseScript, IPointerDownHandler, IPointerUpHandler
         }
 
         canMove = false;
-
-        SoundManager.Instance.SetVolume(volumeEffected, TotalSlidingPercentage());
-    }
-
-    public override void RunOnDisable()
-    {
-        base.RunOnDisable();
 
         SoundManager.Instance.SetVolume(volumeEffected, TotalSlidingPercentage());
     }

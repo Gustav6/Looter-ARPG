@@ -53,6 +53,12 @@ public class UIDropDown : UIBaseScript, IPointerClickHandler
         SelectedResolutionTransform = settings[0];
 
         base.Start();
+
+        if (SelectableScript != null)
+        {
+            SelectableScript.PointerEnter += SelectableScript_PointerEnter;
+            SelectableScript.PointerExit += SelectableScript_PointerExit;
+        }
     }
 
     public override void Update()
@@ -60,7 +66,8 @@ public class UIDropDown : UIBaseScript, IPointerClickHandler
         base.Update();
     }
 
-    public override void RunOnEnable()
+
+    private void SelectableScript_PointerEnter(object sender, PointerEventData e)
     {
         TransitionSystem.AddTransition(new RectSizeTransition(rectTransform, 0.25f, new Vector2(rectTransform.sizeDelta.x, 250), TransitionType.SmoothStop2), gameObject);
 
@@ -68,16 +75,12 @@ public class UIDropDown : UIBaseScript, IPointerClickHandler
         {
             TransitionSystem.transitionPairs.Remove(contentsParent.gameObject);
         }
-
-        base.RunOnEnable();
     }
 
-    public override void RunOnDisable()
+    private void SelectableScript_PointerExit(object sender, PointerEventData e)
     {
         TransitionSystem.AddTransition(new RectSizeTransition(rectTransform, 0.25f, new Vector2(rectTransform.sizeDelta.x, 80), TransitionType.SmoothStart2), gameObject);
         TransitionSystem.AddTransition(new MoveTransition(contentsParent, 0.3f, new Vector2(0, -contentsParent.position.y), TransitionType.SmoothStart2, false), contentsParent.gameObject);
-
-        base.RunOnDisable();
     }
 
     public void OnPointerClick(PointerEventData eventData)

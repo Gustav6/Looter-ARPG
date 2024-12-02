@@ -65,8 +65,8 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 9e409297b395f0e4d91e3fb5259241c4, type: 3}
-  m_Type: 2
+  m_Sprite: {fileID: 21300000, guid: e4e0cc6f5a69dfa49bb403514b275e03, type: 3}
+  m_Type: 1
   m_PreserveAspect: 0
   m_FillCenter: 1
   m_FillMethod: 4
@@ -74,7 +74,7 @@ MonoBehaviour:
   m_FillClockwise: 1
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
-  m_PixelsPerUnitMultiplier: 3
+  m_PixelsPerUnitMultiplier: 6
 --- !u!1 &3384649315512849804
 GameObject:
   m_ObjectHideFlags: 0
@@ -85,6 +85,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8935083257443548591}
   - component: {fileID: -8154374201206381476}
+  - component: {fileID: 4192773811854433892}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -125,28 +126,42 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 54cb87e2fec58bb45b18389bd14b4d5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Active>k__BackingField: 0
+  onClickEvent:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!114 &4192773811854433892
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3384649315512849804}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5cb1972cf6a38641a805e878315a60a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Selected>k__BackingField: 0
   moveTransitionsOnEnable: []
   scaleTransitionsOnEnable:
-  - transitionType: 3
+  - transitionType: 0
     effected: {fileID: 8935083257443548591}
-    duration: 0.25
+    duration: 0.2
     target: {x: 1.1, y: 1.1}
     targetTransform: {fileID: 0}
+    overrideExistingTransitions: 1
   colorTransitionsOnEnable: []
   rotationTransitionsOnEnable: []
   moveTransitionsOnDisable: []
   scaleTransitionsOnDisable:
-  - transitionType: 3
+  - transitionType: 0
     effected: {fileID: 8935083257443548591}
-    duration: 0.25
+    duration: 0.2
     target: {x: 1, y: 1}
     targetTransform: {fileID: 0}
+    overrideExistingTransitions: 1
   colorTransitionsOnDisable: []
   rotationTransitionsOnDisable: []
-  onClickEvent:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &6538655459246721443
 GameObject:
   m_ObjectHideFlags: 0

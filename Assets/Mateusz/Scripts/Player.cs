@@ -14,7 +14,14 @@ public class Player : MonoBehaviour, IDamagable
     public Vector3 Direction { get; private set; }
 
     [BoxGroup("Movement")]
-    public float moveSpeed;
+    [SerializeField] private float currentMoveSpeed;
+
+    [BoxGroup("Movement")]
+    public float sprintAcceleration = 0.15f;
+    [BoxGroup("Movement")]
+    public float sprintMoveSpeed = 10;
+    [BoxGroup("Movement")]
+    public float baseMoveSpeed = 5;
 
     [BoxGroup("Movement")]
     [SerializeField] private float currentStamina;
@@ -113,7 +120,7 @@ public class Player : MonoBehaviour, IDamagable
         }
 
         Stamina = maxStamina;
-        moveSpeed = 5;
+        currentMoveSpeed = baseMoveSpeed;
         controller = GetComponent<Controller2D>();
 
         CurrentHealth = MaxHealth;
@@ -121,7 +128,7 @@ public class Player : MonoBehaviour, IDamagable
 
     private void FixedUpdate()
     {
-        controller.Move(moveSpeed * Time.fixedDeltaTime * Direction);
+        controller.Move(currentMoveSpeed * Time.fixedDeltaTime * Direction);
     }
 
     private void Update()
@@ -130,18 +137,25 @@ public class Player : MonoBehaviour, IDamagable
 
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
-            moveSpeed = 10f;
             sprinting = true;
 
         }
         else if (Input.GetKeyUp(KeyCode.LeftShift) || Stamina == 0)
         {
-            moveSpeed = 5f;
             sprinting = false;
         }
 
         if (Direction != Vector3.zero)
         {
+            if (sprinting)
+            {
+                currentMoveSpeed = Mathf.Lerp(currentMoveSpeed, sprintMoveSpeed, sprintAcceleration);
+            }
+            else
+            {
+                currentMoveSpeed = Mathf.Lerp(currentMoveSpeed, baseMoveSpeed, 0.1f);
+            }
+
             if (MapManager.Instance != null)
             {
                 if (CurrentRegion != Vector2Int.FloorToInt(new Vector2(transform.position.x / (MapManager.Instance.RegionWidth * 0.5f), transform.position.y / (MapManager.Instance.RegionHeight * 0.5f))))
@@ -156,10 +170,13 @@ public class Player : MonoBehaviour, IDamagable
             Stamina -= sprintCost * Time.deltaTime;
             UpdateStaminaBar(1);
         }
-        else if (!sprinting && Stamina < maxStamina)
+        else
         {
-            Stamina += Time.deltaTime * rechargeTime;
-            UpdateStaminaBar(1);
+            if (Stamina < maxStamina)
+            {
+                Stamina += Time.deltaTime * rechargeTime;
+                UpdateStaminaBar(1);
+            }
         }
 
         if (Input.GetKeyDown(KeyCode.Tab))

@@ -223,6 +223,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4771459618284457434}
   - component: {fileID: 5913034975351661088}
+  - component: {fileID: 3340005509034616656}
   m_Layer: 5
   m_Name: InputField
   m_TagString: Untagged
@@ -263,26 +264,28 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a25b5fe29e9d4804f8ccb0e4318f6319, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Active>k__BackingField: 0
-  moveTransitionsOnEnable: []
-  scaleTransitionsOnEnable:
-  - transitionType: 3
-    effected: {fileID: 4771459618284457434}
-    duration: 0.25
-    target: {x: 1.1, y: 1.1}
-    targetTransform: {fileID: 0}
-  colorTransitionsOnEnable: []
-  rotationTransitionsOnEnable: []
-  moveTransitionsOnDisable: []
-  scaleTransitionsOnDisable:
-  - transitionType: 3
-    effected: {fileID: 4771459618284457434}
-    duration: 0.25
-    target: {x: 1, y: 1}
-    targetTransform: {fileID: 0}
-  colorTransitionsOnDisable: []
-  rotationTransitionsOnDisable: []
   canWrite: 0
   standardText: WRITE
   maxAmountOfLetters: 10
   textReference: {fileID: 7115178994144194973}
+--- !u!114 &3340005509034616656
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5990565942713337319}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5cb1972cf6a38641a805e878315a60a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Selected>k__BackingField: 0
+  moveTransitionsOnEnable: []
+  scaleTransitionsOnEnable: []
+  colorTransitionsOnEnable: []
+  rotationTransitionsOnEnable: []
+  moveTransitionsOnDisable: []
+  scaleTransitionsOnDisable: []
+  colorTransitionsOnDisable: []
+  rotationTransitionsOnDisable: []

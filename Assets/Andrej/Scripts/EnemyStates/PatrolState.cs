@@ -28,7 +28,7 @@ public class PatrolState : State
             }
         }
 
-        if (enemyProperties.distanceToPlayer < enemyProperties.aggroRange)
+        if (enemyProperties.hasLineOfSight)
         {
             isComplete = true;
             Debug.Log("patrol complete");

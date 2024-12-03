@@ -20,7 +20,7 @@ public class ChaseState : State
     {
         Chase();
 
-        if (enemyProperties.distanceToPlayer > enemyProperties.aggroRange)
+        if (!enemyProperties.hasLineOfSight)
         {
             isComplete = true;
         }

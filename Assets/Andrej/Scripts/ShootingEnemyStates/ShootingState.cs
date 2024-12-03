@@ -37,7 +37,7 @@ public class ShootingState : State
             timeBtwShots -= Time.deltaTime;
         }
 
-        if (enemyProperties.distanceToPlayer > enemyProperties.aggroRange)
+        if (enemyProperties.hasLineOfSight)
         {
             enemyProperties.isAttacking = false;
             isComplete = true;

@@ -16,8 +16,10 @@ public class EnemyProperties : MonoBehaviour, IDamagable
     public int damage;
     public int knockback;
 
-    public bool isLooking;
+    public bool hasLineOfSight;
     public bool isAttacking;
+
+    public LayerMask cantPassThrough;
 
     Vector2 origin;
     public int CurrentHealth
@@ -57,7 +59,30 @@ public class EnemyProperties : MonoBehaviour, IDamagable
 
     public void FixedUpdate()
     {
-        RaycastHit2D ray = Physics2D.Raycast(transform.position, player.transform.position - transform.position);
+        if (distanceToPlayer <= aggroRange)
+        {
+            Vector2 direction = (player.transform.position - transform.position).normalized;
+            RaycastHit2D ray = Physics2D.Raycast(transform.position, direction, distanceToPlayer, cantPassThrough);
+            if (!ray)
+            {
+                Debug.DrawRay(transform.position, direction * distanceToPlayer, Color.green);
+                if (!hasLineOfSight)
+                {
+                    hasLineOfSight = true;
+                }
+            }
+            else
+            {
+                if (hasLineOfSight)
+                {
+                    hasLineOfSight = false;
+                }
+            }
+        }
+        else if (hasLineOfSight)
+        {
+            hasLineOfSight = false;
+        }
     }
 
     public void Damage(int damageAmount)

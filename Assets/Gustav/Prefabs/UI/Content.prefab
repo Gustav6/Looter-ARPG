@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 5634949852744493014}
   - component: {fileID: 3804405438243161654}
   - component: {fileID: 7736582912446601765}
+  - component: {fileID: 5380121590200692140}
   m_Layer: 5
   m_Name: Content
   m_TagString: Untagged
@@ -136,30 +137,48 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49810bd6a17189a4bbc1899ace5c6966, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  <Active>k__BackingField: 0
+--- !u!114 &5380121590200692140
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3758807556089935685}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e5cb1972cf6a38641a805e878315a60a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  <Selected>k__BackingField: 0
   moveTransitionsOnEnable: []
-  scaleTransitionsOnEnable: []
+  scaleTransitionsOnEnable:
+  - transitionType: 3
+    effected: {fileID: 2301308956579564572}
+    duration: 0.2
+    target: {x: 1.05, y: 1.05}
+    targetTransform: {fileID: 0}
+    overrideExistingTransitions: 1
   colorTransitionsOnEnable:
   - transitionType: 3
-    effected: {fileID: 2301308956579564572}
-    duration: 0.15
-    target: {r: 1, g: 1, b: 1, a: 1}
-  - transitionType: 3
     effected: {fileID: 7328776487668923989}
-    duration: 0.15
+    duration: 0.2
     target: {r: 0, g: 0, b: 0, a: 1}
+    overrideExistingTransitions: 0
   rotationTransitionsOnEnable: []
   moveTransitionsOnDisable: []
-  scaleTransitionsOnDisable: []
-  colorTransitionsOnDisable:
+  scaleTransitionsOnDisable:
   - transitionType: 0
     effected: {fileID: 2301308956579564572}
-    duration: 0.15
-    target: {r: 1, g: 1, b: 1, a: 0.60784316}
+    duration: 0.2
+    target: {x: 1, y: 1}
+    targetTransform: {fileID: 0}
+    overrideExistingTransitions: 1
+  colorTransitionsOnDisable:
   - transitionType: 0
     effected: {fileID: 7328776487668923989}
-    duration: 0.15
+    duration: 0.2
     target: {r: 0, g: 0, b: 0, a: 0.88235295}
+    overrideExistingTransitions: 0
   rotationTransitionsOnDisable: []
 --- !u!1 &6712176672281343231
 GameObject:

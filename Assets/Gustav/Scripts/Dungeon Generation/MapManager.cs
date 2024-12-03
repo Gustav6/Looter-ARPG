@@ -19,6 +19,7 @@ public class MapManager : MonoBehaviour
     public CancellationTokenSource TokenSource { get; private set; }
     public MapSettings Settings { get; private set; }
 
+    [field: SerializeField] public bool LoadMapInCurrentScene { get; private set; }
     [field: SerializeField] public GameObject MapPrefab { get; private set; }
     [field: SerializeField] public int RegionWidth { get; private set; }
     [field: SerializeField] public int RegionHeight { get; private set; }
@@ -86,6 +87,12 @@ public class MapManager : MonoBehaviour
 
         if (nextMap == null)
         {
+            if (LoadMapInCurrentScene)
+            {
+                cameraReference = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+                StartCoroutine(TryToLoadMap(currentMap));
+            }
+
             MapGeneration.GenerateMapAsync(this, MapPrefab);
         }
     }

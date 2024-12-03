@@ -8,8 +8,6 @@ using UnityEngine;
 public class ChaseState : State
 {
     public EnemyProperties enemyProperties;
-    public float exitRange = 12;
-    public float attackRange;
     public void Chase()
     {
         enemyProperties.transform.position = Vector2.MoveTowards(transform.position, enemyProperties.player.transform.position, enemyProperties.speed * Time.deltaTime);
@@ -22,12 +20,12 @@ public class ChaseState : State
     {
         Chase();
 
-        if (enemyProperties.distanceToPlayer > exitRange)
+        if (enemyProperties.distanceToPlayer > enemyProperties.aggroRange)
         {
             isComplete = true;
         }
 
-        if(attackRange > enemyProperties.distanceToPlayer && time > 0.5)
+        if(enemyProperties.attackRange > enemyProperties.distanceToPlayer && time > 0.5)
         {
             enemyProperties.isAttacking = true;
             isComplete = true;
@@ -37,15 +35,5 @@ public class ChaseState : State
     public override void Exit()
     {
 
-    }
-
-    private void OnDrawGizmos()
-    {
-        if(!isComplete)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, exitRange);
-            Gizmos.DrawWireSphere(transform.position, attackRange);
-        }
     }
 }

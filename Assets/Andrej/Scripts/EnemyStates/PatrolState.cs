@@ -9,9 +9,6 @@ public class PatrolState : State
     public NavigateState navigate;
 
     public EnemyProperties enemyProperties;
-
-    public float radius;
-
     public override void Enter()
     {
         Set(idle);
@@ -31,7 +28,7 @@ public class PatrolState : State
             }
         }
 
-        if (enemyProperties.distanceToPlayer < radius)
+        if (enemyProperties.distanceToPlayer < enemyProperties.aggroRange)
         {
             isComplete = true;
             Debug.Log("patrol complete");
@@ -41,14 +38,5 @@ public class PatrolState : State
     public override void Exit()
     {
 
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (!isComplete)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, radius);
-        }
     }
 }

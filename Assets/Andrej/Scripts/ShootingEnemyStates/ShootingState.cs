@@ -9,9 +9,6 @@ public class ShootingState : State
 
     private float timeBtwShots;
     public float startTimeBtwShots;
-
-    public float shootDistance;
-
     public void Shoot()
     {
         if (timeBtwShots <= 0)
@@ -40,7 +37,7 @@ public class ShootingState : State
             timeBtwShots -= Time.deltaTime;
         }
 
-        if (enemyProperties.distanceToPlayer > shootDistance)
+        if (enemyProperties.distanceToPlayer > enemyProperties.aggroRange)
         {
             enemyProperties.isAttacking = false;
             isComplete = true;
@@ -50,14 +47,5 @@ public class ShootingState : State
     public override void Exit()
     {
 
-    }
-
-    private void OnDrawGizmos()
-    {
-        if (!isComplete)
-        {
-            Gizmos.color = Color.red;
-            Gizmos.DrawWireSphere(transform.position, shootDistance);
-        }
     }
 }

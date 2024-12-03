@@ -6,13 +6,17 @@ public class EnemyProperties : MonoBehaviour, IDamagable
 {
     public GameObject player;
     public GameObject damagePopupPrefab;
+
     public float distanceToPlayer;
+    public float aggroRange;
+    public float attackRange;
 
     public float speed;
     public int health;
     public int damage;
     public int knockback;
 
+    public bool isLooking;
     public bool isAttacking;
 
     Vector2 origin;
@@ -51,6 +55,11 @@ public class EnemyProperties : MonoBehaviour, IDamagable
         distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
     }
 
+    public void FixedUpdate()
+    {
+        RaycastHit2D ray = Physics2D.Raycast(transform.position, player.transform.position - transform.position);
+    }
+
     public void Damage(int damageAmount)
     {
         CurrentHealth -= damageAmount;
@@ -60,5 +69,12 @@ public class EnemyProperties : MonoBehaviour, IDamagable
     public void OnDeath()
     {
         Destroy(gameObject);
+    }
+
+    private void OnDrawGizmos()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, aggroRange);
+        Gizmos.DrawWireSphere(transform.position, attackRange);
     }
 }

@@ -23,5 +23,5 @@ MonoBehaviour:
   fireForce: 200
   reloadTime: 0
   effects: 03000000
-  amountOfPircableEnemies: 2
+  amountOfPircableEnemies: 0
   damageTypes: 00000000

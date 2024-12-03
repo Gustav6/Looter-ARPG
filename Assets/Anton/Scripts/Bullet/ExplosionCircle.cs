@@ -34,6 +34,10 @@ public class ExplosionCircle : MonoBehaviour
             {
                 collision.GetComponent<MonoBehaviour>().StartCoroutine(damagable.TickDamage(10, collision.transform, GunController.Instance.damagePopupPrefab));
             }
+            else
+            {
+                damagable.Damage(GunController.Instance.Damage / 8);
+            }
         }
     }
 }

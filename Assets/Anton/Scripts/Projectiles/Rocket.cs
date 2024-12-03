@@ -18,12 +18,10 @@ public class Rocket : BigProjectile
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "Enemy")
-        {   
-            if (GunController.Instance.explosion)
-            {
-                Instantiate(explosionCiclePrefab, transform.position, Quaternion.identity);
-                Destroy(gameObject);
-            }
+        {              
+            CameraShake.ShakeCamera(4);
+            Instantiate(explosionCiclePrefab, transform.position, Quaternion.identity);
+            Destroy(gameObject);
         }
     }
 }

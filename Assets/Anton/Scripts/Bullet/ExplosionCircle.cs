@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 
 public class ExplosionCircle : MonoBehaviour
@@ -29,7 +30,10 @@ public class ExplosionCircle : MonoBehaviour
 
         if (collision.TryGetComponent<IDamagable>(out IDamagable damagable))
         {
-            damagable.Damage(10);
+            if (!damagable.TickDamageActive)
+            {
+                collision.GetComponent<MonoBehaviour>().StartCoroutine(damagable.TickDamage(10, collision.transform, GunController.Instance.damagePopupPrefab));
+            }
         }
     }
 }

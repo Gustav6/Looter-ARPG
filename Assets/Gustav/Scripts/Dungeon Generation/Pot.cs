@@ -28,6 +28,7 @@ public class Pot : MonoBehaviour, IDamagable
     }
 
     [field: SerializeField] public int MaxHealth { get; set; }
+    public bool TickDamageActive { get; set; }
 
     [SerializeField] private Loot[] guaranteedToDrop;
 

@@ -93,6 +93,7 @@ public class Player : MonoBehaviour, IDamagable
             }
         }
     }
+    public bool TickDamageActive { get; set; }
     #endregion
 
     Controller2D controller;

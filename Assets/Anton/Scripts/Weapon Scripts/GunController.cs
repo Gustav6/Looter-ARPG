@@ -19,15 +19,14 @@ public class GunController : MonoBehaviour
     int ammo;
     float timer;
     float timerShake;
-    #region Public Static Variables
-    public static int Damage;
-    public static int pierceAmount;
-    public static bool pierce;
-    public static bool explosion;
-    public static bool dmgOverTime;
-    public static float fireForce;
-    public static bool fireDmg;
-    #endregion
+
+    public int Damage;
+    public int pierceAmount;
+    public bool pierce;
+    public bool explosion;
+    public bool dmgOverTime;
+    public float fireForce;
+    public bool fireDmg;
 
     private float attackTimer;
 
@@ -104,6 +103,11 @@ public class GunController : MonoBehaviour
        
 
         if (Input.GetKeyDown(KeyCode.R))
+        {
+            Reload();
+        }
+
+        if (ammo <= 0)
         {
             Reload();
         }

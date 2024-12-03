@@ -28,6 +28,7 @@ public class AntonsTemporaryEnemyScript : MonoBehaviour, IDamagable
         } 
     }
     [field: SerializeField] public int MaxHealth { get; set; }
+    public bool TickDamageActive { get; set; }
 
     private void Start()
     {

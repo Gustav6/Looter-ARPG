@@ -147,5 +147,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8302b7870a408cd47be281b063c213d3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damagePopupPrefab: {fileID: 5801573854073587537, guid: 46d9f7e137d7efb4c84315a58e250950, type: 3}
-  <MaxHealth>k__BackingField: 1000
+  <MaxHealth>k__BackingField: 10000000

@@ -19,7 +19,7 @@ public class Rocket : BigProjectile
     {
         if (collision.tag == "Enemy")
         {   
-            if (GunController.explosion)
+            if (GunController.Instance.explosion)
             {
                 Instantiate(explosionCiclePrefab, transform.position, Quaternion.identity);
                 Destroy(gameObject);

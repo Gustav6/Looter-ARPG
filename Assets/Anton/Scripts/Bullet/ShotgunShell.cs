@@ -24,19 +24,19 @@ public class ShotgunShell : MonoBehaviour
                 for (int a = 0; a < 5; a++)
                 {
                     GameObject bullet1 = Instantiate(pelletPrefab, transform.position, Quaternion.identity);
-                    bullet1.GetComponent<Rigidbody2D>().AddForce((gunAngle.transform.right -= new Vector3(0.5f, 0, 0)) * GunController.fireForce, ForceMode2D.Impulse);
+                    bullet1.GetComponent<Rigidbody2D>().AddForce((gunAngle.transform.right -= new Vector3(0.5f, 0, 0)) * GunController.Instance.fireForce, ForceMode2D.Impulse);
                 }
                 gunAngle.transform.position = startTransform.position;
                 for (int t = 0; t < 5; t++)
                 {
                     GameObject bullet2 = Instantiate(pelletPrefab, transform.position, Quaternion.identity);
-                    bullet2.GetComponent<Rigidbody2D>().AddForce((gunAngle.transform.right += new Vector3(0.5f, 0, 0)) * GunController.fireForce, ForceMode2D.Impulse);
+                    bullet2.GetComponent<Rigidbody2D>().AddForce((gunAngle.transform.right += new Vector3(0.5f, 0, 0)) * GunController.Instance.fireForce, ForceMode2D.Impulse);
                 }
             }
             else if (mouseWorldPos.y <= transform.position.y)
             {           
                 GameObject bullet1 = Instantiate(pelletPrefab, transform.position, Quaternion.identity);
-                bullet1.GetComponent<Rigidbody2D>().AddForce((gunAngle.transform.right - new Vector3(0, 0.5f, 0)) * GunController.fireForce, ForceMode2D.Impulse);
+                bullet1.GetComponent<Rigidbody2D>().AddForce((gunAngle.transform.right - new Vector3(0, 0.5f, 0)) * GunController.Instance.fireForce, ForceMode2D.Impulse);
             }            
         }
         gunAngle.transform.position = startTransform.position;

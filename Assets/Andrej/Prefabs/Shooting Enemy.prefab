@@ -10,10 +10,10 @@ GameObject:
   m_Component:
   - component: {fileID: 2338967628814538538}
   - component: {fileID: 5672605928646073255}
-  - component: {fileID: 158949818363489007}
   - component: {fileID: 7039066767658744678}
   - component: {fileID: 5903875924031432166}
   - component: {fileID: 1953963940699207726}
+  - component: {fileID: 8486849548873617599}
   m_Layer: 3
   m_Name: Shooting Enemy
   m_TagString: Untagged
@@ -29,8 +29,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4034984483810168527}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -38.05, y: -2.5751095, z: 0}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -94,33 +94,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!50 &158949818363489007
-Rigidbody2D:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4034984483810168527}
-  m_BodyType: 1
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
 --- !u!61 &7039066767658744678
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -179,9 +152,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2d5f43658d4f4d4428efe9a426fc8dac, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  body: {fileID: 0}
   animator: {fileID: 0}
   enemyProperties: {fileID: 1953963940699207726}
+  controller: {fileID: 8486849548873617599}
   patrolState: {fileID: 7164286031740124167}
   chaseState: {fileID: 2707309682483615198}
   shootingState: {fileID: 8775378345776500649}
@@ -206,6 +179,23 @@ MonoBehaviour:
   knockback: 0
   isAttacking: 0
   <MaxHealth>k__BackingField: 125
+--- !u!114 &8486849548873617599
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4034984483810168527}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 757f1c79b2d86674e99d68d115928efb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 128
+  horizontalRayCount: 0
+  verticalRayCount: 0
 --- !u!1 &7971567648934375795
 GameObject:
   m_ObjectHideFlags: 0
@@ -255,7 +245,7 @@ MonoBehaviour:
   idle: {fileID: 4795851339469953032}
   navigate: {fileID: 1740141281623109131}
   enemyProperties: {fileID: 1953963940699207726}
-  radius: 0
+  radius: 10
 --- !u!114 &4795851339469953032
 MonoBehaviour:
   m_ObjectHideFlags: 0

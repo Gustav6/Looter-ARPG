@@ -215,10 +215,10 @@ GameObject:
   m_Component:
   - component: {fileID: 7150605382936732098}
   - component: {fileID: 3329924540678230704}
-  - component: {fileID: 6309375913828335972}
   - component: {fileID: 2552159463489457514}
   - component: {fileID: 578418195324838049}
   - component: {fileID: 4321649477641307041}
+  - component: {fileID: 3572589732216584131}
   m_Layer: 3
   m_Name: Enemy
   m_TagString: Untagged
@@ -299,33 +299,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!50 &6309375913828335972
-Rigidbody2D:
-  serializedVersion: 5
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8525698252564195251}
-  m_BodyType: 1
-  m_Simulated: 1
-  m_UseFullKinematicContacts: 0
-  m_UseAutoMass: 0
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_GravityScale: 1
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_Interpolate: 0
-  m_SleepingMode: 1
-  m_CollisionDetection: 0
-  m_Constraints: 0
 --- !u!61 &2552159463489457514
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -384,8 +357,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3b6d8860595672b47bbd71073588e30c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  body: {fileID: 0}
   animator: {fileID: 0}
+  controller: {fileID: 3572589732216584131}
   enemyProperties: {fileID: 4321649477641307041}
   patrolState: {fileID: 2045918298356660606}
   chaseState: {fileID: 8767022211466439376}
@@ -411,3 +384,20 @@ MonoBehaviour:
   knockback: 0
   isAttacking: 0
   <MaxHealth>k__BackingField: 100
+--- !u!114 &3572589732216584131
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8525698252564195251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 757f1c79b2d86674e99d68d115928efb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  collisionMask:
+    serializedVersion: 2
+    m_Bits: 128
+  horizontalRayCount: 0
+  verticalRayCount: 0

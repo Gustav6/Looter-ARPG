@@ -12,8 +12,6 @@ public abstract class State : MonoBehaviour
 
     protected Core core;
 
-    protected Rigidbody2D body => core.body;
-
     protected Animator animator => core.animator;
 
     public StateMachine machine;

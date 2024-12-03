@@ -147,14 +147,14 @@ MonoBehaviour:
   - transitionType: 3
     effected: {fileID: 8691540081844770997}
     duration: 0.25
-    target: {x: 0, y: -100}
+    target: {x: 0, y: -75}
     targetTransform: {fileID: 0}
     targetInWorldPosition: 0
     overrideExistingTransitions: 1
   - transitionType: 3
     effected: {fileID: 505436086002464741}
     duration: 0.25
-    target: {x: 0, y: -100}
+    target: {x: 0, y: -75}
     targetTransform: {fileID: 0}
     targetInWorldPosition: 0
     overrideExistingTransitions: 1

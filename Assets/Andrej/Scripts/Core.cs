@@ -4,11 +4,11 @@ using UnityEngine;
 
 public abstract class Core : MonoBehaviour
 {
-    public Rigidbody2D body;
-
     public Animator animator;
 
     public StateMachine machine;
+
+    public Controller2D controller;
 
     public State state => machine.state;
 

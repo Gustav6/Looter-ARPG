@@ -23,7 +23,11 @@ public class Player : MonoBehaviour, IDamagable
     [BoxGroup("Movement")]
     public float baseMoveSpeed = 5;
 
-    [BoxGroup("Movement")]
+    private bool sprinting;
+    #endregion
+
+    #region Stamina
+    [BoxGroup("Stamina")]
     [SerializeField] private float currentStamina;
     public float Stamina
     {
@@ -44,25 +48,23 @@ public class Player : MonoBehaviour, IDamagable
             }
         }
     }
-
-    [BoxGroup("Movement")]
+    [BoxGroup("Stamina")]
     public float maxStamina = 100f;
-    [BoxGroup("Movement")]
+    [BoxGroup("Stamina")]
     public float sprintCost = 25f;
-    [BoxGroup("Movement")]
+    [BoxGroup("Stamina")]
     public float rechargeTime = 1f;
-    [BoxGroup("Movement")]
+
+    [BoxGroup("Stamina")]
     [SerializeField] private Image staminaProgressUI = null;
 
-    private bool sprinting;
+    [BoxGroup("Stamina")]
+    [SerializeField] private CanvasGroup staminaSliderCanvasGroup = null;
     #endregion
 
     #region Invenroty
     [BoxGroup("Inventory")]
     public InventoryObject inventory;
-
-    [BoxGroup("Inventory")]
-    [SerializeField] private CanvasGroup sliderCanvasGroup = null;
 
     [BoxGroup("Inventory")]
     public GameObject inventoryCanvas;
@@ -189,15 +191,18 @@ public class Player : MonoBehaviour, IDamagable
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Space))
+        if (inventory != null)
         {
-            Debug.Log("Saving");
-            inventory.Save();
-        }
-        if (Input.GetKeyDown(KeyCode.Q))
-        {
-            Debug.Log("Loading");
-            inventory.Load();
+            if (Input.GetKeyDown(KeyCode.Space))
+            {
+                Debug.Log("Saving");
+                inventory.Save();
+            }
+            if (Input.GetKeyDown(KeyCode.Q))
+            {
+                Debug.Log("Loading");
+                inventory.Load();
+            }
         }
     }
 
@@ -210,16 +215,16 @@ public class Player : MonoBehaviour, IDamagable
 
     void UpdateStaminaBar(int value)
     {
-        if (staminaProgressUI != null && sliderCanvasGroup != null)
+        if (staminaProgressUI != null && staminaSliderCanvasGroup != null)
         {
             staminaProgressUI.fillAmount = Stamina / maxStamina;
             if (value == 0)
             {
-                sliderCanvasGroup.alpha = 0;
+                staminaSliderCanvasGroup.alpha = 0;
             }
             else
             {
-                sliderCanvasGroup.alpha = 1;
+                staminaSliderCanvasGroup.alpha = 1;
             }
         }
     }
@@ -238,7 +243,10 @@ public class Player : MonoBehaviour, IDamagable
 
     private void OnApplicationQuit()
     {
-        inventory.Container.Items.Clear();
+        if (inventory != null)
+        {
+            inventory.Container.Items.Clear();
+        }
     }
 
     public void Damage(int damageAmount)

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TypewriterEffect : MonoBehaviour
 {
-    [SerializeField] private float writingSpeed = 50f;
+    [SerializeField] private float baseWritingSpeed = 20f;
 
     public Coroutine Run(string textToType, TMP_Text textLabel)
     {
@@ -18,7 +18,7 @@ public class TypewriterEffect : MonoBehaviour
 
         while (charIndex < textToType.Length)
         {
-            t += Time.deltaTime * writingSpeed;
+            t += Time.deltaTime * baseWritingSpeed;
             charIndex = Mathf.FloorToInt(t);
             charIndex = Mathf.Clamp(charIndex, 0, textToType.Length);
             textLabel.text = textToType.Substring(0, charIndex);

@@ -1,26 +1,50 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
 
 public class DialogueUI : MonoBehaviour
 {
+    public static DialogueUI Instance;
+
     [SerializeField] private GameObject dialogueBox;
     [SerializeField] private TMP_Text textLabel;
-    [SerializeField] private DialogueObject testDialogue;
+    public DialogueObject dialogue;
 
     private TypewriterEffect typewriterEffect;
+
+    public event EventHandler OnDialogueFinished;
+
+    private void Awake()
+    {
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            Destroy(this);
+            return;
+        }
+    }
 
     private void Start()
     {
         typewriterEffect = GetComponent<TypewriterEffect>();
         CloseDialogueBox();
-        ShowDialogue(testDialogue);
     }
 
     public void ShowDialogue(DialogueObject dialogueObject)
     {
         dialogueBox.SetActive(true);
         StartCoroutine(StepThroughDialogue(dialogueObject));
+    }
+
+    public void CloseDialogueBox()
+    {
+        dialogueBox.SetActive(false);
+        textLabel.text = string.Empty;
     }
 
     private IEnumerator StepThroughDialogue(DialogueObject dialogueObject)
@@ -32,11 +56,11 @@ public class DialogueUI : MonoBehaviour
         }
 
         CloseDialogueBox();
+        DialogueFinished();
     }
 
-    private void CloseDialogueBox()
+    public void DialogueFinished()
     {
-        dialogueBox.SetActive(false);
-        textLabel.text = string.Empty;
+        OnDialogueFinished?.Invoke(this, EventArgs.Empty);
     }
 }

@@ -44,7 +44,7 @@ public class ChaseState : State
                 isComplete = true;
             }
         }
-        else
+        else if(checkedLastLocation)
         {
             checkedLastLocation = false;
         }

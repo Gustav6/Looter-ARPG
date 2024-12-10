@@ -745,12 +745,16 @@ PrefabInstance:
       value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 1953963940699207726, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
+      propertyPath: distanceToPlayer
+      value: 1e+17
+      objectReference: {fileID: 0}
+    - target: {fileID: 1953963940699207726, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
       propertyPath: cantPassThrough.m_Bits
       value: 128
       objectReference: {fileID: 0}
     - target: {fileID: 2338967628814538538, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -38.05
+      value: -48.83
       objectReference: {fileID: 0}
     - target: {fileID: 2338967628814538538, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
       propertyPath: m_LocalPosition.y

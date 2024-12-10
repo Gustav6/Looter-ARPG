@@ -45,6 +45,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyProperties: {fileID: 4321649477641307041}
+  lastSeenLocation: {x: 0, y: 0}
+  checkedLastLocation: 0
 --- !u!1 &6020918913694519885
 GameObject:
   m_ObjectHideFlags: 0
@@ -374,14 +376,18 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   damagePopupPrefab: {fileID: 5801573854073587537, guid: 46d9f7e137d7efb4c84315a58e250950, type: 3}
-  distanceToPlayer: 0
+  distanceToPlayer: 1e+11
   aggroRange: 12
   attackRange: 1.2
   speed: 15
   health: 0
   damage: 0
   knockback: 0
+  hasLineOfSight: 0
   isAttacking: 0
+  cantPassThrough:
+    serializedVersion: 2
+    m_Bits: 0
   <MaxHealth>k__BackingField: 100
 --- !u!114 &3572589732216584131
 MonoBehaviour:

@@ -5,7 +5,6 @@ using UnityEngine;
 public class ShootingState : State
 {
     public GameObject projectile;
-    public EnemyProperties enemyProperties;
 
     private float timeBtwShots;
     public float startTimeBtwShots;

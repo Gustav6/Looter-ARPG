@@ -23,10 +23,6 @@ public class ChaseState : MoveState
             {
                 moveDirection = (lastSeenLocation.Value - (Vector2)transform.position).normalized;
             }
-            else
-            {
-                moveDirection = Vector2.zero;
-            }
         }
 
         Debug.Log(moveDirection);

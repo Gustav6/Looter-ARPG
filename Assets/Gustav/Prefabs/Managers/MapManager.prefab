@@ -49,8 +49,8 @@ MonoBehaviour:
   spawnFunction: 1
   generationRadius: 250
   stripSize: {x: 150, y: 125}
-  totalRoomsCount: 15
-  amountOfMainRooms: 15
+  totalRoomsCount: 25
+  amountOfMainRooms: 25
   roomMaxSize: {x: 25, y: 22}
   roomMinSize: {x: 12, y: 10}
   roundCorners: 1
@@ -64,29 +64,22 @@ MonoBehaviour:
   hallwayMaxWidth: 12
   enemyPrefabs:
   - {fileID: 8525698252564195251, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
-  amountOfEnemies: 25
+  - {fileID: 4034984483810168527, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
+  amountOfEnemies: 35
   perlinNoiseMaps:
-  - name: Breakable Cover
-    tileMapEffected: 0
-    amountOfNoiseLoops: 2
-    noiseScale: 6
-    octaves: 5
-    persistence: 0.2
-    lacunarity: 0
-    prefabs:
-    - name: Wall
-      heightValue: 0
-      prefab: {fileID: 8740092898635350770, guid: e77099fea85d40a4cb1cf1a5e89752cf, type: 3}
   - name: Prefabs
     tileMapEffected: 0
-    amountOfNoiseLoops: 2
+    amountOfNoiseLoops: 4
     noiseScale: 8
-    octaves: 4
-    persistence: 1
+    octaves: 5
+    persistence: 0.548
     lacunarity: 2
     prefabs:
+    - name: Empty
+      heightValue: 0.05
+      prefab: {fileID: 0}
     - name: Barrel
-      heightValue: 0.12
+      heightValue: 0.1
       prefab: {fileID: 4889750398875816261, guid: 46289d76540a0724e9abe84559d0610c, type: 3}
 --- !u!114 &3171003164158351417
 MonoBehaviour:
@@ -105,6 +98,7 @@ MonoBehaviour:
     type: 0
   - tile: {fileID: 11400000, guid: f01ce3f1289e516448379e45243aa6e4, type: 2}
     type: 1
+  <LoadMapInCurrentScene>k__BackingField: 0
   <MapPrefab>k__BackingField: {fileID: 8227713409367015042, guid: 5f8a012069c1dbc4f8cd7e4df38d44f6, type: 3}
   <RegionWidth>k__BackingField: 0
   <RegionHeight>k__BackingField: 0

@@ -63,6 +63,7 @@ public class MapManager : MonoBehaviour
 
         SceneManager.sceneLoaded += OnSceneLoad;
         MapGeneration.OnGenerationCompleted += MapGeneration_OnGenerationCompleted;
+        SubscribeToPlayerRegionSwitchEvent();
     }
 
     public void Update()
@@ -94,6 +95,22 @@ public class MapManager : MonoBehaviour
             }
 
             MapGeneration.GenerateMapAsync(this, MapPrefab);
+        }
+    }
+
+    private void OnSceneLoad(Scene scene, LoadSceneMode mode)
+    {
+        cameraReference = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
+
+        SubscribeToPlayerRegionSwitchEvent();
+    }
+
+    private void SubscribeToPlayerRegionSwitchEvent()
+    {
+        if (Player.Instance != null)
+        {
+            Player.Instance.OnRegionSwitch -= Instance_OnRegionSwitch;
+            Player.Instance.OnRegionSwitch += Instance_OnRegionSwitch;
         }
     }
 
@@ -137,18 +154,6 @@ public class MapManager : MonoBehaviour
         LoadMap(mapToLoad);
 
         tryingToLoadMap = false;
-    }
-
-
-    private void OnSceneLoad(Scene scene, LoadSceneMode mode)
-    {
-        cameraReference = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
-
-        if (Player.Instance != null)
-        {
-            Player.Instance.OnRegionSwitch -= Instance_OnRegionSwitch;
-            Player.Instance.OnRegionSwitch += Instance_OnRegionSwitch;
-        }
     }
 
     #endregion

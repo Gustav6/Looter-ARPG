@@ -17,7 +17,7 @@ public class NPC : MonoBehaviour
     {
         if (canInteractWith && !isSpeaking)
         {
-            if (Input.GetKey(KeyCode.E))
+            if (Input.GetKeyDown(KeyCode.E))
             {
                 DialogueUI.Instance.ShowDialogue(dialogue);
                 isSpeaking = true;

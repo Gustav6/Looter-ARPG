@@ -5,59 +5,81 @@ using Unity.Hierarchy;
 using Unity.VisualScripting;
 using UnityEngine;
 
-public class ChaseState : State
+public class ChaseState : MoveState
 {
-    public EnemyProperties enemyProperties;
-    public Vector2 lastSeenLocation;
+    public Vector2? lastSeenLocation;
     public bool checkedLastLocation = false;
 
     private float distanceFromLastLocation;
     public void Chase()
     {
-        if (!enemyProperties.hasLineOfSight)
+        if (enemyProperties.hasLineOfSight)
         {
-            enemyProperties.transform.position = Vector2.MoveTowards(transform.position, lastSeenLocation, enemyProperties.speed * Time.deltaTime);
+            moveDirection = (enemyProperties.player.transform.position - transform.position).normalized;
         }
         else
         {
-            enemyProperties.transform.position = Vector2.MoveTowards(transform.position, enemyProperties.player.transform.position, enemyProperties.speed * Time.deltaTime);
+            if (!checkedLastLocation && lastSeenLocation != null)
+            {
+                moveDirection = (lastSeenLocation.Value - (Vector2)transform.position).normalized;
+            }
+            else
+            {
+                moveDirection = Vector2.zero;
+            }
         }
+
+        Debug.Log(moveDirection);
     }
     public override void Enter()
     {
-
+        base.Enter();
     }
     public override void Do()
     {
         Chase();
 
-        if (!enemyProperties.hasLineOfSight)
-        {
-            distanceFromLastLocation = Vector3.Distance(transform.position, lastSeenLocation);
-            if (!checkedLastLocation)
-            {
-                lastSeenLocation = enemyProperties.player.transform.position;
-                checkedLastLocation = true;
-            }
-            if (distanceFromLastLocation < 0.05)
-            {
-                isComplete = true;
-            }
-        }
-        else if(checkedLastLocation)
-        {
-            checkedLastLocation = false;
-        }
+        LineOfSightCheck();
 
         if(enemyProperties.attackRange > enemyProperties.distanceToPlayer && time > 0.5)
         {
             enemyProperties.isAttacking = true;
             isComplete = true;
         }
+
+        base.Do();
+    }
+
+    public void LineOfSightCheck()
+    {
+        if (enemyProperties.hasLineOfSight)
+        {
+            lastSeenLocation = null;
+
+            return;
+        }
+        else if (lastSeenLocation != null)
+        {
+            distanceFromLastLocation = Vector3.Distance(transform.position, lastSeenLocation.Value);
+
+            if (distanceFromLastLocation < 0.05)
+            {
+                moveDirection = Vector2.zero;
+
+                checkedLastLocation = true;
+                lastSeenLocation = null;
+                isComplete = true;
+            }
+
+            return;
+        }
+
+        lastSeenLocation = enemyProperties.player.transform.position;
+        checkedLastLocation = false;
     }
 
     public override void Exit()
     {
-
+        base.Exit();
     }
 }

@@ -4,8 +4,6 @@ using UnityEngine;
 
 public class AttackState : State
 {
-    public EnemyProperties enemyProperties;
-
     private float delay = 0.15f;
     public override void Enter() 
     {

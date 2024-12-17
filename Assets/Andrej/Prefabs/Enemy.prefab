@@ -93,6 +93,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyProperties: {fileID: 4321649477641307041}
+  enemyProperties: {fileID: 4321649477641307041}
 --- !u!58 &4690625219934385929
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -139,8 +140,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3403999157092351010}
   - component: {fileID: 2045918298356660606}
-  - component: {fileID: 7270396774483703595}
-  - component: {fileID: 4239414238914401201}
   m_Layer: 0
   m_Name: Patrol
   m_TagString: Untagged
@@ -175,34 +174,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4b84ba40cda14a04d852c253a4ac48db, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  idle: {fileID: 7270396774483703595}
-  navigate: {fileID: 4239414238914401201}
-  enemyProperties: {fileID: 4321649477641307041}
---- !u!114 &7270396774483703595
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6924369275571516725}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 15946cfa8eadedd4db87679e6b3c4fed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
---- !u!114 &4239414238914401201
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6924369275571516725}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8cfa951a7e8cf7240ad6c43152951ea7, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  randomDir: {x: 0, y: 0}
   enemyProperties: {fileID: 4321649477641307041}
 --- !u!1 &8525698252564195251
 GameObject:
@@ -376,6 +347,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   player: {fileID: 0}
   damagePopupPrefab: {fileID: 5801573854073587537, guid: 46d9f7e137d7efb4c84315a58e250950, type: 3}
+  controller: {fileID: 0}
   distanceToPlayer: 1e+11
   aggroRange: 12
   attackRange: 1.2

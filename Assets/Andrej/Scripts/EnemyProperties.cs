@@ -7,6 +7,8 @@ public class EnemyProperties : MonoBehaviour, IDamagable
     public GameObject player;
     public GameObject damagePopupPrefab;
 
+    public Controller2D controller;
+
     public float distanceToPlayer;
     public float aggroRange;
     public float attackRange;
@@ -50,6 +52,8 @@ public class EnemyProperties : MonoBehaviour, IDamagable
         player = GameObject.FindGameObjectWithTag("Player");
 
         origin = transform.position;
+
+        controller = GetComponent<Controller2D>();
     }
 
     private void Update()

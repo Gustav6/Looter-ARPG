@@ -4,6 +4,7 @@ using UnityEngine;
 
 public abstract class State : MonoBehaviour
 {
+    public EnemyProperties enemyProperties;
     public bool isComplete { get; protected set; }
 
     protected float startTime;
@@ -12,13 +13,13 @@ public abstract class State : MonoBehaviour
 
     protected Core core;
 
-    protected Animator animator => core.animator;
+    protected Animator Anim => core.animator;
 
     public StateMachine machine;
 
     public StateMachine parent;
 
-    public State state => machine.state;
+    public State CurrentState => machine.state;
 
     protected void Set(State newState, bool forceReset = false)
     {
@@ -39,13 +40,13 @@ public abstract class State : MonoBehaviour
     public void DoBranch()
     {
         Do();
-        state?.DoBranch();
+        CurrentState?.DoBranch();
     }
 
     public void DoFixedBranch()
     {
         DoFixed();
-        state?.DoFixedBranch();
+        CurrentState?.DoFixedBranch();
     }
 
     public void Initialise(StateMachine _parent)

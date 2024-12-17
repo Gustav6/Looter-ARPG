@@ -18,10 +18,10 @@ public class Rocket : BigProjectile
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.tag == "Enemy")
-        {              
-            CameraShake.ShakeCamera(4);
+        {
+            Debug.Log("aahh");
             Instantiate(explosionCiclePrefab, transform.position, Quaternion.identity);
-            Destroy(gameObject);
+            CameraShake.ShakeCamera(4);
         }
     }
 }

@@ -245,7 +245,7 @@ public class Player : MonoBehaviour, IDamagable
     {
         if (inventory != null)
         {
-            inventory.Container.Items.Clear();
+            inventory.Container.Items = new InventorySlot[24];
         }
     }
 

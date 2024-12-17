@@ -1,7 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using UnityEngine.UI;
 
 public class DisplayInventory : MonoBehaviour
@@ -15,51 +18,83 @@ public class DisplayInventory : MonoBehaviour
     public int x_Space_Between_Items;
     public int number_Of_Columns;
     public int y_Space_Between_Items;
-    Dictionary<InventorySlot, GameObject> itemsDisplayed = new Dictionary<InventorySlot, GameObject>();
+    Dictionary<GameObject, InventorySlot > itemsDisplayed = new Dictionary<GameObject , InventorySlot>();
     void Start()
     {
-        CreateDisplay();
+        CreateSlots();
     }
 
     void Update()
     {
-        UpdateDisplay();
+        UpdateSlots();   
     }
 
-    public void UpdateDisplay()
+    public void UpdateSlots()
     {
-        for (int i = 0; i < inventory.Container.Items.Count; i++)
+        foreach (KeyValuePair<GameObject, InventorySlot> _slot in itemsDisplayed)
         {
-            InventorySlot slot = inventory.Container.Items[i];
-            if (itemsDisplayed.ContainsKey(inventory.Container.Items[i]))
+            if (_slot.Value.ID >= 0)
             {
-                itemsDisplayed[inventory.Container.Items[i]].GetComponentInChildren<TextMeshProUGUI>().text = slot.amount.ToString("n0");
+                _slot.Key.transform.GetChild(0).GetComponentInChildren<Image>().sprite = inventory.database.GetItem[_slot.Value.item.Id].UiDisplay;
+                _slot.Key.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(1, 1, 1, 1);
+                _slot.Key.GetComponentInChildren<TextMeshProUGUI>().text = _slot.Value.amount == 1 ? "" : _slot.Value.amount.ToString("n0");
             }
             else
             {
-                var obj = Instantiate(inventoryPrefab, Vector3.zero, Quaternion.identity, transform);
-                obj.transform.GetChild(0).GetComponentInChildren<Image>().sprite = inventory.database.GetItem[slot.item.Id].UiDisplay;
-                obj.GetComponent<RectTransform>().localPosition = GetPosition(i);
-                obj.GetComponentInChildren<TextMeshProUGUI>().text = slot.amount.ToString("n0");
-                itemsDisplayed.Add(inventory.Container.Items[i], obj);
+                _slot.Key.transform.GetChild(0).GetComponentInChildren<Image>().sprite = null;
+                _slot.Key.transform.GetChild(0).GetComponentInChildren<Image>().color = new Color(1, 1, 1, 0);
+                _slot.Key.GetComponentInChildren<TextMeshProUGUI>().text = "";
             }
+        
         }
     }
-    public void CreateDisplay()
+
+    public void CreateSlots()
     {
-        for (int i = 0; i < inventory.Container.Items.Count; i++)
+        itemsDisplayed = new Dictionary<GameObject, InventorySlot>();
+        for (int i = 0; i < inventory.Container.Items.Length; i++)
         {
-            InventorySlot slot = inventory.Container.Items[i];
-
             var obj = Instantiate(inventoryPrefab, Vector3.zero, Quaternion.identity, transform);
-            obj.transform.GetChild(0).GetComponentInChildren<Image>().sprite = inventory.database.GetItem[slot.item.Id].UiDisplay;
             obj.GetComponent<RectTransform>().localPosition = GetPosition(i);
-            obj.GetComponentInChildren<TextMeshProUGUI>().text =slot.amount.ToString("n0");
 
-            itemsDisplayed.Add(slot, obj);
+            AddEvent(obj, EventTriggerType.PointerEnter, delegate { OnEnter(obj); });
+            AddEvent(obj, EventTriggerType.PointerExit, delegate { OnExit(obj); });
+            AddEvent(obj, EventTriggerType.BeginDrag, delegate { OnDragStart(obj); });
+            AddEvent(obj, EventTriggerType.EndDrag, delegate { OnDragExit(obj); });
+            AddEvent(obj, EventTriggerType.Drag, delegate { OnDrag(obj); });
+
+            itemsDisplayed.Add(obj, inventory.Container.Items[i]);
         }
     }
+    private void AddEvent(GameObject obj, EventTriggerType type, UnityAction<BaseEventData> action)
+    {
+        EventTrigger trigger = obj.GetComponent<EventTrigger>();
+        var eventTrigger = new EventTrigger.Entry();
+        eventTrigger.eventID = type;
+        eventTrigger.callback.AddListener(action);
+        trigger.triggers.Add(eventTrigger);
+    }
 
+    public void OnEnter(GameObject obj)
+    {
+
+    }
+    public void OnExit(GameObject obj)
+    {
+
+    }
+    public void OnDragStart(GameObject obj)
+    {
+        var mouseObject = new GameObject();
+    }
+    public void OnDragExit(GameObject obj)
+    {
+
+    }
+    public void OnDrag(GameObject obj)
+    {
+
+    }
     public Vector3 GetPosition(int i)
     {
         return new Vector3(x_Start + (x_Space_Between_Items * (i % number_Of_Columns)), y_Start + (-y_Space_Between_Items * (i / number_Of_Columns)), 0f);

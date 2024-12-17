@@ -13,6 +13,6 @@ MonoBehaviour:
   m_Name: objectofmassdestruction
   m_EditorClassIdentifier: 
   Id: 1
-  UiDisplay: {fileID: -1081035513, guid: eb1c37c4efa0d124792ba35f4aa1df47, type: 3}
+  UiDisplay: {fileID: 8029128692041829076, guid: 72587d34dfcd639489afa82e3ff55e46, type: 3}
   type: 2
   description: 

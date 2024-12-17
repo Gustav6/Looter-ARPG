@@ -180,6 +180,11 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 06747a0b8372b4649b069ee3b69e655c, type: 3}
+--- !u!4 &889398599 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2442056998277691869, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
+  m_PrefabInstance: {fileID: 1466876505}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1168078352 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7850766631232578949, guid: 7782a358ea2820641ad509817eaa57d8, type: 3}
@@ -213,7 +218,23 @@ PrefabInstance:
     - target: {fileID: 63582763776312651, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: gun
       value: 
-      objectReference: {fileID: 11400000, guid: ddbc4c73383053443ab6145f503f179d, type: 2}
+      objectReference: {fileID: 11400000, guid: 9dcf49aaf94415b44971313920b4e13f, type: 2}
+    - target: {fileID: 63582763776312651, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
+      propertyPath: playerPos
+      value: 
+      objectReference: {fileID: 1629195659}
+    - target: {fileID: 63582763776312651, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
+      propertyPath: weaponRotateAxis
+      value: 
+      objectReference: {fileID: 889398599}
+    - target: {fileID: 63582763776312651, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
+      propertyPath: collidableLayersRaycast.m_Bits
+      value: 128
+      objectReference: {fileID: 0}
+    - target: {fileID: 717219227269886209, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2550612651143373822, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: inventory
       value: 

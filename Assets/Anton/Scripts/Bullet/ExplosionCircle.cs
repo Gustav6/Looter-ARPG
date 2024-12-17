@@ -6,6 +6,7 @@ using UnityEngine;
 public class ExplosionCircle : MonoBehaviour
 {
     float timer;
+    public bool tickDamage;
     private void Start()
     {
         transform.localScale = new Vector3(1, 1);
@@ -27,12 +28,15 @@ public class ExplosionCircle : MonoBehaviour
         {
             return;
         }
-
+      
         if (collision.TryGetComponent<IDamagable>(out IDamagable damagable))
         {
-            if (!damagable.TickDamageActive)
+            if (tickDamage)
             {
-                collision.GetComponent<MonoBehaviour>().StartCoroutine(damagable.TickDamage(10, collision.transform, GunController.Instance.damagePopupPrefab));
+                if (!damagable.TickDamageActive)
+                {
+                    collision.GetComponent<MonoBehaviour>().StartCoroutine(damagable.TickDamage(10, collision.transform, GunController.Instance.damagePopupPrefab));
+                }
             }
             else
             {

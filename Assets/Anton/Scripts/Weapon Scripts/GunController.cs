@@ -4,6 +4,7 @@ using System.Linq;
 using TMPro;
 using Unity.VisualScripting;
 using UnityEngine;
+using static UnityEditor.ShaderGraph.Internal.KeywordDependentCollection;
 
 public class GunController : MonoBehaviour
 {
@@ -14,8 +15,9 @@ public class GunController : MonoBehaviour
     public Transform firePoint;
     public Transform firePoint2;
     public SpriteRenderer sprite;
-    public LayerMask enemyLayers;
+    public LayerMask collidableLayersRaycast;
     public TextMeshPro ammoCount;
+    public Transform weaponRotateAxis;
     int ammo;
     float timer;
     float timerShake;
@@ -86,7 +88,13 @@ public class GunController : MonoBehaviour
     void Update()
     {
         #region Input
-        if (attackTimer >= gun.fireRate)
+        RaycastHit2D raycastHit = Physics2D.Raycast(weaponRotateAxis.transform.position, WeaponRotate.dir, 3.2f, collidableLayersRaycast);
+        Debug.DrawRay(weaponRotateAxis.transform.position, WeaponRotate.dir.normalized * 3.2f, Color.red);
+        if (raycastHit)
+        {
+            //nothing happens
+        }
+        else if (attackTimer >= gun.fireRate)
         {
             if (Input.GetMouseButton(0))
             {

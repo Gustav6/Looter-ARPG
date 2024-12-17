@@ -218,7 +218,7 @@ PrefabInstance:
     - target: {fileID: 63582763776312651, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: gun
       value: 
-      objectReference: {fileID: 11400000, guid: 9dcf49aaf94415b44971313920b4e13f, type: 2}
+      objectReference: {fileID: 11400000, guid: ddbc4c73383053443ab6145f503f179d, type: 2}
     - target: {fileID: 63582763776312651, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: playerPos
       value: 

@@ -15,13 +15,10 @@ public class Rocket : BigProjectile
         
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    public override void OnHit(RaycastHit2D hit, IDamagable damagable)
     {
-        if (collision.tag == "Enemy")
-        {
-            Debug.Log("aahh");
-            Instantiate(explosionCiclePrefab, transform.position, Quaternion.identity);
-            CameraShake.ShakeCamera(4);
-        }
+        Instantiate(explosionCiclePrefab, transform.position, Quaternion.identity);
+
+        base.OnHit(hit, damagable);
     }
 }

@@ -6,7 +6,6 @@ using UnityEngine;
 public class FireBall : Projectile
 {
     public GameObject fireExplosionCiclePrefab;
-
     public override void OnHit(RaycastHit2D hit, IDamagable damagable)
     {
         Instantiate(fireExplosionCiclePrefab, transform.position, Quaternion.identity);

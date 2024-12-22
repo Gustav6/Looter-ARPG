@@ -30,9 +30,14 @@ public class Selectable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
     [Foldout("Disable Transitions")]
     [SerializeField] private UIRotationTransition[] rotationTransitionsOnDisable;
 
-    private void Start()
+    protected virtual void Start()
     {
         SetActiveStatus(false);
+    }
+
+    protected virtual void Update()
+    {
+        
     }
 
     public void OnPointerEnter(PointerEventData eventData)
@@ -61,7 +66,7 @@ public class Selectable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         }
     }
 
-    public void RunWhenSelected()
+    public virtual void RunWhenSelected()
     {
         foreach (UIMoveTransition transition in moveTransitionsOnEnable)
         {
@@ -129,7 +134,7 @@ public class Selectable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         }
     }
 
-    public void RunWhenDeselected()
+    public virtual void RunWhenDeselected()
     {
         foreach (UIMoveTransition transition in moveTransitionsOnDisable)
         {

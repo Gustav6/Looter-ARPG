@@ -19,6 +19,8 @@ public static class MapGeneration
     public static event EventHandler OnGenerationCompleted;
     private static int amountOfCoreroutinesStarted, amountOfCoreroutinesFinished;
 
+    private static Vector3Int travelToNextMapObjectPosition;
+
     public static async void GenerateMapAsync(MapManager manager, GameObject mapPrefab)
     {
         // Every game object within map
@@ -173,15 +175,23 @@ public static class MapGeneration
             availableGroundPositions.UnionWith(tileMaps[TileMapType.ground]);
             availableWallPositions.UnionWith(tileMaps[TileMapType.wall]);
 
+            // Add teleporters position and remove it from available positions
+            travelToNextMapObjectPosition = Vector3Int.FloorToInt(mapReference.endRoom.center);
+
+            travelToNextMapObjectPosition.x += rng.Next(-mapReference.endRoom.width / 5, mapReference.endRoom.width / 5);
+            travelToNextMapObjectPosition.y += rng.Next(-mapReference.endRoom.height / 5, mapReference.endRoom.height / 5);
+
+            availableGroundPositions.Remove(travelToNextMapObjectPosition);
+
             // Remove the players spawn position and surrounding tiles from available list
-            Vector2Int tempTopRightPosition, tempBottomLeftPosition;
+            Vector2Int playerSpawnTopRightPosition, playerSpawnBottomLeftPosition;
 
-            tempTopRightPosition = Vector2Int.CeilToInt(mapReference.startRoom.WorldPosition) + Vector2Int.one * 2;
-            tempBottomLeftPosition = Vector2Int.FloorToInt(mapReference.startRoom.WorldPosition) - Vector2Int.one * 2;
+            playerSpawnTopRightPosition = Vector2Int.CeilToInt(mapReference.startRoom.WorldPosition) + Vector2Int.one * 2;
+            playerSpawnBottomLeftPosition = Vector2Int.FloorToInt(mapReference.startRoom.WorldPosition) - Vector2Int.one * 2;
 
-            for (int x = tempBottomLeftPosition.x; x < tempTopRightPosition.x; x++)
+            for (int x = playerSpawnBottomLeftPosition.x; x < playerSpawnTopRightPosition.x; x++)
             {
-                for (int y = tempBottomLeftPosition.y; y < tempTopRightPosition.y; y++)
+                for (int y = playerSpawnBottomLeftPosition.y; y < playerSpawnTopRightPosition.y; y++)
                 {
                     availableGroundPositions.Remove(new(x, y));
                 }
@@ -250,6 +260,8 @@ public static class MapGeneration
             return;
         }
 
+        manager.SpawnPrefab(manager.TravelToNextMapPrefab, travelToNextMapObjectPosition, mapReference, false);
+
         mapReference.WallMap.transform.GetComponent<TilemapCollider2D>().enabled = false;
 
         #region Coroutines
@@ -271,6 +283,11 @@ public static class MapGeneration
         Array.Fill(tiles, manager.tilePairs[TileTexture.wall]);
 
         manager.StartCoroutine(SetTiles(mapReference, TileMapType.wall, wallTileRanges, tileMaps[TileMapType.wall].ToArray(), tiles));
+
+        tiles = new TileBase[1000];
+        Array.Fill(tiles, manager.tilePairs[TileTexture.wallIcon]);
+
+        manager.StartCoroutine(SetTiles(mapReference, TileMapType.wallIcon, wallTileRanges, tileMaps[TileMapType.wall].ToArray(), tiles));
         amountOfCoreroutinesStarted++;
         #endregion
     }
@@ -314,6 +331,9 @@ public static class MapGeneration
                     break;
                 case TileMapType.wall:
                     map.WallMap.SetTiles(mapPositions[range], tiles);
+                    break;
+                case TileMapType.wallIcon:
+                    map.WallMapIcons.SetTiles(mapPositions[range], tiles);
                     break;
                 default:
                     break;
@@ -1097,5 +1117,6 @@ public static class MapGeneration
 public enum TileMapType
 {
     ground,
-    wall
+    wall,
+    wallIcon
 }

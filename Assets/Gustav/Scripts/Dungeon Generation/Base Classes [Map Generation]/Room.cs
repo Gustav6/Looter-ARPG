@@ -107,9 +107,9 @@ public class Room : IHeapItem<Room>
 
                     if (c1.Intersects(tilePos + (Vector2.one / 2)) || c2.Intersects(tilePos + (Vector2.one / 2)))
                     {
-                        if (i % width == 0 || i % width == width || i / width == 0 || i / width == height)
+                        if (i % width == 0 || i % width == (width - 1) || i / width == 0 || i / width == (height - 1))
                         {
-                            if (randomNumber > 50)
+                            if (randomNumber > 75)
                             {
                                 canAdd = true;
                             }

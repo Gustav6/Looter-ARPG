@@ -4,12 +4,15 @@ public class NPC : MonoBehaviour
 {
     [SerializeField] private DialogueObject dialogue;
     [SerializeField] private bool isSpeaking;
+    private DialogueUI dialogueReference;
 
     private bool canInteractWith = false;
 
     private void Start()
     {
-        DialogueUI.Instance.OnDialogueFinished += Dialogue_OnDialogueFinished;
+        dialogueReference = UIManager.Instance.ObjectPairs[InstantiatedObjectType.dialogueCanvas].GetComponent<DialogueUI>();
+
+        dialogueReference.OnDialogueFinished += Dialogue_OnDialogueFinished;
         isSpeaking = false;
     }
 
@@ -19,7 +22,7 @@ public class NPC : MonoBehaviour
         {
             if (Input.GetKeyDown(KeyCode.E))
             {
-                DialogueUI.Instance.ShowDialogue(dialogue);
+                dialogueReference.ShowDialogue(dialogue);
                 isSpeaking = true;
             }
         }
@@ -47,7 +50,7 @@ public class NPC : MonoBehaviour
             return;
         }
 
-        DialogueUI.Instance.CloseDialogueBox();
+        dialogueReference.CloseDialogueBox();
         canInteractWith = false;
     }
 }

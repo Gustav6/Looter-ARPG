@@ -132,7 +132,7 @@ GameObject:
   - component: {fileID: 78950045}
   - component: {fileID: 78950044}
   m_Layer: 5
-  m_Name: Canvas
+  m_Name: Menu Canvas
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -436,6 +436,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2173455460441430663, guid: 06747a0b8372b4649b069ee3b69e655c, type: 3}
+      propertyPath: instantiateOnStart.Array.size
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6007536782413481001, guid: 06747a0b8372b4649b069ee3b69e655c, type: 3}
       propertyPath: m_Name
       value: UIManager
@@ -493,6 +497,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: <LoadMapInCurrentScene>k__BackingField
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3649946842529648313, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -722,11 +730,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 451416500728142060, guid: 21f6c3fdb93983e4d9796ad91abe8f46, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1043569970263249261, guid: 21f6c3fdb93983e4d9796ad91abe8f46, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 1959122380589275317, guid: 21f6c3fdb93983e4d9796ad91abe8f46, type: 3}
       propertyPath: m_SizeDelta.y
@@ -734,7 +742,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1959122380589275317, guid: 21f6c3fdb93983e4d9796ad91abe8f46, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 40
       objectReference: {fileID: 0}
     - target: {fileID: 2820193053082975825, guid: 21f6c3fdb93983e4d9796ad91abe8f46, type: 3}
       propertyPath: m_fontAsset
@@ -798,7 +806,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4327714189102910058, guid: 21f6c3fdb93983e4d9796ad91abe8f46, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -40
       objectReference: {fileID: 0}
     - target: {fileID: 4327714189102910058, guid: 21f6c3fdb93983e4d9796ad91abe8f46, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -818,7 +826,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4406371932552702288, guid: 21f6c3fdb93983e4d9796ad91abe8f46, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -210
       objectReference: {fileID: 0}
     - target: {fileID: 4406371932552702288, guid: 21f6c3fdb93983e4d9796ad91abe8f46, type: 3}
       propertyPath: m_AnchoredPosition.x
@@ -898,7 +906,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7344542363485019544, guid: 21f6c3fdb93983e4d9796ad91abe8f46, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: -125
       objectReference: {fileID: 0}
     - target: {fileID: 7344542363485019544, guid: 21f6c3fdb93983e4d9796ad91abe8f46, type: 3}
       propertyPath: m_AnchoredPosition.x

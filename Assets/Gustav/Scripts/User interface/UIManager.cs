@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -5,6 +6,10 @@ using UnityEngine;
 public class UIManager : MonoBehaviour
 {
     public static UIManager Instance { get; private set; }
+
+    public Dictionary<InstantiatedObjectType, GameObject> ObjectPairs { get; private set; }
+
+    public InstantiateObjectOnStart[] instantiateOnStart;
 
     public bool GamePaused { get; private set; }
 
@@ -19,14 +24,33 @@ public class UIManager : MonoBehaviour
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else if (Instance != this)
+        else
         {
             Destroy(gameObject);
             return;
         }
 
+        ObjectPairs = new Dictionary<InstantiatedObjectType, GameObject>();
+
+        foreach (InstantiateObjectOnStart objectToInstantiate in instantiateOnStart)
+        {
+            GameObject g = Instantiate(objectToInstantiate.prefab);
+            g.SetActive(objectToInstantiate.active);
+
+            ObjectPairs.TryAdd(objectToInstantiate.type, g);
+        }
+
         ResolutionScaling = 1;
-        UnPauseGame();
+    }
+
+    public void PowerupMenu(bool active)
+    {
+        ObjectPairs[InstantiatedObjectType.powerupCanvas].SetActive(active);
+    }
+
+    public void PauseMenu(bool active)
+    {
+        ObjectPairs[InstantiatedObjectType.pauseCanvas].SetActive(active);
     }
 
     public void PauseGame()
@@ -46,4 +70,19 @@ public class UIManager : MonoBehaviour
     {
         FullScreen = true;
     }
+}
+
+[Serializable]
+public struct InstantiateObjectOnStart
+{
+    public InstantiatedObjectType type;
+    public GameObject prefab;
+    public bool active;
+}
+
+public enum InstantiatedObjectType
+{
+    dialogueCanvas,
+    powerupCanvas,
+    pauseCanvas,
 }

@@ -49,8 +49,8 @@ MonoBehaviour:
   spawnFunction: 1
   generationRadius: 250
   stripSize: {x: 150, y: 125}
-  totalRoomsCount: 25
-  amountOfMainRooms: 25
+  totalRoomsCount: 15
+  amountOfMainRooms: 15
   roomMaxSize: {x: 25, y: 22}
   roomMinSize: {x: 12, y: 10}
   roundCorners: 1
@@ -65,7 +65,7 @@ MonoBehaviour:
   enemyPrefabs:
   - {fileID: 8525698252564195251, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
   - {fileID: 4034984483810168527, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
-  amountOfEnemies: 35
+  amountOfEnemies: 30
   perlinNoiseMaps:
   - name: Prefabs
     tileMapEffected: 0
@@ -98,8 +98,11 @@ MonoBehaviour:
     type: 0
   - tile: {fileID: 11400000, guid: f01ce3f1289e516448379e45243aa6e4, type: 2}
     type: 1
-  <LoadMapInCurrentScene>k__BackingField: 0
+  - tile: {fileID: 11400000, guid: 4c3c381c0431b194cb7ce0c060bc50e8, type: 2}
+    type: 2
+  <LoadMapInCurrentScene>k__BackingField: 1
   <MapPrefab>k__BackingField: {fileID: 8227713409367015042, guid: 5f8a012069c1dbc4f8cd7e4df38d44f6, type: 3}
+  <TravelToNextMapPrefab>k__BackingField: {fileID: 573335589479022553, guid: d61570b7e33617b488b0650f034a8a4b, type: 3}
   <RegionWidth>k__BackingField: 0
   <RegionHeight>k__BackingField: 0
   currentMap: {fileID: 0}

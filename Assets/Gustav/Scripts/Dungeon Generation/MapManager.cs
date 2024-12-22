@@ -21,6 +21,7 @@ public class MapManager : MonoBehaviour
 
     [field: SerializeField] public bool LoadMapInCurrentScene { get; private set; }
     [field: SerializeField] public GameObject MapPrefab { get; private set; }
+    [field: SerializeField] public GameObject TravelToNextMapPrefab { get; private set; }
     [field: SerializeField] public int RegionWidth { get; private set; }
     [field: SerializeField] public int RegionHeight { get; private set; }
 
@@ -286,4 +287,5 @@ public enum TileTexture
 {
     ground,   
     wall,
+    wallIcon
 }

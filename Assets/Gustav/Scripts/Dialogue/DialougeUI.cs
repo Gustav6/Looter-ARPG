@@ -5,8 +5,6 @@ using UnityEngine;
 
 public class DialogueUI : MonoBehaviour
 {
-    public static DialogueUI Instance;
-
     [SerializeField] private GameObject dialogueBox;
     [SerializeField] private TMP_Text textLabel;
     public DialogueObject dialogue;
@@ -14,20 +12,6 @@ public class DialogueUI : MonoBehaviour
     private TypewriterEffect typewriterEffect;
 
     public event EventHandler OnDialogueFinished;
-
-    private void Awake()
-    {
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject);
-        }
-        else if (Instance != this)
-        {
-            Destroy(this);
-            return;
-        }
-    }
 
     private void Start()
     {

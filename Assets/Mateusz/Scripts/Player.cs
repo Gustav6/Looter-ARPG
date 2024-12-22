@@ -57,9 +57,6 @@ public class Player : MonoBehaviour, IDamagable
 
     [BoxGroup("Stamina")]
     [SerializeField] private Image staminaProgressUI = null;
-
-    [BoxGroup("Stamina")]
-    [SerializeField] private CanvasGroup staminaSliderCanvasGroup = null;
     #endregion
 
     #region Invenroty
@@ -171,14 +168,14 @@ public class Player : MonoBehaviour, IDamagable
         if (sprinting)
         {
             Stamina -= sprintCost * Time.deltaTime;
-            UpdateStaminaBar(1);
+            UpdateStaminaBar();
         }
         else
         {
             if (Stamina < maxStamina)
             {
                 Stamina += Time.deltaTime * rechargeTime;
-                UpdateStaminaBar(1);
+                UpdateStaminaBar();
             }
         }
 
@@ -213,19 +210,11 @@ public class Player : MonoBehaviour, IDamagable
         PreviousRegion = CurrentRegion;
     }
 
-    void UpdateStaminaBar(int value)
+    void UpdateStaminaBar()
     {
-        if (staminaProgressUI != null && staminaSliderCanvasGroup != null)
+        if (staminaProgressUI != null)
         {
             staminaProgressUI.fillAmount = Stamina / maxStamina;
-            if (value == 0)
-            {
-                staminaSliderCanvasGroup.alpha = 0;
-            }
-            else
-            {
-                staminaSliderCanvasGroup.alpha = 1;
-            }
         }
     }
 

@@ -5,7 +5,6 @@ using UnityEngine.Tilemaps;
 
 public class MapSettings : MonoBehaviour
 {
-    #region Generation
     [Foldout("Generation Variables")]
     public int seed;
 
@@ -13,18 +12,14 @@ public class MapSettings : MonoBehaviour
     public SpawnFunction spawnFunction = SpawnFunction.Circle;
 
     [Foldout("Generation Variables")]
-    public int generationRadius = 50;
+    public int radiusForGen = 50;
 
     [Foldout("Generation Variables")]
-    public Vector2Int stripSize = new(100, 50);
-    #endregion
-
-    #region Room
+    public Vector2Int stripSizeForGen = new(100, 50);
 
     [Foldout("Room Variables")]
     public int totalRoomsCount = 10;
 
-    #region Main room variable
     [Foldout("Room Variables")]
     [SerializeField] private int amountOfMainRooms = 5;
     public int AmountOfMainRooms
@@ -42,7 +37,6 @@ public class MapSettings : MonoBehaviour
             }
         }
     }
-    #endregion
 
     [Foldout("Room Variables")]
     public Vector2Int roomMaxSize = new(10, 10);
@@ -73,28 +67,22 @@ public class MapSettings : MonoBehaviour
     }
 
     [Foldout("Room Variables")]
-    public bool roundCorners = true;
-    [Foldout("Room Variables")]
     public GameObject[] doNotAllowInStartingRoom;
-
-    #endregion
-
-    #region Hallway
 
     [Foldout("Hallway Variables")]
     [Range(0, 100)] public float amountOfHallwayLoops = 15;
+
     [Foldout("Hallway Variables")]
-    public bool randomizedHallwaySize = false;
+    public bool randomizedHallwayWidth = false;
+
     [Foldout("Hallway Variables")]
     [DisableIf("randomizedHallwaySize")] public int hallwayWidth = 10;
+
     [Foldout("Hallway Variables")]
     [EnableIf("randomizedHallwaySize")] public int hallwayMinWidth = 10;
+
     [Foldout("Hallway Variables")]
     [EnableIf("randomizedHallwaySize")] public int hallwayMaxWidth = 15;
-
-    #endregion
-
-    #region Enemies
 
     [Foldout("Enemy Variables")]
     public GameObject[] enemyPrefabs;
@@ -102,18 +90,16 @@ public class MapSettings : MonoBehaviour
     [Foldout("Enemy Variables")]
     public int amountOfEnemies;
 
-    #endregion
-
-    #region Perlin Noise
     [Foldout("Perlin Noise Map")]
-    public PerlinNoiseMap[] perlinNoiseMaps;
-    #endregion
+    public NoiseMap[] noiseMaps;
+
+    [Foldout("Spawn Prefab")]
+    public PrefabSpawn[] prefabsToSpawn;
 }
 
 [Serializable]
-public struct PerlinNoiseMap
+public struct NoiseMap
 {
-    public string name;
     public TileMapType tileMapEffected;
 
     public int amountOfNoiseLoops;
@@ -129,4 +115,14 @@ public struct TilePair
 {
     public TileBase tile;
     public TileTexture type;
+}
+
+[Serializable]
+public struct PrefabSpawn
+{
+    public int amount;
+    public GameObject prefab;
+    public TileMapType tileMapEffected;
+    public bool canRandomizePosition;
+    public Vector2Int randomPositionRange;
 }

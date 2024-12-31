@@ -37,6 +37,9 @@ public class UIButton : UIBaseScript, IPointerClickHandler
         Application.Quit();
     }
 
+    public void UnPauseGame() => UIManager.Instance.UnPauseGame();
+    public void PauseGame() => UIManager.Instance.PauseGame();
+
     public void OnPointerClick(PointerEventData eventData)
     {
         if (eventData.button != PointerEventData.InputButton.Left)

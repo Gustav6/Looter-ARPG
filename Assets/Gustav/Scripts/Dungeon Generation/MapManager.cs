@@ -8,7 +8,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.Tilemaps;
 
-public class MapManager : MonoBehaviour
+public class MapManager : MonoBehaviour, IDataPersistence
 {
     public static MapManager Instance { get; private set; }
 
@@ -35,21 +35,24 @@ public class MapManager : MonoBehaviour
 
     private bool tryingToLoadMap = false;
 
-    private void Start()
+    private void Awake()
     {
         if (Instance == null)
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
         }
-        else if (Instance != this)
+        else
         {
             Destroy(gameObject);
             return;
         }
 
         Settings = GetComponent<MapSettings>();
+    }
 
+    private void Start()
+    {
         TokenSource = new();
 
         RegionHeight = 16;
@@ -60,11 +63,16 @@ public class MapManager : MonoBehaviour
             tilePairs.Add(pair.type, pair.tile);
         }
 
+        if (DataPersistenceManager.Instance != null)
+        {
+            DataPersistenceManager.Instance.LoadSpecifiedData(this);
+        }
+
         MapGeneration.GenerateMapAsync(this, MapPrefab);
 
         SceneManager.sceneLoaded += OnSceneLoad;
         MapGeneration.OnGenerationCompleted += MapGeneration_OnGenerationCompleted;
-        SubscribeToPlayerRegionSwitchEvent();
+        SubscribeToRegionSwitch();
     }
 
     public void Update()
@@ -75,12 +83,56 @@ public class MapManager : MonoBehaviour
         }
     }
 
-    private void OnDisable()
+    public void LoadData(GameData data)
     {
-        if (Instance == this)
-        {
-            TokenSource.Cancel();
-        }
+        Settings.seed = data.seed;
+
+        // Rooms
+        Settings.totalRoomsCount = data.totalRoomsCount;
+        Settings.AmountOfMainRooms = data.amountOfMainRooms;
+        Settings.roomMaxSize = data.roomMaxSize;
+        Settings.RoomMinSize = data.roomMinSize;
+
+        // Spawn
+        Settings.spawnFunction = data.spawnFunction;
+        Settings.radiusForGen = data.radiusForGen;
+        Settings.stripSizeForGen = data.stripSizeForGen;
+
+        // Hallways
+        Settings.amountOfHallwayLoops = data.amountOfHallwayLoops;
+        Settings.randomizedHallwayWidth = data.randomizedHallwayWidth;
+        Settings.hallwayWidth = data.hallwayWidth;
+        Settings.hallwayMinWidth = data.hallwayMinWidth;
+        Settings.hallwayMaxWidth = data.hallwayMaxWidth;
+
+        // Enemies
+        Settings.amountOfEnemies = data.amountOfEnemies;
+    }
+
+    public void SaveData(GameData data)
+    {
+        data.seed = currentMap.RequiredSettingsForMap.seed;
+        
+        // Rooms
+        data.totalRoomsCount = currentMap.RequiredSettingsForMap.totalRoomsCount;
+        data.amountOfMainRooms = currentMap.RequiredSettingsForMap.amountOfMainRooms;
+        data.roomMaxSize = currentMap.RequiredSettingsForMap.roomMaxSize;
+        data.roomMinSize = currentMap.RequiredSettingsForMap.roomMinSize;
+        
+        // Spawn
+        data.spawnFunction = currentMap.RequiredSettingsForMap.spawnFunction;
+        data.radiusForGen = currentMap.RequiredSettingsForMap.radiusForGen;
+        data.stripSizeForGen =  currentMap.RequiredSettingsForMap.stripSizeForGen;
+        
+        // Hallways
+        data.amountOfHallwayLoops = currentMap.RequiredSettingsForMap.amountOfHallwayLoops;
+        data.randomizedHallwayWidth = currentMap.RequiredSettingsForMap.randomizedHallwayWidth;
+        data.hallwayWidth = currentMap.RequiredSettingsForMap.hallwayWidth;
+        data.hallwayMinWidth = currentMap.RequiredSettingsForMap.hallwayMinWidth;
+        data.hallwayMaxWidth = currentMap.RequiredSettingsForMap.hallwayMaxWidth;
+        
+        // Enemies
+        data.amountOfEnemies = currentMap.RequiredSettingsForMap.amountOfEnemies;
     }
 
     private void MapGeneration_OnGenerationCompleted(object sender, EventArgs e)
@@ -99,14 +151,25 @@ public class MapManager : MonoBehaviour
         }
     }
 
+    #region Stop Async on disable 
+    private void OnDisable()
+    {
+        if (Instance == this)
+        {
+            TokenSource.Cancel();
+        }
+    }
+    #endregion
+
+    #region Region switch releated
     private void OnSceneLoad(Scene scene, LoadSceneMode mode)
     {
         cameraReference = GameObject.FindGameObjectWithTag("MainCamera").GetComponent<Camera>();
 
-        SubscribeToPlayerRegionSwitchEvent();
+        SubscribeToRegionSwitch();
     }
 
-    private void SubscribeToPlayerRegionSwitchEvent()
+    private void SubscribeToRegionSwitch()
     {
         if (Player.Instance != null)
         {
@@ -114,6 +177,54 @@ public class MapManager : MonoBehaviour
             Player.Instance.OnRegionSwitch += Instance_OnRegionSwitch;
         }
     }
+
+    #region Game objects
+    public GameObject SpawnPrefab(GameObject prefab, Vector3 spawnPosition, Map map, bool activeStatus = true)
+    {
+        if (map.startRoom.groundTiles.Contains(Vector3Int.RoundToInt(spawnPosition)) && Settings.doNotAllowInStartingRoom.Contains(prefab))
+        {
+            return null;
+        }
+
+        GameObject spawnedPrefab = Instantiate(prefab, spawnPosition + new Vector3(0.5f, 0.5f), Quaternion.identity, map.ActiveGameObjectsParent.transform);
+        SetGameObjectsRegion(spawnedPrefab, map.MapRegions);
+        spawnedPrefab.SetActive(activeStatus);
+
+        return spawnedPrefab;
+    }
+
+    public void SetGameObjectsRegion(GameObject gameObject, Dictionary<Vector2Int, List<GameObject>> regionDictionary)
+    {
+        Vector2Int region = new((int)(gameObject.transform.position.x / RegionWidth), (int)(gameObject.transform.position.y / RegionHeight));
+
+        if (regionDictionary.ContainsKey(region))
+        {
+            regionDictionary[region].Add(gameObject);
+        }
+        else
+        {
+            regionDictionary.Add(region, new List<GameObject> { gameObject });
+        }
+    }
+
+    public void RemoveGameObject(GameObject g, Dictionary<Vector2Int, List<GameObject>> regionDictionary)
+    {
+        Vector2Int region = new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y / RegionHeight));
+
+        if (regionDictionary.TryGetValue(region, out List<GameObject> gameObjects))
+        {
+            gameObjects.Remove(g);
+
+            if (gameObjects.Count <= 0)
+            {
+                regionDictionary.Remove(region);
+            }
+        }
+
+        Destroy(g);
+    }
+    #endregion
+    #endregion
 
     #region Load map methods
     private void LoadMap(Map map)
@@ -138,7 +249,7 @@ public class MapManager : MonoBehaviour
     {
         tryingToLoadMap = true;
 
-        while (Player.Instance == null || mapToLoad == null || !mapToLoad.generationComplete)
+        while (Player.Instance == null || mapToLoad == null || !mapToLoad.readyToLoad)
         {
             yield return null;
         }
@@ -230,51 +341,6 @@ public class MapManager : MonoBehaviour
         previousRegions.UnionWith(currentRegions);
     }
     #endregion
-
-    public GameObject SpawnPrefab(GameObject prefab, Vector3Int tileSpawnPosition, Map map, bool activeStatus = true)
-    {
-        if (map.startRoom.groundTiles.Contains(tileSpawnPosition) && Settings.doNotAllowInStartingRoom.Contains(prefab))
-        {
-            return null;
-        }
-
-        GameObject spawnedPrefab = Instantiate(prefab, tileSpawnPosition + new Vector3(0.5f, 0.5f), Quaternion.identity, map.ActiveGameObjectsParent.transform);
-        SetGameObjectsRegion(spawnedPrefab, map.MapRegions);
-        spawnedPrefab.SetActive(activeStatus);
-
-        return spawnedPrefab;
-    }
-
-    public void SetGameObjectsRegion(GameObject gameObject, Dictionary<Vector2Int, List<GameObject>> regionDictionary)
-    {
-        Vector2Int region = new((int)(gameObject.transform.position.x / RegionWidth), (int)(gameObject.transform.position.y / RegionHeight));
-
-        if (regionDictionary.ContainsKey(region))
-        {
-            regionDictionary[region].Add(gameObject);
-        }
-        else
-        {
-            regionDictionary.Add(region, new List<GameObject> { gameObject });
-        }
-    }
-
-    public void RemoveGameObject(GameObject g, Dictionary<Vector2Int, List<GameObject>> regionDictionary)
-    {
-        Vector2Int region = new((int)(g.transform.position.x / RegionWidth), (int)(g.transform.position.y /RegionHeight));
-
-        if (regionDictionary.TryGetValue(region, out List<GameObject> gameObjects))
-        {
-            gameObjects.Remove(g);
-
-            if (gameObjects.Count <= 0)
-            {
-                regionDictionary.Remove(region);
-            }
-        }
-
-        Destroy(g);
-    }
 }
 
 public enum SpawnFunction
@@ -287,5 +353,5 @@ public enum TileTexture
 {
     ground,   
     wall,
-    wallIcon
+    walkableIcon
 }

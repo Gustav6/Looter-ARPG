@@ -13,7 +13,5 @@ MonoBehaviour:
   m_Name: Dialogue Test
   m_EditorClassIdentifier: 
   dialogue:
-  - WOW TEST 1!!!!
-  - 'WOW TEST 2!!!!
-
-    STOP TEST NOW'
+  - Howdy
+  - STOP

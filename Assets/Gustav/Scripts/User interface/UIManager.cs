@@ -1,7 +1,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 public class UIManager : MonoBehaviour
 {
@@ -10,6 +12,8 @@ public class UIManager : MonoBehaviour
     public Dictionary<InstantiatedObjectType, GameObject> ObjectPairs { get; private set; }
 
     public InstantiateObjectOnStart[] instantiateOnStart;
+
+    [field: SerializeField] public GameObject ActiveUIObject { get; private set; }
 
     public bool GamePaused { get; private set; }
 
@@ -43,23 +47,67 @@ public class UIManager : MonoBehaviour
         ResolutionScaling = 1;
     }
 
-    public void PowerupMenu(bool active)
+    public void ActivateANewUIObject(InstantiatedObjectType objectType)
     {
-        ObjectPairs[InstantiatedObjectType.powerupCanvas].SetActive(active);
+        if (ActiveUIObject != null)
+        {
+            ActiveUIObject.SetActive(false);
+        }
+
+        ActiveUIObject = ObjectPairs[objectType];
+        ActiveUIObject.SetActive(true);
     }
 
-    public void PauseMenu(bool active)
+    public void DeactivateCurrentUIObject()
     {
-        ObjectPairs[InstantiatedObjectType.pauseCanvas].SetActive(active);
+        if (ActiveUIObject == null)
+        {
+            return;
+        }
+
+        ActiveUIObject.SetActive(false);
+        ActiveUIObject = null;
     }
 
-    public void PauseGame()
+    public void PauseFunction(InputAction.CallbackContext context)
     {
-        GamePaused = true;
+        if (context.performed)
+        {
+            GamePaused = !GamePaused;
+
+            if (GamePaused)
+            {
+                if (ActiveUIObject != ObjectPairs[InstantiatedObjectType.pauseCanvas])
+                {
+                    ActivateANewUIObject(InstantiatedObjectType.pauseCanvas);
+                }
+            }
+            else
+            {
+                if (ActiveUIObject == ObjectPairs[InstantiatedObjectType.pauseCanvas])
+                {
+                    DeactivateCurrentUIObject();
+                }
+            }
+        }
     }
+
     public void UnPauseGame()
     {
         GamePaused = false;
+
+        if (ActiveUIObject == ObjectPairs[InstantiatedObjectType.pauseCanvas])
+        {
+            DeactivateCurrentUIObject();
+        }
+    }
+    public void PauseGame()
+    {
+        GamePaused = true;
+        if (ActiveUIObject != ObjectPairs[InstantiatedObjectType.pauseCanvas])
+        {
+            ActivateANewUIObject(InstantiatedObjectType.pauseCanvas);
+        }
     }
 
     public void DisableFullscreen()

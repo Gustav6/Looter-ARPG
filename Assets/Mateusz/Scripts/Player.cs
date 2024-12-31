@@ -6,7 +6,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Controller2D))]
-public class Player : MonoBehaviour, IDamagable
+public class Player : MonoBehaviour, IDamagable, IDataPersistence
 {
     public static Player Instance { get; private set; }
 
@@ -46,6 +46,8 @@ public class Player : MonoBehaviour, IDamagable
             {
                 currentStamina = value;
             }
+
+            UpdateStaminaBar();
         }
     }
     [BoxGroup("Stamina")]
@@ -126,6 +128,11 @@ public class Player : MonoBehaviour, IDamagable
         CurrentHealth = MaxHealth;
     }
 
+    private void Start()
+    {
+        DataPersistenceManager.Instance.LoadSpecifiedData(this);
+    }
+
     private void FixedUpdate()
     {
         controller.Move(currentMoveSpeed * Time.fixedDeltaTime * Direction);
@@ -150,6 +157,7 @@ public class Player : MonoBehaviour, IDamagable
             if (sprinting)
             {
                 currentMoveSpeed = Mathf.Lerp(currentMoveSpeed, sprintMoveSpeed, sprintAcceleration);
+                Stamina -= sprintCost * Time.deltaTime;
             }
             else
             {
@@ -165,17 +173,11 @@ public class Player : MonoBehaviour, IDamagable
             }
         }
 
-        if (sprinting)
-        {
-            Stamina -= sprintCost * Time.deltaTime;
-            UpdateStaminaBar();
-        }
-        else
+        if(!sprinting || Direction == Vector3.zero)
         {
             if (Stamina < maxStamina)
             {
                 Stamina += Time.deltaTime * rechargeTime;
-                UpdateStaminaBar();
             }
         }
 
@@ -201,6 +203,18 @@ public class Player : MonoBehaviour, IDamagable
                 inventory.Load();
             }
         }
+    }
+
+    public void LoadData(GameData data)
+    {
+        MaxHealth = data.playerMaxHealth;
+        CurrentHealth = data.playerCurrentHealth;
+    }
+
+    public void SaveData(GameData data)
+    {
+        data.playerMaxHealth = MaxHealth;
+        data.playerCurrentHealth = CurrentHealth;
     }
 
     public void UpdateRegion()

@@ -375,6 +375,34 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 7713187838738996543}
     m_Modifications:
+    - target: {fileID: -8154374201206381476, guid: 942e3af373769b142b457e2c1a42e57e, type: 3}
+      propertyPath: onClickEvent.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8154374201206381476, guid: 942e3af373769b142b457e2c1a42e57e, type: 3}
+      propertyPath: onClickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: -8154374201206381476, guid: 942e3af373769b142b457e2c1a42e57e, type: 3}
+      propertyPath: onClickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 568871577231761339}
+    - target: {fileID: -8154374201206381476, guid: 942e3af373769b142b457e2c1a42e57e, type: 3}
+      propertyPath: onClickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8154374201206381476, guid: 942e3af373769b142b457e2c1a42e57e, type: 3}
+      propertyPath: onClickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: UnPauseGame
+      objectReference: {fileID: 0}
+    - target: {fileID: -8154374201206381476, guid: 942e3af373769b142b457e2c1a42e57e, type: 3}
+      propertyPath: onClickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: UIButton, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: -8154374201206381476, guid: 942e3af373769b142b457e2c1a42e57e, type: 3}
+      propertyPath: onClickEvent.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 3384649315512849804, guid: 942e3af373769b142b457e2c1a42e57e, type: 3}
       propertyPath: m_Name
       value: Button
@@ -472,6 +500,17 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 942e3af373769b142b457e2c1a42e57e, type: 3}
+--- !u!114 &568871577231761339 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: -8154374201206381476, guid: 942e3af373769b142b457e2c1a42e57e, type: 3}
+  m_PrefabInstance: {fileID: 662273723625962471}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 54cb87e2fec58bb45b18389bd14b4d5b, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!224 &8272853652276414024 stripped
 RectTransform:
   m_CorrespondingSourceObject: {fileID: 8935083257443548591, guid: 942e3af373769b142b457e2c1a42e57e, type: 3}

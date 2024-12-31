@@ -65,7 +65,7 @@ MonoBehaviour:
   enemyPrefabs:
   - {fileID: 8525698252564195251, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
   - {fileID: 4034984483810168527, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
-  amountOfEnemies: 30
+  amountOfEnemies: 0
   perlinNoiseMaps:
   - name: Prefabs
     tileMapEffected: 0

@@ -26,4 +26,6 @@ public struct NoiseRegion
     public string name;
     [Range(0, 1)] public float heightValue;
     public GameObject prefab;
+    public bool canRandomizePosition;
+    public Vector2Int randomPositionRange;
 }

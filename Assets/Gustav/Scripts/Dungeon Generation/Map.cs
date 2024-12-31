@@ -1,3 +1,5 @@
+using NaughtyAttributes;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Tilemaps;
@@ -13,5 +15,60 @@ public class Map : MonoBehaviour
 
     public Room startRoom, endRoom;
 
-    public bool generationComplete = false;
+    public bool readyToLoad = false;
+
+    [field: SerializeField] public RequiredSettings RequiredSettingsForMap { get; private set; }
+
+    public void SetRequiredSettings()
+    {
+        RequiredSettingsForMap = new()
+        {
+            seed = MapManager.Instance.Settings.seed,
+
+            // Rooms
+            totalRoomsCount = MapManager.Instance.Settings.totalRoomsCount,
+            amountOfMainRooms = MapManager.Instance.Settings.AmountOfMainRooms,
+            roomMaxSize = MapManager.Instance.Settings.roomMaxSize,
+            roomMinSize = MapManager.Instance.Settings.RoomMinSize,
+
+            // Spawn
+            spawnFunction = MapManager.Instance.Settings.spawnFunction,
+            radiusForGen = MapManager.Instance.Settings.radiusForGen,
+            stripSizeForGen = MapManager.Instance.Settings.stripSizeForGen,
+
+            // Hallways
+            amountOfHallwayLoops = MapManager.Instance.Settings.amountOfHallwayLoops,
+            randomizedHallwayWidth = MapManager.Instance.Settings.randomizedHallwayWidth,
+            hallwayWidth = MapManager.Instance.Settings.hallwayWidth,
+            hallwayMinWidth = MapManager.Instance.Settings.hallwayMinWidth,
+            hallwayMaxWidth = MapManager.Instance.Settings.hallwayMaxWidth,
+
+            // Enemies
+            amountOfEnemies = MapManager.Instance.Settings.amountOfEnemies
+        };
+    }
+}
+
+[Serializable]
+public struct RequiredSettings
+{
+    // Variable for random number gen
+    public int seed;
+
+    // Room variables
+    public int totalRoomsCount, amountOfMainRooms;
+    public Vector2Int roomMaxSize, roomMinSize;
+
+    // Spawn variables
+    public SpawnFunction spawnFunction;
+    public int radiusForGen;
+    public Vector2Int stripSizeForGen;
+
+    // Hallway variables
+    public float amountOfHallwayLoops;
+    public bool randomizedHallwayWidth;
+    public int hallwayWidth, hallwayMinWidth, hallwayMaxWidth;
+
+    // Enemies
+    public int amountOfEnemies;
 }

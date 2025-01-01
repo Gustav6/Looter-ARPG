@@ -23,12 +23,12 @@ public class MoveTransition : Transition
         this.execute += execute;
     }
 
-    public MoveTransition(Transform t, float time, CurveType type, float interval, float amplitude, Vector2 offset, bool targetInWorld = true, ExecuteAfterTransition execute = null)
+    public MoveTransition(Transform t, float time, TransitionType type, float interval, Vector2 amplitude, Vector2 offset, bool targetInWorld = true, ExecuteAfterTransition execute = null)
     {
         transform = t;
 
         timerMax = time;
-        curveType = type;
+        transitionType = type;
 
         startingPosition = t.position;
         targetIsInWorldPosition = targetInWorld;
@@ -55,20 +55,39 @@ public class MoveTransition : Transition
             return;
         }
 
-        if (transitionType != null)
+        switch (transitionType)
         {
-            if (targetIsInWorldPosition)
-            {
-                transform.position = Vector3.Lerp(startingPosition, targetPosition, t);
-            }
-            else
-            {
-                transform.position = Vector3.Lerp(startingPosition, startingPosition + targetPosition, t);
-            }
-        }
-        else if (curveType != null)
-        {
-            transform.position = new Vector2(t + curveOffset.x, t + curveOffset.y);
+            case TransitionType.SinCurve:
+
+                if (targetIsInWorldPosition)
+                {
+                    transform.position = new Vector2(TransitionSystem.SinCurve(timer / timerMax, curveInterval, curveAmplitude.x) + curveOffset.x, TransitionSystem.SinCurve(timer / timerMax, curveInterval, curveAmplitude.y) + curveOffset.y);
+                }
+                else
+                {
+                    transform.localPosition = new Vector2(TransitionSystem.SinCurve(timer / timerMax, curveInterval, curveAmplitude.x) + curveOffset.x, TransitionSystem.SinCurve(timer / timerMax, curveInterval, curveAmplitude.y) + curveOffset.y);
+                }
+                break;
+            case TransitionType.CosCurve:
+                if (targetIsInWorldPosition)
+                {
+                    transform.position = new Vector2(TransitionSystem.CosCurve(timer / timerMax, curveInterval, curveAmplitude.x) + curveOffset.x, TransitionSystem.CosCurve(timer / timerMax, curveInterval, curveAmplitude.y) + curveOffset.y);
+                }
+                else
+                {
+                    transform.localPosition = new Vector2(TransitionSystem.CosCurve(timer / timerMax, curveInterval, curveAmplitude.x) + curveOffset.x, TransitionSystem.CosCurve(timer / timerMax, curveInterval, curveAmplitude.y) + curveOffset.y);
+                }
+                break;
+            default:
+                if (targetIsInWorldPosition)
+                {
+                    transform.position = Vector3.Lerp(startingPosition, targetPosition, t);
+                }
+                else
+                {
+                    transform.position = Vector3.Lerp(startingPosition, startingPosition + targetPosition, t);
+                }
+                break;
         }
     }
 

@@ -15,7 +15,7 @@ public class UIDropDown : UIBaseScript, IPointerClickHandler
     [BoxGroup("Drop down variables")]
     [SerializeField] private GameObject contentPrefab;
 
-    private readonly List<Transform> settings = new();
+    private readonly List<Transform> contentTransforms = new();
     public Dictionary<Transform, Resolution> ResolutionTransformPair;
     [field: SerializeField] public Transform SelectedResolutionTransform { get; private set; }
 
@@ -25,17 +25,17 @@ public class UIDropDown : UIBaseScript, IPointerClickHandler
 
         for (int i = 0; i < contentsParent.childCount; i++)
         {
-            settings.Add(contentsParent.GetChild(i));
+            contentTransforms.Add(contentsParent.GetChild(i));
         }
 
 
         for (int i = 0; i < Screen.resolutions.Length; i++)
         {
-            string resolution = Screen.resolutions[i].width.ToString() + " x " + Screen.resolutions[i].height.ToString();
+            string resolution = Screen.resolutions[Screen.resolutions.Length - 1 - i].width.ToString() + " x " + Screen.resolutions[Screen.resolutions.Length - 1 - i].height.ToString();
 
             if (i < 3)
             {
-                settings[i].GetComponentInChildren<TextMeshProUGUI>().text = resolution;
+                contentTransforms[i].GetComponentInChildren<TextMeshProUGUI>().text = resolution;
             }
             else
             {
@@ -43,14 +43,15 @@ public class UIDropDown : UIBaseScript, IPointerClickHandler
 
                 g.GetComponentInChildren<TextMeshProUGUI>().text = resolution;
 
-                settings.Add(g.transform);
+                contentTransforms.Add(g.transform);
             }
 
-            ResolutionTransformPair.Add(settings[i], Screen.resolutions[i]);
-                settings[i].name = resolution;
+            ResolutionTransformPair.Add(contentTransforms[i], Screen.resolutions[Screen.resolutions.Length - 1 - i]);
+            contentTransforms[i].name = resolution;
         }
 
-        SelectedResolutionTransform = settings[0];
+        ChangeResolution(contentTransforms[0]);
+        HighlightResolution(contentTransforms[0]);
 
         base.Start();
 
@@ -90,9 +91,9 @@ public class UIDropDown : UIBaseScript, IPointerClickHandler
             return;
         }
 
-        for (int i = 0; i < settings.Count; i++)
+        for (int i = 0; i < contentTransforms.Count; i++)
         {
-            if (settings[i].GetComponent<BoxCollider2D>().OverlapPoint(Input.mousePosition))
+            if (contentTransforms[i].GetComponent<BoxCollider2D>().OverlapPoint(Input.mousePosition))
             {
                 Debug.Log(i);
             }
@@ -101,10 +102,25 @@ public class UIDropDown : UIBaseScript, IPointerClickHandler
 
     public void ChangeResolution(Transform transform)
     {
+        if (transform == SelectedResolutionTransform)
+        {
+            return;
+        }
+
+        if (SelectedResolutionTransform != null)
+        {
+            TransitionSystem.AddTransition(new ColorTransition(SelectedResolutionTransform, 0.1f, new Color(1, 1, 1, 0.5f), TransitionType.SmoothStop2), SelectedResolutionTransform.gameObject);
+        }
+
         Screen.SetResolution(ResolutionTransformPair[transform].width, ResolutionTransformPair[transform].height, UIManager.Instance.FullScreen);
 
         SelectedResolutionTransform = transform;
 
         Debug.Log("Resolution changed to: " + ResolutionTransformPair[transform].ToString());
+    }
+
+    public void HighlightResolution(Transform transform)
+    {
+        TransitionSystem.AddTransition(new ColorTransition(transform, 0.1f, new Color(1, 1, 1, 1), TransitionType.SmoothStart2), gameObject);
     }
 }

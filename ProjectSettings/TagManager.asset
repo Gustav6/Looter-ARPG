@@ -56,11 +56,11 @@ TagManager:
   - name: Loot
     uniqueID: 943644933
     locked: 0
-  - name: Player
-    uniqueID: 2276557581
-    locked: 0
   - name: Decoration
     uniqueID: 543009751
+    locked: 0
+  - name: Player
+    uniqueID: 2276557581
     locked: 0
   m_RenderingLayers:
   - Default

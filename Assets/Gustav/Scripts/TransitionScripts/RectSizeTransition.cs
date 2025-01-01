@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public class RectSizeTransition : Transition
 {
@@ -22,12 +23,12 @@ public class RectSizeTransition : Transition
         this.execute += execute;
     }
 
-    public RectSizeTransition(RectTransform rt, float time, CurveType type, float interval, float amplitude, Vector2 offset, ExecuteAfterTransition execute = null)
+    public RectSizeTransition(RectTransform rt, float time, TransitionType type, float interval, Vector2 amplitude, Vector2 offset, ExecuteAfterTransition execute = null)
     {
         rectTransform = rt;
 
         timerMax = time;
-        curveType = type;
+        transitionType = type;
 
         curveInterval = interval;
         curveAmplitude = amplitude;
@@ -51,14 +52,12 @@ public class RectSizeTransition : Transition
             return;
         }
 
-        if (transitionType != null)
+        rectTransform.sizeDelta = transitionType switch
         {
-            rectTransform.sizeDelta = Vector2.Lerp(startingSize, targetSize, t);
-        }
-        else if (curveType != null)
-        {
-            rectTransform.sizeDelta = new Vector2(t + curveOffset.x, t + curveOffset.y);
-        }
+            TransitionType.SinCurve => (Vector3)new Vector2(TransitionSystem.SinCurve(timer / timerMax, curveInterval, curveAmplitude.x) + curveOffset.x, TransitionSystem.SinCurve(timer / timerMax, curveInterval, curveAmplitude.y) + curveOffset.y),
+            TransitionType.CosCurve => (Vector3)new Vector2(TransitionSystem.CosCurve(timer / timerMax, curveInterval, curveAmplitude.x) + curveOffset.x, TransitionSystem.CosCurve(timer / timerMax, curveInterval, curveAmplitude.y) + curveOffset.y),
+            _ => Vector2.Lerp(startingSize, targetSize, t),
+        };
     }
     public override void RunAfterTransition()
     {

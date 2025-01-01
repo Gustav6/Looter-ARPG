@@ -451,6 +451,10 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 8980735876513060430, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -513,6 +517,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: UIManager
       objectReference: {fileID: 0}
+    - target: {fileID: 6007536782413481001, guid: 06747a0b8372b4649b069ee3b69e655c, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8185893460374732403, guid: 06747a0b8372b4649b069ee3b69e655c, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -566,18 +574,6 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
-    - target: {fileID: 3482412697192661413, guid: 44e216f4da2c6624d880939b9cc356fc, type: 3}
-      propertyPath: m_Color.b
-      value: 0.043137256
-      objectReference: {fileID: 0}
-    - target: {fileID: 3482412697192661413, guid: 44e216f4da2c6624d880939b9cc356fc, type: 3}
-      propertyPath: m_Color.g
-      value: 0.31764707
-      objectReference: {fileID: 0}
-    - target: {fileID: 3482412697192661413, guid: 44e216f4da2c6624d880939b9cc356fc, type: 3}
-      propertyPath: m_Color.r
-      value: 0.5647059
-      objectReference: {fileID: 0}
     - target: {fileID: 4927387976968504256, guid: 44e216f4da2c6624d880939b9cc356fc, type: 3}
       propertyPath: m_AnchorMax.x
       value: 0
@@ -755,6 +751,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: DataManager
       objectReference: {fileID: 0}
+    - target: {fileID: 1002743226133515757, guid: a00ca50211e9e27488bfc10084625728, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 2398636757224143821, guid: a00ca50211e9e27488bfc10084625728, type: 3}
       propertyPath: useEncryption
       value: 0
@@ -821,105 +821,25 @@ PrefabInstance:
       value: 75
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: hallwayWidth
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: roundCorners
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: roomMaxSize.x
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: roomMaxSize.y
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: roomMinSize.x
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: roomMinSize.y
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: spawnFunction
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: hallwayMaxWidth
-      value: 7
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: hallwayMinWidth
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: totalRoomsCount
-      value: 75
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: generationRadius
       value: 100
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: amountOfMainRooms
-      value: 75
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.size
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: randomizedHallwaySize
       value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabsToSpawn.Array.size
-      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.size
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].octaves
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].lacunarity
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].noiseScale
-      value: 8
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].name
       value: Prefabs
       objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].persistence
-      value: 0.5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabsToSpawn.Array.data[0].amount
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabsToSpawn.Array.data[0].prefab
-      value: 
-      objectReference: {fileID: 1472808312321901918, guid: 74ef37aba4ba7c842aa7f3c9a1f5ca3a, type: 3}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabsToSpawn.Array.data[1].amount
-      value: 30
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabsToSpawn.Array.data[1].prefab
-      value: 
-      objectReference: {fileID: 5964063023200584229, guid: 911133c5d8bf06445ba6686da926fee6, type: 3}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].octaves
       value: 5
@@ -937,18 +857,6 @@ PrefabInstance:
       value: 0.548
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].amountOfNoiseLoops
-      value: 3
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].prefabs.Array.size
-      value: 2
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabsToSpawn.Array.data[1].tileMapEffected
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.size
       value: 2
       objectReference: {fileID: 0}
@@ -960,46 +868,6 @@ PrefabInstance:
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.size
       value: 3
       objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabsToSpawn.Array.data[0].canRandomizePosition
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabsToSpawn.Array.data[1].canRandomizePosition
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[0].name
-      value: Empty
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[1].name
-      value: Pot
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabsToSpawn.Array.data[0].randomPositionRange.x
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabsToSpawn.Array.data[0].randomPositionRange.y
-      value: 15
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabsToSpawn.Array.data[1].randomPositionRange.x
-      value: 25
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: prefabsToSpawn.Array.data[1].randomPositionRange.y
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[0].prefab
-      value: 
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[1].prefab
-      value: 
-      objectReference: {fileID: 4889750398875816261, guid: 46289d76540a0724e9abe84559d0610c, type: 3}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.data[0].name
       value: Empty
@@ -1027,14 +895,6 @@ PrefabInstance:
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[2].name
       value: Barrel
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[0].heightValue
-      value: 0.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[1].heightValue
-      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.data[0].prefab
@@ -1087,30 +947,6 @@ PrefabInstance:
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[1].prefabs.Array.data[2].heightValue
       value: 0.1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[0].canRandomizePosition
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[1].canRandomizePosition
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[0].randomPositionRange.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[0].randomPositionRange.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[1].randomPositionRange.x
-      value: 25
-      objectReference: {fileID: 0}
-    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
-      propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[1].randomPositionRange.y
-      value: 25
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: perlinNoiseMaps.Array.data[0].prefabs.Array.data[1].canRandomizePosition
@@ -1175,6 +1011,10 @@ PrefabInstance:
     - target: {fileID: 4600069235979334545, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: m_Name
       value: MapManager
+      objectReference: {fileID: 0}
+    - target: {fileID: 4600069235979334545, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

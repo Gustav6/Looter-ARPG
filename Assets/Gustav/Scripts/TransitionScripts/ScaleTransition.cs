@@ -20,12 +20,12 @@ public class ScaleTransition : Transition
         this.execute += execute;
     }
 
-    public ScaleTransition(Transform t, float time, CurveType type, float interval, float amplitude, Vector2 offset, ExecuteAfterTransition execute = null)
+    public ScaleTransition(Transform t, float time, TransitionType type, float interval, Vector2 amplitude, Vector2 offset, ExecuteAfterTransition execute = null)
     {
         transform = t;
 
         timerMax = time;
-        curveType = type;
+        transitionType = type;
 
         curveInterval = interval;
         curveAmplitude = amplitude;
@@ -51,14 +51,12 @@ public class ScaleTransition : Transition
             return;
         }
 
-        if (transitionType != null)
+        transform.localScale = transitionType switch
         {
-            transform.localScale = Vector3.Lerp(startingScale, targetScale, t);
-        }
-        else if (curveType != null)
-        {
-            transform.localScale = new Vector2(t + curveOffset.x, t + curveOffset.y);
-        }
+            TransitionType.SinCurve => (Vector3)new Vector2(TransitionSystem.SinCurve(timer / timerMax, curveInterval, curveAmplitude.x) + curveOffset.x, TransitionSystem.SinCurve(timer / timerMax, curveInterval, curveAmplitude.y) + curveOffset.y),
+            TransitionType.CosCurve => (Vector3)new Vector2(TransitionSystem.CosCurve(timer / timerMax, curveInterval, curveAmplitude.x) + curveOffset.x, TransitionSystem.CosCurve(timer / timerMax, curveInterval, curveAmplitude.y) + curveOffset.y),
+            _ => Vector3.Lerp(startingScale, targetScale, t),
+        };
     }
 
     public override void RunAfterTransition()
@@ -77,13 +75,13 @@ public class ScaleTransition : Transition
     {
         if (transform != null)
         {
-            if (transitionType != null)
-            {
-                transform.localScale = targetScale;
-            }
-            else if (curveType != null)
+            if (transitionType == TransitionType.SinCurve || transitionType == TransitionType.CosCurve)
             {
                 transform.localScale = curveOffset;
+            }
+            else
+            {
+                transform.localScale = targetScale;
             }
         }
     }

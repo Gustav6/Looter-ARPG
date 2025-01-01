@@ -47,6 +47,6 @@ public class LootScript : MonoBehaviour
 
     private void OnBecameVisible()
     {
-        TransitionSystem.AddTransition(new ScaleTransition(transform, 1, CurveType.SinCurve, 2, 0.05f, Vector2.one), gameObject, true, true);
+        TransitionSystem.AddTransition(new ScaleTransition(transform, 1, TransitionType.SinCurve, 2, new Vector2(0.05f, 0.05f), Vector2.one), gameObject, true, true);
     }
 }

@@ -20,12 +20,12 @@ public class RotationTransition : Transition
         this.execute += execute;
     }
 
-    public RotationTransition(Transform t, float time, CurveType type, float interval, float amplitude, Vector2 offset, ExecuteAfterTransition execute = null)
+    public RotationTransition(Transform t, float time, TransitionType type, float interval, Vector2 amplitude, Vector2 offset, ExecuteAfterTransition execute = null)
     {
         transform = t;
 
         timerMax = time;
-        curveType = type;
+        transitionType = type;
 
         curveInterval = interval;
         curveAmplitude = amplitude;
@@ -49,13 +49,17 @@ public class RotationTransition : Transition
             return;
         }
 
-        if (transitionType != null)
+        switch (transitionType)
         {
-            transform.Rotate(Vector3.Lerp(startingRotation, targetRotation, t));
-        }
-        else if (curveType != null)
-        {
-            transform.Rotate(new Vector2(t + curveOffset.x, t + curveOffset.y));
+            case TransitionType.SinCurve:
+                transform.Rotate(new Vector2(TransitionSystem.SinCurve(timer / timerMax, curveInterval, curveAmplitude.x) + curveOffset.x, TransitionSystem.SinCurve(timer / timerMax, curveInterval, curveAmplitude.y) + curveOffset.y));
+                break;
+            case TransitionType.CosCurve:
+                transform.Rotate(new Vector2(TransitionSystem.CosCurve(timer / timerMax, curveInterval, curveAmplitude.x) + curveOffset.x, TransitionSystem.CosCurve(timer / timerMax, curveInterval, curveAmplitude.y) + curveOffset.y));
+                break;
+            default:
+                transform.Rotate(Vector3.Lerp(startingRotation, targetRotation, t));
+                break;
         }
     }
 

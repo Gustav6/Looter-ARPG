@@ -76,13 +76,13 @@ public class MapSettings : MonoBehaviour
     public bool randomizedHallwayWidth = false;
 
     [Foldout("Hallway Variables")]
-    [DisableIf("randomizedHallwaySize")] public int hallwayWidth = 10;
+    [DisableIf("randomizedHallwayWidth")] public int hallwayWidth = 10;
 
     [Foldout("Hallway Variables")]
-    [EnableIf("randomizedHallwaySize")] public int hallwayMinWidth = 10;
+    [EnableIf("randomizedHallwayWidth")] public int hallwayMinWidth = 10;
 
     [Foldout("Hallway Variables")]
-    [EnableIf("randomizedHallwaySize")] public int hallwayMaxWidth = 15;
+    [EnableIf("randomizedHallwayWidth")] public int hallwayMaxWidth = 15;
 
     [Foldout("Enemy Variables")]
     public GameObject[] enemyPrefabs;

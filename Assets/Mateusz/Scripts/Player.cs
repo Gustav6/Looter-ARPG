@@ -130,7 +130,10 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
 
     private void Start()
     {
-        DataPersistenceManager.Instance.LoadSpecifiedData(this);
+        if (DataPersistenceManager.Instance != null)
+        {
+            DataPersistenceManager.Instance.LoadSpecifiedData(this);
+        }
     }
 
     private void FixedUpdate()

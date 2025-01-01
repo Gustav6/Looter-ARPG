@@ -7,11 +7,10 @@ public abstract class Transition
     public delegate void ExecuteAfterTransition();
     public ExecuteAfterTransition execute;
 
-    protected TransitionType? transitionType;
-    protected CurveType? curveType;
+    protected TransitionType transitionType;
 
-    private protected float curveInterval, curveAmplitude;
-    private protected Vector2 curveOffset;
+    private protected float curveInterval;
+    private protected Vector2 curveOffset, curveAmplitude;
 
     public bool loop;
 
@@ -24,7 +23,11 @@ public abstract class Transition
 
     public virtual void Start()
     {
-        if (timerMax <= 0)
+        if (loop)
+        {
+            timerMax = 1;
+        }
+        else if (timerMax <= 0)
         {
             OnInstantTransition();
         }
@@ -48,28 +51,16 @@ public abstract class Transition
             isRemoved = true;
         }
 
-        if (transitionType != null)
+        t = transitionType switch
         {
-            t = transitionType switch
-            {
-                TransitionType.SmoothStart2 => TransitionSystem.SmoothStart2(timer / timerMax),
-                TransitionType.SmoothStart3 => TransitionSystem.SmoothStart3(timer / timerMax),
-                TransitionType.SmoothStart4 => TransitionSystem.SmoothStart4(timer / timerMax),
-                TransitionType.SmoothStop2 => TransitionSystem.SmoothStop2(timer / timerMax),
-                TransitionType.SmoothStop3 => TransitionSystem.SmoothStop3(timer / timerMax),
-                TransitionType.SmoothStop4 => TransitionSystem.SmoothStop4(timer / timerMax),
-                _ => 0,
-            };
-        }
-        else if (curveType != null)
-        {
-            t = curveType switch
-            {
-                CurveType.SinCurve => TransitionSystem.SinCurve(timer / timerMax, curveInterval, curveAmplitude),
-                CurveType.CosCurve => TransitionSystem.CosCurve(timer / timerMax, curveInterval, curveAmplitude),
-                _ => 0,
-            };
-        }
+            TransitionType.SmoothStart2 => TransitionSystem.SmoothStart2(timer / timerMax),
+            TransitionType.SmoothStart3 => TransitionSystem.SmoothStart3(timer / timerMax),
+            TransitionType.SmoothStart4 => TransitionSystem.SmoothStart4(timer / timerMax),
+            TransitionType.SmoothStop2 => TransitionSystem.SmoothStop2(timer / timerMax),
+            TransitionType.SmoothStop3 => TransitionSystem.SmoothStop3(timer / timerMax),
+            TransitionType.SmoothStop4 => TransitionSystem.SmoothStop4(timer / timerMax),
+            _ => 0,
+        };
     }
 
     public abstract void OnInstantTransition();

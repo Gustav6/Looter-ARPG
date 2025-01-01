@@ -10,7 +10,7 @@ public class UIDropDownContent : UIBaseScript, IPointerClickHandler
             return;
         }
 
-        TransitionSystem.AddTransition(new ColorTransition(transform, 0.1f, new Color(1, 1, 1, 0.65f), TransitionType.SmoothStop2, RunAfterClickAnimation), gameObject);
+        TransitionSystem.AddTransition(new ColorTransition(transform, 0.1f, new Color(0.85f, 0.85f, 0.85f, 0.5f), TransitionType.SmoothStop2, RunAfterClickAnimation), gameObject);
     }
 
     private void RunAfterClickAnimation()
@@ -19,6 +19,6 @@ public class UIDropDownContent : UIBaseScript, IPointerClickHandler
 
         dropDown.ChangeResolution(transform);
 
-        TransitionSystem.AddTransition(new ColorTransition(transform, 0.1f, new Color(1, 1, 1, 1), TransitionType.SmoothStart2), gameObject);
+        dropDown.HighlightResolution(transform);
     }
 }

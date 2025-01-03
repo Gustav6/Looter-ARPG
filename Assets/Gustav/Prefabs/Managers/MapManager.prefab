@@ -47,7 +47,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   seed: 0
   spawnFunction: 0
-  radiusForGen: 40
+  radiusForGen: 50
   stripSizeForGen: {x: 75, y: 25}
   totalRoomsCount: 60
   amountOfMainRooms: 60
@@ -58,9 +58,10 @@ MonoBehaviour:
   - {fileID: 8525698252564195251, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
   amountOfHallwayLoops: 12.5
   randomizedHallwayWidth: 1
-  hallwayWidth: 5
-  hallwayMinWidth: 3
-  hallwayMaxWidth: 6
+  randomizeHallwayPath: 1
+  hallwayWidth: 0
+  hallwayMinWidth: 5
+  hallwayMaxWidth: 8
   enemyPrefabs:
   - {fileID: 8525698252564195251, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
   - {fileID: 4034984483810168527, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
@@ -83,17 +84,24 @@ MonoBehaviour:
       prefab: {fileID: 4889750398875816261, guid: 46289d76540a0724e9abe84559d0610c, type: 3}
       canRandomizePosition: 1
       randomPositionRange: {x: 25, y: 25}
-  prefabsToSpawn:
-  - amount: 30
-    prefab: {fileID: 1472808312321901918, guid: 74ef37aba4ba7c842aa7f3c9a1f5ca3a, type: 3}
-    tileMapEffected: 0
-    canRandomizePosition: 1
-    randomPositionRange: {x: 15, y: 15}
-  - amount: 30
-    prefab: {fileID: 5964063023200584229, guid: 911133c5d8bf06445ba6686da926fee6, type: 3}
-    tileMapEffected: 0
-    canRandomizePosition: 1
-    randomPositionRange: {x: 20, y: 5}
+  - tileMapEffected: 0
+    amountOfNoiseLoops: 5
+    noiseScale: 8
+    octaves: 4
+    persistence: 1
+    lacunarity: 2
+    prefabs:
+    - name: Skull
+      heightValue: 0.05
+      prefab: {fileID: 1472808312321901918, guid: 74ef37aba4ba7c842aa7f3c9a1f5ca3a, type: 3}
+      canRandomizePosition: 1
+      randomPositionRange: {x: 15, y: 15}
+    - name: Cactus
+      heightValue: 0.1
+      prefab: {fileID: 5964063023200584229, guid: 911133c5d8bf06445ba6686da926fee6, type: 3}
+      canRandomizePosition: 1
+      randomPositionRange: {x: 20, y: 8}
+  prefabsToSpawn: []
 --- !u!114 &3171003164158351417
 MonoBehaviour:
   m_ObjectHideFlags: 0

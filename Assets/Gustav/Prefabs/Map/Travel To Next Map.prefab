@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2993694329010267792}
   - component: {fileID: 6921071711784570231}
+  - component: {fileID: 2242318927672271024}
   - component: {fileID: 6344938466271749355}
   - component: {fileID: 688622323076736060}
   m_Layer: 0
@@ -49,6 +50,34 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b190f34ddb473f54d84b6c8f8fba39c3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+--- !u!114 &2242318927672271024
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 573335589479022553}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1567d3f1c47d4441a76a8befe75b97a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveTransitionsOnEnable:
+  - effected: {fileID: 6622722536887074738}
+    transitionType: 6
+    duration: 0
+    overrideExistingTransitions: 1
+    loopAnimation: 1
+    target: {x: 0, y: 0}
+    targetTransform: {fileID: 0}
+    targetInWorld: 0
+    interval: 3.5
+    offset: {x: 0, y: 1}
+    amplitude: {x: 0, y: 0.025}
+  scaleTransitionsOnEnable: []
+  colorTransitionsOnEnable: []
+  rotationTransitionsOnEnable: []
+  rectSizeTransitionsOnEnable: []
 --- !u!61 &6344938466271749355
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -149,7 +178,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1.5, y: 1.5, z: 1}
+  m_LocalScale: {x: 1.35, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 2993694329010267792}
@@ -219,7 +248,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6622722536887074738}
   - component: {fileID: 6654705795257561159}
-  - component: {fileID: 4422904210823625411}
   m_Layer: 0
   m_Name: Indicator
   m_TagString: Untagged
@@ -297,34 +325,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &4422904210823625411
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4502609399960386151}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1567d3f1c47d4441a76a8befe75b97a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveTransitionsOnEnable:
-  - effected: {fileID: 6622722536887074738}
-    transitionType: 6
-    duration: 0
-    overrideExistingTransitions: 1
-    loopAnimation: 1
-    target: {x: 0, y: 0}
-    targetTransform: {fileID: 0}
-    targetInWorld: 0
-    interval: 3
-    offset: {x: 0, y: 1}
-    amplitude: {x: 0, y: 0.025}
-  scaleTransitionsOnEnable: []
-  colorTransitionsOnEnable: []
-  rotationTransitionsOnEnable: []
-  rectSizeTransitionsOnEnable: []
 --- !u!1 &5769268188898821277
 GameObject:
   m_ObjectHideFlags: 0

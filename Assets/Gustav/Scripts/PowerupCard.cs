@@ -41,6 +41,15 @@ public class PowerupCard : Selectable, IPointerClickHandler
             return;
         }
 
+        TransitionSystem.AddTransition(new ColorTransition(cardImage, 0.15f, new Color(0.7f, 0.7f, 0.7f), TransitionType.SmoothStop2, RunAfterClick), cardImage.gameObject);
+        TransitionSystem.AddTransition(new ScaleTransition(transform, 0.15f, new Vector2(1.05f, 1.05f), TransitionType.SmoothStop2), cardImage.gameObject);
+
         // Add power up to stats
+    }
+
+    private void RunAfterClick()
+    {
+        TransitionSystem.AddTransition(new ColorTransition(cardImage, 0.15f, Color.white, TransitionType.SmoothStop2), cardImage.gameObject);
+        TransitionSystem.AddTransition(new ScaleTransition(transform, 0.15f, new Vector2(1.1f, 1.1f), TransitionType.SmoothStop2), cardImage.gameObject);
     }
 }

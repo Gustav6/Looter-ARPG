@@ -9,8 +9,8 @@ public class Controller2D : MonoBehaviour
 
     public LayerMask collisionMask;
 
-    const float skinWidth = .015f;
-    const float distanceBetweenRays = .25f;
+    const float skinWidth = .01f;
+    const float distanceBetweenRays = .2f;
 
     [HideInInspector]
     public int horizontalRayCount;
@@ -106,8 +106,8 @@ public class Controller2D : MonoBehaviour
         float boundsWidth = bounds.size.x;
         float boundsHeight = bounds.size.y;
 
-        horizontalRayCount = Mathf.Clamp(Mathf.RoundToInt(boundsHeight / distanceBetweenRays), 2, 2 + Mathf.RoundToInt(boundsHeight / distanceBetweenRays));
-        verticalRayCount = Mathf.Clamp(Mathf.RoundToInt(boundsWidth / distanceBetweenRays), 2, 2 + Mathf.RoundToInt(boundsWidth / distanceBetweenRays));
+        horizontalRayCount = Mathf.Clamp(Mathf.RoundToInt(boundsHeight / distanceBetweenRays), 3, 3 + Mathf.RoundToInt(boundsHeight / distanceBetweenRays));
+        verticalRayCount = Mathf.Clamp(Mathf.RoundToInt(boundsWidth / distanceBetweenRays), 3, 3 + Mathf.RoundToInt(boundsWidth / distanceBetweenRays));
 
         horizontalRaySpacing = bounds.size.y / (horizontalRayCount - 1);
         verticalRaySpacing = bounds.size.x / (verticalRayCount - 1);

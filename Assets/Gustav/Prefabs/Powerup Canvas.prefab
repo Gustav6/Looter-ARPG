@@ -9,6 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2321535496730644747}
+  - component: {fileID: 2549145409246253726}
   m_Layer: 5
   m_Name: PowerUps
   m_TagString: Untagged
@@ -38,6 +39,127 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &2549145409246253726
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5712631915270583779}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f1567d3f1c47d4441a76a8befe75b97a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  moveTransitionsOnEnable:
+  - effected: {fileID: 7389639768902396390}
+    transitionType: 0
+    duration: 0
+    overrideExistingTransitions: 1
+    loopAnimation: 0
+    target: {x: 0, y: 0}
+    targetTransform: {fileID: 9027714996509568318}
+    targetInWorld: 1
+    interval: 0
+    offset: {x: 0, y: 0}
+    amplitude: {x: 0, y: 0}
+  - effected: {fileID: 4183583680685446815}
+    transitionType: 0
+    duration: 0
+    overrideExistingTransitions: 1
+    loopAnimation: 0
+    target: {x: 0, y: 0}
+    targetTransform: {fileID: 9027714996509568318}
+    targetInWorld: 1
+    interval: 0
+    offset: {x: 0, y: 0}
+    amplitude: {x: 0, y: 0}
+  - effected: {fileID: 7389639768902396390}
+    transitionType: 3
+    duration: 0.5
+    overrideExistingTransitions: 1
+    loopAnimation: 0
+    target: {x: -420, y: 0}
+    targetTransform: {fileID: 9027714996509568318}
+    targetInWorld: 1
+    interval: 0
+    offset: {x: 0, y: 0}
+    amplitude: {x: 0, y: 0}
+  - effected: {fileID: 4183583680685446815}
+    transitionType: 3
+    duration: 0.5
+    overrideExistingTransitions: 1
+    loopAnimation: 0
+    target: {x: 420, y: 0}
+    targetTransform: {fileID: 9027714996509568318}
+    targetInWorld: 1
+    interval: 0
+    offset: {x: 0, y: 0}
+    amplitude: {x: 0, y: 0}
+  scaleTransitionsOnEnable:
+  - effected: {fileID: 4183583680685446815}
+    transitionType: 0
+    duration: 0
+    overrideExistingTransitions: 1
+    loopAnimation: 0
+    target: {x: 0, y: 0}
+    targetTransform: {fileID: 0}
+    interval: 0
+    offset: {x: 0, y: 0}
+    amplitude: {x: 0, y: 0}
+  - effected: {fileID: 9027714996509568318}
+    transitionType: 0
+    duration: 0
+    overrideExistingTransitions: 1
+    loopAnimation: 0
+    target: {x: 0, y: 0}
+    targetTransform: {fileID: 0}
+    interval: 0
+    offset: {x: 0, y: 0}
+    amplitude: {x: 0, y: 0}
+  - effected: {fileID: 7389639768902396390}
+    transitionType: 0
+    duration: 0
+    overrideExistingTransitions: 1
+    loopAnimation: 0
+    target: {x: 0, y: 0}
+    targetTransform: {fileID: 0}
+    interval: 0
+    offset: {x: 0, y: 0}
+    amplitude: {x: 0, y: 0}
+  - effected: {fileID: 7389639768902396390}
+    transitionType: 3
+    duration: 0.25
+    overrideExistingTransitions: 1
+    loopAnimation: 0
+    target: {x: 1, y: 1}
+    targetTransform: {fileID: 0}
+    interval: 0
+    offset: {x: 0, y: 0}
+    amplitude: {x: 0, y: 0}
+  - effected: {fileID: 9027714996509568318}
+    transitionType: 3
+    duration: 0.25
+    overrideExistingTransitions: 1
+    loopAnimation: 0
+    target: {x: 1, y: 1}
+    targetTransform: {fileID: 0}
+    interval: 0
+    offset: {x: 0, y: 0}
+    amplitude: {x: 0, y: 0}
+  - effected: {fileID: 4183583680685446815}
+    transitionType: 3
+    duration: 0.25
+    overrideExistingTransitions: 1
+    loopAnimation: 0
+    target: {x: 1, y: 1}
+    targetTransform: {fileID: 0}
+    interval: 0
+    offset: {x: 0, y: 0}
+    amplitude: {x: 0, y: 0}
+  colorTransitionsOnEnable: []
+  rotationTransitionsOnEnable: []
+  rectSizeTransitionsOnEnable: []
 --- !u!1 &7204142092221823222
 GameObject:
   m_ObjectHideFlags: 0
@@ -56,7 +178,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2836656968218059864
 RectTransform:
   m_ObjectHideFlags: 0
@@ -309,7 +431,8 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1619197520729365284, guid: ef37c435146c15040926f9f0d5b3fe26, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -485,7 +608,8 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1619197520729365284, guid: ef37c435146c15040926f9f0d5b3fe26, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -663,7 +787,8 @@ PrefabInstance:
       propertyPath: m_Mesh
       value: 
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 1619197520729365284, guid: ef37c435146c15040926f9f0d5b3fe26, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []

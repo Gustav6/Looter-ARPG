@@ -73,7 +73,7 @@ public class MapSettings : MonoBehaviour
     [Range(0, 100)] public float amountOfHallwayLoops = 15;
 
     [Foldout("Hallway Variables")]
-    public bool randomizedHallwayWidth = false;
+    public bool randomizedHallwayWidth = false, randomizeHallwayPath = true;
 
     [Foldout("Hallway Variables")]
     [DisableIf("randomizedHallwayWidth")] public int hallwayWidth = 10;

@@ -36,10 +36,7 @@ public class Selectable : MonoBehaviour, IPointerEnterHandler, IPointerExitHandl
         SetActiveStatus(false);
     }
 
-    protected virtual void Update()
-    {
-        
-    }
+    protected virtual void Update() { }
 
     public void OnPointerEnter(PointerEventData eventData)
     {

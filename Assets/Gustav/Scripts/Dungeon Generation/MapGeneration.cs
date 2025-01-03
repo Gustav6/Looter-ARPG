@@ -866,7 +866,7 @@ public static class MapGeneration
 
             // Find a path starting from first room in list towards the connected room.
 
-            List<Vector3Int> hallwayPath = new(AStar.FindPath(startingPosition, targetPosition, true, manager.Settings.seed));
+            List<Vector3Int> hallwayPath = new(AStar.FindPath(startingPosition, targetPosition, manager.Settings.randomizeHallwayPath, manager.Settings.seed));
             tileMaps[TileMapType.ground].UnionWith(hallwayPath);
 
             for (int i = 0; i < hallwayPath.Count; i++)
@@ -922,10 +922,10 @@ public static class MapGeneration
     #region Expand hallway path
     private static void ExpandHallwayAndAddTiles(Vector3Int current, Vector3Int next, int hallwayWidth)
     {
-        for (int i = -hallwayWidth + 1; i < hallwayWidth; i++)
+        for (int i = 0; i < hallwayWidth; i++)
         {
-            tileMaps[TileMapType.ground].Add(new(current.x, current.y + i));
-            tileMaps[TileMapType.ground].Add(new(current.x + i, current.y));
+            tileMaps[TileMapType.ground].Add(new(current.x, current.y + i - (hallwayWidth / 2)));
+            tileMaps[TileMapType.ground].Add(new(current.x + i - (hallwayWidth / 2), current.y));
         }
 
         for (int i = 0; i < 35; i++)

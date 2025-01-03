@@ -33,7 +33,7 @@ public class MapManager : MonoBehaviour, IDataPersistence
 
     [HideInInspector] public Map currentMap, nextMap;
 
-    private bool tryingToLoadMap = false;
+    public bool TryingToLoadMap { get; private set; }
 
     private void Awake()
     {
@@ -77,7 +77,7 @@ public class MapManager : MonoBehaviour, IDataPersistence
 
     public void Update()
     {
-        if (Input.GetKeyDown(KeyCode.M) && !tryingToLoadMap)
+        if (Input.GetKeyDown(KeyCode.M) && !TryingToLoadMap)
         {
             StartCoroutine(TryToLoadMap(nextMap));
         }
@@ -238,16 +238,16 @@ public class MapManager : MonoBehaviour, IDataPersistence
 
         UpdateActiveRegions();
 
-        GameObject g1 = new() { name = "Start Room" };
-        g1.transform.position = map.startRoom.WorldPosition;
+        //GameObject g1 = new() { name = "Start Room" };
+        //g1.transform.position = map.startRoom.WorldPosition;
 
-        GameObject g2 = new() { name = "End Room" };
-        g2.transform.position = map.endRoom.WorldPosition;
+        //GameObject g2 = new() { name = "End Room" };
+        //g2.transform.position = map.endRoom.WorldPosition;
     }
 
     public IEnumerator TryToLoadMap(Map mapToLoad)
     {
-        tryingToLoadMap = true;
+        TryingToLoadMap = true;
 
         while (Player.Instance == null || mapToLoad == null || !mapToLoad.readyToLoad)
         {
@@ -265,7 +265,7 @@ public class MapManager : MonoBehaviour, IDataPersistence
 
         LoadMap(mapToLoad);
 
-        tryingToLoadMap = false;
+        TryingToLoadMap = false;
     }
 
     #endregion

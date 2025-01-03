@@ -29,6 +29,9 @@ public class Pot : MonoBehaviour, IDamagable
 
     [field: SerializeField] public int MaxHealth { get; set; }
     public bool TickDamageActive { get; set; }
+    public bool IsBeingKnockedBack { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public Coroutine KnockbackCoroutine { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
+    public AnimationCurve KnockbackForceCurve { get => throw new NotImplementedException(); set => throw new NotImplementedException(); }
 
     [SerializeField] private Loot[] guaranteedToDrop;
 
@@ -104,5 +107,10 @@ public class Pot : MonoBehaviour, IDamagable
         }
 
         MapManager.Instance.RemoveGameObject(gameObject, MapManager.Instance.currentMap.MapRegions);
+    }
+
+    public void Knockback(Controller2D controller, float strength, Vector2 direction)
+    {
+        throw new NotImplementedException();
     }
 }

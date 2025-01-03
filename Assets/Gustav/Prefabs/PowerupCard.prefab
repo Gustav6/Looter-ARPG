@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 4514957948236783798}
   - component: {fileID: 3057057900996043448}
-  - component: {fileID: 1619197520729365284}
   m_Layer: 5
   m_Name: PowerupCard
   m_TagString: Untagged
@@ -54,89 +53,80 @@ MonoBehaviour:
   <Selected>k__BackingField: 0
   moveTransitionsOnEnable: []
   scaleTransitionsOnEnable:
-  - transitionType: 3
-    effected: {fileID: 4514957948236783798}
+  - effected: {fileID: 4514957948236783798}
+    transitionType: 3
     duration: 0.2
+    overrideExistingTransitions: 1
+    loopAnimation: 0
     target: {x: 1.1, y: 1.1}
     targetTransform: {fileID: 0}
-    overrideExistingTransitions: 1
-  - transitionType: 3
-    effected: {fileID: 3729987691507484412}
+    interval: 0
+    offset: {x: 0, y: 0}
+    amplitude: {x: 0, y: 0}
+  - effected: {fileID: 3729987691507484412}
+    transitionType: 3
     duration: 0.2
+    overrideExistingTransitions: 1
+    loopAnimation: 0
     target: {x: 1, y: 1}
     targetTransform: {fileID: 0}
-    overrideExistingTransitions: 1
+    interval: 0
+    offset: {x: 0, y: 0}
+    amplitude: {x: 0, y: 0}
   colorTransitionsOnEnable:
-  - transitionType: 3
-    effected: {fileID: 667315885201360305}
+  - effected: {fileID: 667315885201360305}
+    transitionType: 3
     duration: 0.2
+    overrideExistingTransitions: 1
+    loopAnimation: 0
     target: {r: 1, g: 0.79215693, b: 0, a: 1}
-    overrideExistingTransitions: 1
-  - transitionType: 3
-    effected: {fileID: 248548871681221866}
+  - effected: {fileID: 248548871681221866}
+    transitionType: 3
     duration: 0.2
-    target: {r: 1, g: 1, b: 1, a: 1}
     overrideExistingTransitions: 1
+    loopAnimation: 0
+    target: {r: 1, g: 1, b: 1, a: 1}
   rotationTransitionsOnEnable: []
   moveTransitionsOnDisable: []
   scaleTransitionsOnDisable:
-  - transitionType: 0
-    effected: {fileID: 4514957948236783798}
+  - effected: {fileID: 4514957948236783798}
+    transitionType: 0
     duration: 0.2
+    overrideExistingTransitions: 1
+    loopAnimation: 0
     target: {x: 0.9, y: 0.9}
     targetTransform: {fileID: 0}
-    overrideExistingTransitions: 1
-  - transitionType: 0
-    effected: {fileID: 3729987691507484412}
+    interval: 0
+    offset: {x: 0, y: 0}
+    amplitude: {x: 0, y: 0}
+  - effected: {fileID: 3729987691507484412}
+    transitionType: 0
     duration: 0.2
+    overrideExistingTransitions: 1
+    loopAnimation: 0
     target: {x: 1, y: 0}
     targetTransform: {fileID: 0}
-    overrideExistingTransitions: 1
+    interval: 0
+    offset: {x: 0, y: 0}
+    amplitude: {x: 0, y: 0}
   colorTransitionsOnDisable:
-  - transitionType: 0
-    effected: {fileID: 667315885201360305}
+  - effected: {fileID: 667315885201360305}
+    transitionType: 0
     duration: 0.2
+    overrideExistingTransitions: 1
+    loopAnimation: 0
     target: {r: 1, g: 0.7921569, b: 0, a: 0}
-    overrideExistingTransitions: 1
-  - transitionType: 0
-    effected: {fileID: 248548871681221866}
+  - effected: {fileID: 248548871681221866}
+    transitionType: 0
     duration: 0.2
-    target: {r: 0.735849, g: 0.735849, b: 0.735849, a: 1}
     overrideExistingTransitions: 1
+    loopAnimation: 0
+    target: {r: 0.735849, g: 0.735849, b: 0.735849, a: 1}
   rotationTransitionsOnDisable: []
   descriptionObject: {fileID: 3805518118702870902}
   descriptionText: {fileID: 6034071491564051977}
   cardImage: {fileID: 6702426517169923926}
   cardAttached: {fileID: 0}
---- !u!114 &1619197520729365284
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2167235168631649734}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f1567d3f1c47d4441a76a8befe75b97a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  moveTransitionsOnEnable: []
-  scaleTransitionsOnEnable:
-  - transitionType: 0
-    effected: {fileID: 4514957948236783798}
-    duration: 0
-    target: {x: 0, y: 0}
-    targetTransform: {fileID: 0}
-    overrideExistingTransitions: 1
-  - transitionType: 3
-    effected: {fileID: 4514957948236783798}
-    duration: 0.4
-    target: {x: 0.9, y: 0.9}
-    targetTransform: {fileID: 0}
-    overrideExistingTransitions: 1
-  colorTransitionsOnEnable: []
-  rotationTransitionsOnEnable: []
-  RectSizeTransitionsOnEnable: []
 --- !u!1 &3805518118702870902
 GameObject:
   m_ObjectHideFlags: 0

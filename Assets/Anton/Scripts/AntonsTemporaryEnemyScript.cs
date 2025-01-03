@@ -29,6 +29,9 @@ public class AntonsTemporaryEnemyScript : MonoBehaviour, IDamagable
     }
     [field: SerializeField] public int MaxHealth { get; set; }
     public bool TickDamageActive { get; set; }
+    public bool IsBeingKnockedBack { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+    public Coroutine KnockbackCoroutine { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
+    public AnimationCurve KnockbackForceCurve { get => throw new System.NotImplementedException(); set => throw new System.NotImplementedException(); }
 
     private void Start()
     {
@@ -43,5 +46,10 @@ public class AntonsTemporaryEnemyScript : MonoBehaviour, IDamagable
     public void OnDeath()
     {
         Destroy(gameObject);
+    }
+
+    public void Knockback(Controller2D controller, float strength, Vector2 direction)
+    {
+        throw new System.NotImplementedException();
     }
 }

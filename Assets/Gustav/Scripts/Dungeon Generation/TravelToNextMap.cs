@@ -4,7 +4,7 @@ public class TravelToNextMap : MonoBehaviour
 {
     public void OnTriggerEnter2D(Collider2D collision)
     {
-        if (!collision.CompareTag("Player"))
+        if (!collision.CompareTag("Player") || MapManager.Instance == null || MapManager.Instance.TryingToLoadMap)
         {
             return;
         }

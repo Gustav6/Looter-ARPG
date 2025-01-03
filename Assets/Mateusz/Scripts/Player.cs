@@ -1,7 +1,6 @@
 using NaughtyAttributes;
 using System;
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -11,7 +10,7 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
     public static Player Instance { get; private set; }
 
     #region Movement
-    public Vector3 Direction { get; private set; }
+    public Vector3 InputDirection { get; private set; }
 
     [BoxGroup("Movement")]
     [SerializeField] private float currentMoveSpeed;
@@ -99,11 +98,15 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
 
     Controller2D controller;
 
-    public bool facingRight = false;
+    [HideInInspector] public bool facingRight = false;
     [field: SerializeField] public Transform SpriteTransform { get; private set; }
 
     public Vector2Int CurrentRegion { get; private set; }
     public Vector2Int PreviousRegion { get; private set; }
+
+    [field: SerializeField] public bool IsBeingKnockedBack { get; set; }
+    [field: SerializeField] public AnimationCurve KnockbackForceCurve { get; set; }
+    public Coroutine KnockbackCoroutine { get; set; }
 
     public event EventHandler OnRegionSwitch;
 
@@ -138,12 +141,26 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
 
     private void FixedUpdate()
     {
-        controller.Move(currentMoveSpeed * Time.fixedDeltaTime * Direction);
+        if (!IsBeingKnockedBack)
+        {
+            controller.Move(currentMoveSpeed * Time.fixedDeltaTime * InputDirection);
+        }
     }
 
     private void Update()
     {
-        Direction = new(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            if (this is IDamagable d)
+            {
+                d.Knockback(controller, new Vector2(UnityEngine.Random.Range(-1f, 1f), UnityEngine.Random.Range(-1f, 1f)).normalized, 0.25f);
+            }
+        }
+
+        if (!IsBeingKnockedBack)
+        {
+            InputDirection = new(Input.GetAxis("Horizontal"), Input.GetAxis("Vertical"));
+        }
 
         if (Input.GetKeyDown(KeyCode.LeftShift))
         {
@@ -155,7 +172,7 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
             sprinting = false;
         }
 
-        if (Direction != Vector3.zero)
+        if (InputDirection != Vector3.zero || IsBeingKnockedBack)
         {
             if (sprinting)
             {
@@ -176,7 +193,7 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
             }
         }
 
-        if(!sprinting || Direction == Vector3.zero)
+        if(!sprinting || InputDirection == Vector3.zero)
         {
             if (Stamina < maxStamina)
             {

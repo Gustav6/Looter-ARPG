@@ -64,7 +64,10 @@ public class MapSettings : MonoBehaviour
                 }
             }
         }
+
     }
+    [Foldout("Room Variables")]
+    public int distanceFromRoomToRoom = 3;
 
     [Foldout("Room Variables")]
     public GameObject[] doNotAllowInStartingRoom;

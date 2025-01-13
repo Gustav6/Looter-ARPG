@@ -72,7 +72,7 @@ MonoBehaviour:
     targetTransform: {fileID: 0}
     targetInWorld: 0
     interval: 3.5
-    offset: {x: 0, y: 1}
+    offset: {x: 0, y: 1.5}
     amplitude: {x: 0, y: 0.025}
   scaleTransitionsOnEnable: []
   colorTransitionsOnEnable: []
@@ -227,7 +227,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 21300000, guid: ca4adf144c3dc934e95c90df084c83c3, type: 3}
+  m_Sprite: {fileID: 1909760425, guid: 6188589d98eabf244ab2211fa398149e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0
@@ -264,7 +264,7 @@ Transform:
   m_GameObject: {fileID: 4502609399960386151}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: -0.7071068, w: 0.7071068}
-  m_LocalPosition: {x: 0, y: 1, z: 0}
+  m_LocalPosition: {x: 0, y: 1.5, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []

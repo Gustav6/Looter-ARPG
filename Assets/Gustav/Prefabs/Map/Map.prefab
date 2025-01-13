@@ -471,7 +471,7 @@ TilemapRenderer:
   m_LightmapParameters: {fileID: 0}
   m_SortingLayerID: 1807875347
   m_SortingLayer: -1
-  m_SortingOrder: 0
+  m_SortingOrder: 1
   m_ChunkSize: {x: 32, y: 32, z: 32}
   m_ChunkCullingBounds: {x: 0, y: 0, z: 0}
   m_MaxChunkCount: 16
@@ -609,7 +609,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &8153986514212459468
 Transform:
   m_ObjectHideFlags: 0
@@ -820,4 +820,19 @@ MonoBehaviour:
   <WallMap>k__BackingField: {fileID: 7312442040768145718}
   <WallMapIcons>k__BackingField: {fileID: 8427680081182909662}
   <ActiveGameObjectsParent>k__BackingField: {fileID: 6732061483527339164}
-  generationComplete: 0
+  readyToLoad: 0
+  <RequiredSettingsForMap>k__BackingField:
+    seed: 0
+    totalRoomsCount: 0
+    amountOfMainRooms: 0
+    roomMaxSize: {x: 0, y: 0}
+    roomMinSize: {x: 0, y: 0}
+    spawnFunction: 0
+    radiusForGen: 0
+    stripSizeForGen: {x: 0, y: 0}
+    amountOfHallwayLoops: 0
+    randomizedHallwayWidth: 0
+    hallwayWidth: 0
+    hallwayMinWidth: 0
+    hallwayMaxWidth: 0
+    amountOfEnemies: 0

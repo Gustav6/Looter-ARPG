@@ -17,7 +17,6 @@ public static class MapGeneration
     private static HashSet<Vector3Int> availableGroundPositions, availableWallPositions;
 
     public static event EventHandler OnGenerationCompleted;
-    private static int amountOfCoreroutinesStarted, amountOfCoreroutinesFinished;
 
     private static Vector3Int travelToNextMapObjectPosition;
 
@@ -75,14 +74,14 @@ public static class MapGeneration
             #region Room generation
 
             // Heap for keeping a reference to the largest rooms (Most amount of ground tiles)
-            Heap<Room> roomHeapForSize = new(manager.Settings.AmountOfMainRooms);
+            Heap<Room> roomHeapForSize = new(manager.Settings.totalRoomsCount);
 
             for (int i = 0; i < roomList.Length; i++)
             {
                 Room newRoom = GenerateRoom(manager);
+                roomHeapForSize.Add(newRoom);
 
                 roomList[i] = newRoom;
-                roomHeapForSize.Add(newRoom);
             }
 
             for (int i = 0; i < mainRooms.Length; i++)
@@ -99,9 +98,9 @@ public static class MapGeneration
                 canMoveRoom = false;
 
                 // Move rooms away from any other room that intersect said room
-                foreach (Room room in roomList)
+                foreach (Room room in mainRooms)
                 {
-                    Vector3Int dir = (Vector3Int)GetDirection(room, roomList);
+                    Vector3Int dir = (Vector3Int)GetDirection(manager, room, mainRooms);
 
                     if (dir != Vector3Int.zero)
                     {
@@ -162,13 +161,13 @@ public static class MapGeneration
             }
 
             // Connect rooms using: Delaunay triangulation
-            List<Triangle> triangulation = GenerateDelaunayTriangulation(manager, roomList);
+            List<Triangle> triangulation = GenerateDelaunayTriangulation(manager, mainRooms);
 
             // Connect rooms with the minimal amount of edges + loop amount
-            List<Edge> minimumSpanningTree = GetMinimumSpanningTree(manager, triangulation, roomList);
+            List<Edge> minimumSpanningTree = GetMinimumSpanningTree(manager, triangulation, mainRooms);
 
             // Connect rooms with hallways
-            GenerateHallways(manager, minimumSpanningTree, roomList);
+            GenerateHallways(manager, minimumSpanningTree, mainRooms);
 
             // Remove wall tiles that are on the same tile position as any ground tile
             tileMaps[TileMapType.wall].ExceptWith(tileMaps[TileMapType.ground]);
@@ -269,11 +268,11 @@ public static class MapGeneration
         mapReference.WallMap.transform.GetComponent<TilemapCollider2D>().enabled = false;
 
         #region Coroutines
-        amountOfCoreroutinesStarted = 0;
-        amountOfCoreroutinesFinished = 0;
+        mapReference.amountOfCoreroutinesStarted = 0;
+        mapReference.amountOfCoreroutinesFinished = 0;
 
         manager.StartCoroutine(SpawnGameObjects(manager, mapReference, gameObjects));
-        amountOfCoreroutinesStarted++;
+        mapReference.amountOfCoreroutinesStarted++;
 
         TileBase[] tiles;
         
@@ -281,18 +280,18 @@ public static class MapGeneration
         Array.Fill(tiles, manager.tilePairs[TileTexture.ground]);
 
         manager.StartCoroutine(SetTiles(mapReference, TileMapType.ground, groundTileRanges, tileMaps[TileMapType.ground].ToArray(), tiles));
-        amountOfCoreroutinesStarted++;
+        mapReference.amountOfCoreroutinesStarted++;
 
         tiles = new TileBase[1000];
         Array.Fill(tiles, manager.tilePairs[TileTexture.wall]);
 
         manager.StartCoroutine(SetTiles(mapReference, TileMapType.wall, wallTileRanges, tileMaps[TileMapType.wall].ToArray(), tiles));
+        mapReference.amountOfCoreroutinesStarted++;
 
-        tiles = new TileBase[1000];
-        Array.Fill(tiles, manager.tilePairs[TileTexture.walkableIcon]);
+        //tiles = new TileBase[1000];
+        //Array.Fill(tiles, manager.tilePairs[TileTexture.walkableIcon]);
 
-        manager.StartCoroutine(SetTiles(mapReference, TileMapType.walkableIcon, groundTileRanges, tileMaps[TileMapType.ground].ToArray(), tiles));
-        amountOfCoreroutinesStarted++;
+        //manager.StartCoroutine(SetTiles(mapReference, TileMapType.walkableIcon, groundTileRanges, tileMaps[TileMapType.ground].ToArray(), tiles));
         #endregion
     }
 
@@ -311,11 +310,12 @@ public static class MapGeneration
             }
         }
 
-        amountOfCoreroutinesFinished++;
+        map.amountOfCoreroutinesFinished++;
 
-        if (AllCoreroutinesFinished(map))
+        if (map.amountOfCoreroutinesFinished == map.amountOfCoreroutinesStarted)
         {
             map.readyToLoad = true;
+            Debug.Log("Map ready to load");
             OnGenerationCompleted?.Invoke(null, EventArgs.Empty);
         }
 
@@ -351,26 +351,16 @@ public static class MapGeneration
             map.WallMap.GetComponent<TilemapCollider2D>().enabled = true;
         }
 
-        amountOfCoreroutinesFinished++;
+        map.amountOfCoreroutinesFinished++;
 
-        if (AllCoreroutinesFinished(map))
+        if (map.amountOfCoreroutinesFinished == map.amountOfCoreroutinesStarted)
         {
             map.readyToLoad = true;
+            Debug.Log("Map ready to load");
             OnGenerationCompleted?.Invoke(null, EventArgs.Empty);
         }
 
         Debug.Log(tileMapType + " Is done");
-    }
-
-    public static bool AllCoreroutinesFinished(Map map)
-    {
-        if (amountOfCoreroutinesFinished == amountOfCoreroutinesStarted)
-        {
-            map.readyToLoad = true;
-            return true;
-        }
-
-        return false;
     }
     #endregion
 
@@ -415,14 +405,14 @@ public static class MapGeneration
 
     #region Room seperation
 
-    private static Vector2Int GetDirection(Room currentRoom, Room[] rooms)
+    private static Vector2Int GetDirection(MapManager manager, Room currentRoom, Room[] rooms)
     {
         Vector2 separationVelocity = Vector2.zero;
         Vector2 otherPosition, otherAgentToCurrent, directionToTravel;
 
         foreach (Room room in rooms)
         {
-            if (!RoomIntersects(currentRoom, room))
+            if (!RoomIntersects(currentRoom, room, manager.Settings.distanceFromRoomToRoom))
             {
                 continue;
             }
@@ -463,13 +453,13 @@ public static class MapGeneration
 
     #region Room intersection
 
-    private static bool RoomIntersects(Room roomA, Room roomB)
+    private static bool RoomIntersects(Room roomA, Room roomB, int expandedSize = 0)
     {
         if (roomA != roomB)
         {
-            if (roomA.BottomLeft.x < roomB.TopRight.x && roomA.TopRight.x > roomB.BottomLeft.x)
+            if (roomA.BottomLeft.x - expandedSize < roomB.TopRight.x + expandedSize && roomA.TopRight.x + expandedSize > roomB.BottomLeft.x - expandedSize)
             {
-                if (roomA.BottomLeft.y < roomB.TopRight.y && roomA.TopRight.y > roomB.BottomLeft.y)
+                if (roomA.BottomLeft.y - expandedSize < roomB.TopRight.y + expandedSize && roomA.TopRight.y + expandedSize > roomB.BottomLeft.y - expandedSize)
                 {
                     return true;
                 }
@@ -924,8 +914,11 @@ public static class MapGeneration
     {
         for (int i = 0; i < hallwayWidth; i++)
         {
-            tileMaps[TileMapType.ground].Add(new(current.x, current.y + i - (hallwayWidth / 2)));
-            tileMaps[TileMapType.ground].Add(new(current.x + i - (hallwayWidth / 2), current.y));
+            for (int j = 0; j < hallwayWidth; j++)
+            {
+                //tileMaps[TileMapType.ground].Add(new(current.x, current.y + i - (hallwayWidth / 2)));
+                tileMaps[TileMapType.ground].Add(new(current.x + i - (hallwayWidth / 2), current.y + j - (hallwayWidth / 2)));
+            }
         }
 
         for (int i = 0; i < 35; i++)
@@ -1096,6 +1089,46 @@ public static class MapGeneration
         }
     }
     #endregion
+
+    private static void CleanUpWallTiles()
+    {
+        // Use cellular automata to sense what tiles are missing enough neighbors.
+
+        int neighborCount;
+        Vector3Int tempPosition;
+
+        for (int i = tileMaps[TileMapType.wall].Count - 1; i >= 0; i--)
+        {
+            // Remove if the requirement is not met.
+
+            // Requirement 4 or more neighbors exist
+            // If not remove position
+
+            neighborCount = 0;
+
+            for (int x = -1; x < 2; x++)
+            {
+                for (int y = -1; y < 2; y++)
+                {
+                    tempPosition = tileMaps[TileMapType.wall].ElementAt(i);
+                    tempPosition.x += x;
+                    tempPosition.y += y;
+
+                    if (tileMaps[TileMapType.wall].Contains(tempPosition))
+                    {
+                        neighborCount++;
+                    }
+                }
+            }
+
+            if (neighborCount <= 3)
+            {
+                tileMaps[TileMapType.wall].Remove(tileMaps[TileMapType.wall].ElementAt(i));
+                availableWallPositions.Remove(tileMaps[TileMapType.wall].ElementAt(i));
+                Debug.Log("Removed: " + tileMaps[TileMapType.wall].ElementAt(i));
+            }
+        }
+    }
 
     #region Add enemies
     private static void AddEnemiesToList(MapManager manager, List<GameObjectPositionPair> gameObjects)

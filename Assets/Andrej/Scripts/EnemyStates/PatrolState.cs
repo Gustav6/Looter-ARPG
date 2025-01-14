@@ -7,7 +7,7 @@ public class PatrolState : MoveState
 {
     public override void Enter()
     {
-
+        //InsideUnitCircle
     }
 
     public override void Do()

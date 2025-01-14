@@ -1,6 +1,6 @@
-using NaughtyAttributes;
-using System;
+
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -12,21 +12,21 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
     #region Movement
     public Vector3 InputDirection { get; private set; }
 
-    [BoxGroup("Movement")]
+    //[BoxGroup("Movement")]
     [SerializeField] private float currentMoveSpeed;
 
-    [BoxGroup("Movement")]
+    //[BoxGroup("Movement")]
     public float sprintAcceleration = 0.15f;
-    [BoxGroup("Movement")]
+    //[BoxGroup("Movement")]
     public float sprintMoveSpeed = 10;
-    [BoxGroup("Movement")]
+    //[BoxGroup("Movement")]
     public float baseMoveSpeed = 5;
 
     private bool sprinting;
     #endregion
 
     #region Stamina
-    [BoxGroup("Stamina")]
+    //[BoxGroup("Stamina")]
     [SerializeField] private float currentStamina;
     public float Stamina
     {
@@ -49,22 +49,22 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
             UpdateStaminaBar();
         }
     }
-    [BoxGroup("Stamina")]
+    //[BoxGroup("Stamina")]
     public float maxStamina = 100f;
-    [BoxGroup("Stamina")]
+    //[BoxGroup("Stamina")]
     public float sprintCost = 25f;
-    [BoxGroup("Stamina")]
-    public float rechargeTime = 1f;
+    //[BoxGroup("Stamina")]
+    public float rechargeTime = 1f; 
 
-    [BoxGroup("Stamina")]
+    //[BoxGroup("Stamina")]
     [SerializeField] private Image staminaProgressUI = null;
     #endregion
 
     #region Invenroty
-    [BoxGroup("Inventory")]
+    //[BoxGroup("Inventory")]
     public InventoryObject inventory;
 
-    [BoxGroup("Inventory")]
+    //[BoxGroup("Inventory")]
     public GameObject inventoryCanvas;
 
     private bool inventoryOpen;
@@ -108,7 +108,7 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
     [field: SerializeField] public AnimationCurve KnockbackForceCurve { get; set; }
     public Coroutine KnockbackCoroutine { get; set; }
 
-    public event EventHandler OnRegionSwitch;
+    //public event EventHandler OnRegionSwitch;
 
 
     private void Awake()
@@ -188,7 +188,7 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
             {
                 if (CurrentRegion != Vector2Int.FloorToInt(new Vector2(transform.position.x / (MapManager.Instance.RegionWidth * 0.5f), transform.position.y / (MapManager.Instance.RegionHeight * 0.5f))))
                 {
-                    UpdateRegion();
+                    //UpdateRegion();
                 }
             }
         }
@@ -237,12 +237,12 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
         data.playerCurrentHealth = CurrentHealth;
     }
 
-    public void UpdateRegion()
-    {
-        CurrentRegion = new Vector2Int((int)(transform.position.x / MapManager.Instance.RegionWidth), (int)(transform.position.y / MapManager.Instance.RegionHeight));
-        OnRegionSwitch?.Invoke(this, EventArgs.Empty);
-        PreviousRegion = CurrentRegion;
-    }
+    //public void UpdateRegion()
+    //{
+    //    CurrentRegion = new Vector2Int((int)(transform.position.x / MapManager.Instance.RegionWidth), (int)(transform.position.y / MapManager.Instance.RegionHeight));
+    //    OnRegionSwitch?.Invoke(this, EventArgs.Empty);
+    //    PreviousRegion = CurrentRegion;
+    //}
 
     void UpdateStaminaBar()
     {
@@ -258,6 +258,7 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
         var item = other.GetComponent<GroundItem>();
         if (item)
         {
+            Item _item = new Item(item.item);
             Debug.Log("henlo2");
             inventory.AddItem(new Item(item.item), 1);
             Destroy(other.gameObject);
@@ -268,7 +269,7 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
     {
         if (inventory != null)
         {
-            inventory.Container.Items = new InventorySlot[24];
+            inventory.Container.Items = new InventorySlot[28];
         }
     }
 

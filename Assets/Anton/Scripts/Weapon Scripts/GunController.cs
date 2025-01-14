@@ -18,8 +18,6 @@ public class GunController : MonoBehaviour
     public TextMeshPro ammoCount;
     public Transform weaponRotateAxis;
     int ammo;
-    float timer;
-    float timerShake;
 
     public int Damage;
     public int pierceAmount;
@@ -30,6 +28,7 @@ public class GunController : MonoBehaviour
     public bool fireDmg;
 
     private float attackTimer;
+    float reloadTimer;
 
     private void Awake()
     {
@@ -52,6 +51,7 @@ public class GunController : MonoBehaviour
         ammo = gun.Ammo;
         pierceAmount = gun.amountOfPircableEnemies;
         fireForce = gun.fireForce;
+        reloadTimer = 0;
 
         #region Set Static Variables
         pierce = false;
@@ -100,7 +100,7 @@ public class GunController : MonoBehaviour
                 else if (ammo > 0)
                 {
                     Attack();
-                }  
+                }
             }
         }
         else if (attackTimer >= gun.fireRate / 4)
@@ -130,7 +130,7 @@ public class GunController : MonoBehaviour
     {
         CameraShake.ShakeCamera(2);
         GameObject bullet = Instantiate(gun.bulletPrefab, firePoint.transform.position, Quaternion.identity);
-        bullet.GetComponent<Rigidbody2D>().AddForce(firePoint.right * gun.fireForce, ForceMode2D.Impulse);
+        bullet.GetComponent<Rigidbody2D>().AddForce(firePoint.right * gun.fireForce, ForceMode2D.Impulse);      
         if (gun.effects != null && gun.effects.Length != 0)
         {
             if (gun.effects.Contains(WeaponEffect.dubbelShot))
@@ -144,8 +144,12 @@ public class GunController : MonoBehaviour
     }
 
     void Reload()
-    {       
-        ammo = gun.Ammo;        
-        Debug.Log("Reloaded Gun");       
+    {
+        reloadTimer += Time.deltaTime;
+        if (reloadTimer >= gun.reloadTime)
+        {
+            ammo = gun.Ammo;
+            reloadTimer = 0;
+        } 
     }
 }

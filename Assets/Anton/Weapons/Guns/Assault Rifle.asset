@@ -21,7 +21,7 @@ MonoBehaviour:
   critChanse: 0
   fireRate: 0.2
   fireForce: 20
-  reloadTime: 0
+  reloadTime: 2
   effects: 
   amountOfPircableEnemies: 0
   damageTypes: 04000000

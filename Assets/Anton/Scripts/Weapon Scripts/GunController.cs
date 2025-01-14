@@ -87,17 +87,17 @@ public class GunController : MonoBehaviour
     void Update()
     {
         #region Input
-        RaycastHit2D raycastHit = Physics2D.Raycast(weaponRotateAxis.transform.position, WeaponRotate.dir, 3.2f, collidableLayersRaycast);
-        Debug.DrawRay(weaponRotateAxis.transform.position, WeaponRotate.dir.normalized * 3.2f, Color.red);
-        if (raycastHit)
-        {
-            //nothing happens
-        }
-        else if (attackTimer >= gun.fireRate)
+        if (attackTimer >= gun.fireRate)
         {
             if (Input.GetMouseButton(0))
             {
-                if (ammo > 0)
+                RaycastHit2D raycastHit = Physics2D.Raycast(weaponRotateAxis.transform.position, WeaponRotate.dir, 3.2f, collidableLayersRaycast);
+                Debug.DrawRay(weaponRotateAxis.transform.position, WeaponRotate.dir.normalized * 3.2f, Color.red);
+                if (raycastHit)
+                {
+                    //nothing happens
+                }
+                else if (ammo > 0)
                 {
                     Attack();
                 }  

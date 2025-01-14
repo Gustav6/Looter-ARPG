@@ -282,6 +282,11 @@ public static class MapGeneration
         manager.StartCoroutine(SetTiles(mapReference, TileMapType.ground, groundTileRanges, tileMaps[TileMapType.ground].ToArray(), tiles));
         mapReference.amountOfCoreroutinesStarted++;
 
+        //tiles = new TileBase[tileMaps[TileMapType.wall].Count];
+        //Array.Fill(tiles, manager.tilePairs[TileTexture.wall]);
+
+        //manager.wallMapTest.SetTiles(tileMaps[TileMapType.wall].ToArray(), tiles);
+
         tiles = new TileBase[1000];
         Array.Fill(tiles, manager.tilePairs[TileTexture.wall]);
 

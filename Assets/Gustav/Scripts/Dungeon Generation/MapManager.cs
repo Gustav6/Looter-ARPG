@@ -34,6 +34,7 @@ public class MapManager : MonoBehaviour, IDataPersistence
 
     [HideInInspector] public Map currentMap, nextMap;
 
+    public Tilemap wallMapTest;
     public bool TryingToLoadMap { get; private set; }
 
     private void Awake()
@@ -84,6 +85,7 @@ public class MapManager : MonoBehaviour, IDataPersistence
         }
     }
 
+    #region Save and load methods
     public void LoadData(GameData data)
     {
         Settings.seed = data.seed;
@@ -135,6 +137,7 @@ public class MapManager : MonoBehaviour, IDataPersistence
         // Enemies
         data.amountOfEnemies = currentMap.RequiredSettingsForMap.amountOfEnemies;
     }
+    #endregion
 
     private void MapGeneration_OnGenerationCompleted(object sender, EventArgs e)
     {
@@ -148,7 +151,7 @@ public class MapManager : MonoBehaviour, IDataPersistence
                 StartCoroutine(TryToLoadMap(currentMap));
             }
 
-            MapGeneration.GenerateMapAsync(this, MapPrefab);
+            //MapGeneration.GenerateMapAsync(this, MapPrefab);
         }
     }
 
@@ -232,10 +235,12 @@ public class MapManager : MonoBehaviour, IDataPersistence
     {
         map.gameObject.SetActive(true);
 
-        mapRegions = map.GetComponent<Map>().MapRegions;
+        mapRegions = map.MapRegions;
 
         Player.Instance.transform.position = map.startRoom.WorldPosition;
         cameraReference.transform.position = Player.Instance.transform.position;
+
+        map.WallMap.RefreshAllTiles();
 
         UpdateActiveRegions();
 

@@ -19,12 +19,16 @@ public class TileRemoverTest : MonoBehaviour
             yield return new WaitForEndOfFrame();
         }
 
-        Debug.Log(position);
-        //MapManager.Instance.currentMap.WallMap.SetTile(pos, null);
+        Debug.Log("Remove: " + position);
+
+        ReplaceTileWithGround();
     }
 
-    private void OnDestroy()
+    private void ReplaceTileWithGround()
     {
-        //Debug.Log("Destroyed");
+        MapManager.Instance.currentMap.WallMap.SetTile(position, null);
+        MapManager.Instance.currentMap.GroundMap.SetTile(position, MapManager.Instance.tilePairs[TileTexture.ground]);
+
+        Destroy(this);
     }
 }

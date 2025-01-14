@@ -47,12 +47,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   seed: 0
   spawnFunction: 0
-  radiusForGen: 50
-  stripSizeForGen: {x: 75, y: 25}
-  totalRoomsCount: 60
-  amountOfMainRooms: 60
+  radiusForGen: 45
+  stripSizeForGen: {x: 100, y: 50}
+  totalRoomsCount: 30
+  amountOfMainRooms: 30
   roomMaxSize: {x: 7, y: 7}
   roomMinSize: {x: 4, y: 4}
+  distanceFromRoomToRoom: 1
   doNotAllowInStartingRoom:
   - {fileID: 7687138853657912553, guid: f5fbfca504f544347a5c2c54d12a41ed, type: 3}
   - {fileID: 8525698252564195251, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
@@ -60,47 +61,13 @@ MonoBehaviour:
   randomizedHallwayWidth: 1
   randomizeHallwayPath: 1
   hallwayWidth: 0
-  hallwayMinWidth: 5
-  hallwayMaxWidth: 8
+  hallwayMinWidth: 4
+  hallwayMaxWidth: 6
   enemyPrefabs:
   - {fileID: 8525698252564195251, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
   - {fileID: 4034984483810168527, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
   amountOfEnemies: 0
-  noiseMaps:
-  - tileMapEffected: 0
-    amountOfNoiseLoops: 3
-    noiseScale: 8
-    octaves: 2
-    persistence: 0.5
-    lacunarity: 2
-    prefabs:
-    - name: Empty
-      heightValue: 0.05
-      prefab: {fileID: 0}
-      canRandomizePosition: 0
-      randomPositionRange: {x: 0, y: 0}
-    - name: Pot
-      heightValue: 0.1
-      prefab: {fileID: 4889750398875816261, guid: 46289d76540a0724e9abe84559d0610c, type: 3}
-      canRandomizePosition: 1
-      randomPositionRange: {x: 25, y: 25}
-  - tileMapEffected: 0
-    amountOfNoiseLoops: 5
-    noiseScale: 8
-    octaves: 4
-    persistence: 1
-    lacunarity: 2
-    prefabs:
-    - name: Skull
-      heightValue: 0.05
-      prefab: {fileID: 1472808312321901918, guid: 74ef37aba4ba7c842aa7f3c9a1f5ca3a, type: 3}
-      canRandomizePosition: 1
-      randomPositionRange: {x: 15, y: 15}
-    - name: Cactus
-      heightValue: 0.1
-      prefab: {fileID: 5964063023200584229, guid: 911133c5d8bf06445ba6686da926fee6, type: 3}
-      canRandomizePosition: 1
-      randomPositionRange: {x: 20, y: 8}
+  noiseMaps: []
   prefabsToSpawn: []
 --- !u!114 &3171003164158351417
 MonoBehaviour:
@@ -117,10 +84,8 @@ MonoBehaviour:
   tiles:
   - tile: {fileID: 11400000, guid: 00a767e073315744ca30b088cf81ffce, type: 2}
     type: 0
-  - tile: {fileID: 11400000, guid: f01ce3f1289e516448379e45243aa6e4, type: 2}
+  - tile: {fileID: 11400000, guid: f6a51d97d3b49da4893972f3961a2b8b, type: 2}
     type: 1
-  - tile: {fileID: 11400000, guid: 4c3c381c0431b194cb7ce0c060bc50e8, type: 2}
-    type: 2
   <LoadMapInCurrentScene>k__BackingField: 1
   <MapPrefab>k__BackingField: {fileID: 8227713409367015042, guid: 5f8a012069c1dbc4f8cd7e4df38d44f6, type: 3}
   <TravelToNextMapPrefab>k__BackingField: {fileID: 573335589479022553, guid: d61570b7e33617b488b0650f034a8a4b, type: 3}
@@ -128,3 +93,4 @@ MonoBehaviour:
   <RegionHeight>k__BackingField: 0
   currentMap: {fileID: 0}
   nextMap: {fileID: 0}
+  wallMapTest: {fileID: 0}

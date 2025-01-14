@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public static class MapGeneration
 {
@@ -350,35 +351,44 @@ public static class MapGeneration
 
         if (map.amountOfTilemapCoreroutinesFinished == map.amountOfTilemapCoreroutinesStarted)
         {
-            manager.StartCoroutine(CleanUpTilemap(map));
+            manager.StartCoroutine(CleanUpTileMap(map));
         }
 
         Debug.Log(tileMapType + " Is done");
     }
     #endregion
 
-    private static IEnumerator CleanUpTilemap(Map map)
+    private static IEnumerator CleanUpTileMap(Map map)
     {
         map.WallMap.RefreshAllTiles();
 
+        while (map.WallMap.transform.childCount > 0)
+        {
+            for (int i = map.WallMap.transform.childCount - 1; i >= 0; i--)
+            {
+                Debug.Log(map.WallMap.transform.childCount);
+
+                Vector3Int position = Vector3Int.FloorToInt(map.WallMap.transform.GetChild(i).position);
+                MapManager.Instance.currentMap.WallMap.SetTile(position, null);
+                MapManager.Instance.currentMap.GroundMap.SetTile(position, MapManager.Instance.tilePairs[TileTexture.ground]);
+            }
+
+            map.WallMap.RefreshAllTiles();
+
+            yield return new WaitForEndOfFrame();
+        }
+
         for (int i = tileMaps[TileMapType.wall].Count - 1; i >= 0; i--)
         {
-            if (!WallTileNeighborsGroundTile(tileMaps[TileMapType.wall].ElementAt(i)))
+            if (!WallTileNeighborsAGroundTile(tileMaps[TileMapType.wall].ElementAt(i)))
             {
                 map.WallMap.SetTile(tileMaps[TileMapType.wall].ElementAt(i), null);
             }
         }
 
-        yield return null;
-
         map.readyToLoad = true;
         Debug.Log("Map ready to load");
         OnGenerationCompleted?.Invoke(null, EventArgs.Empty);
-    }
-
-    private static bool WallTileNeighborsGroundTile(Vector3Int position)
-    {
-        return false;
     }
 
     #endregion
@@ -883,7 +893,7 @@ public static class MapGeneration
                     break;
                 }
 
-                ExpandHallwayAndAddTiles(hallwayPath[i], hallwayPath[i + 1], hallwayWidth, 2);
+                ExpandHallwayAndAddTiles(hallwayPath[i], hallwayPath[i + 1], hallwayWidth, 5);
             }
 
             // *Working* but not very good looking
@@ -1090,7 +1100,7 @@ public static class MapGeneration
                                     }
                                     break;
                                 case TileMapType.wall:
-                                    if (availableWallPositions.Contains(tilePosition))
+                                    if (availableWallPositions.Contains(tilePosition) && !WallTileNeighborsAGroundTile(tilePosition))
                                     {
                                         availableWallPositions.Remove(tilePosition);
                                     }
@@ -1172,7 +1182,6 @@ public static class MapGeneration
                     }
                     break;
                 case TileMapType.wall:
-
                     for (int i = 0; i < pair.amount; i++)
                     {
                         if (availableWallPositions.Count == 0)
@@ -1180,7 +1189,14 @@ public static class MapGeneration
                             break;
                         }
 
-                        tilePosition = availableWallPositions.ElementAt(rng.Next(0, availableGroundPositions.Count + 1));
+                        tilePosition = availableWallPositions.ElementAt(rng.Next(0, availableWallPositions.Count + 1));
+
+                        while (WallTileNeighborsAGroundTile(tilePosition) && availableWallPositions.Count > 0)
+                        {
+                            availableWallPositions.Remove(tilePosition);
+
+                            tilePosition = availableWallPositions.ElementAt(rng.Next(0, availableWallPositions.Count + 1));
+                        }
 
                         spawnPosition = tilePosition;
 
@@ -1199,6 +1215,22 @@ public static class MapGeneration
         }
     }
     #endregion
+
+    private static bool WallTileNeighborsAGroundTile(Vector3Int position)
+    {
+        for (int x = -1; x < 2; x++)
+        {
+            for (int y = -1; y < 2; y++)
+            {
+                if (tileMaps[TileMapType.ground].Contains(position + new Vector3Int(x, y)))
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
 
     private struct GameObjectPositionPair
     {

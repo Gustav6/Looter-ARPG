@@ -126,16 +126,16 @@ public class Room : IHeapItem<Room>
 
         for (int x = 0; x < width; x++)
         {
-            for (int y = 0; y < 2; y++)
+            for (int y = 0; y < 5; y++)
             {
                 walls.Add(new Vector3Int(x, -1 - y) + Vector3Int.FloorToInt(position));
                 walls.Add(new Vector3Int(x, height + y) + Vector3Int.FloorToInt(position));
             }
         }
 
-        for (int x = -2; x < height + 2; x++)
+        for (int x = -5; x < height + 5; x++)
         {
-            for (int y = 0; y < 2; y++)
+            for (int y = 0; y < 5; y++)
             {
                 walls.Add(new Vector3Int(-1 - y, x) + Vector3Int.FloorToInt(position));
                 walls.Add(new Vector3Int(width + y, x) + Vector3Int.FloorToInt(position));

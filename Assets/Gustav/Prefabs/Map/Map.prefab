@@ -64,7 +64,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &5796272734027472288
 Transform:
   m_ObjectHideFlags: 0
@@ -820,8 +820,8 @@ MonoBehaviour:
   <WallMap>k__BackingField: {fileID: 7312442040768145718}
   <WallMapIcons>k__BackingField: {fileID: 8427680081182909662}
   <ActiveGameObjectsParent>k__BackingField: {fileID: 6732061483527339164}
-  amountOfCoreroutinesStarted: 0
-  amountOfCoreroutinesFinished: 0
+  amountOfTilemapCoreroutinesStarted: 0
+  amountOfTilemapCoreroutinesFinished: 0
   readyToLoad: 0
   <RequiredSettingsForMap>k__BackingField:
     seed: 0

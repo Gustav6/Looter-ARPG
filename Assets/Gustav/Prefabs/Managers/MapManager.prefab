@@ -47,12 +47,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   seed: 0
   spawnFunction: 0
-  radiusForGen: 45
+  radiusForGen: 35
   stripSizeForGen: {x: 100, y: 50}
   totalRoomsCount: 30
   amountOfMainRooms: 30
-  roomMaxSize: {x: 7, y: 7}
-  roomMinSize: {x: 4, y: 4}
+  roomMaxSize: {x: 9, y: 7}
+  roomMinSize: {x: 6, y: 4}
   distanceFromRoomToRoom: 1
   doNotAllowInStartingRoom:
   - {fileID: 7687138853657912553, guid: f5fbfca504f544347a5c2c54d12a41ed, type: 3}
@@ -60,9 +60,9 @@ MonoBehaviour:
   amountOfHallwayLoops: 12.5
   randomizedHallwayWidth: 1
   randomizeHallwayPath: 1
-  hallwayWidth: 0
+  hallwayWidth: 2
   hallwayMinWidth: 4
-  hallwayMaxWidth: 6
+  hallwayMaxWidth: 7
   enemyPrefabs:
   - {fileID: 8525698252564195251, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
   - {fileID: 4034984483810168527, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
@@ -84,7 +84,7 @@ MonoBehaviour:
   tiles:
   - tile: {fileID: 11400000, guid: 00a767e073315744ca30b088cf81ffce, type: 2}
     type: 0
-  - tile: {fileID: 11400000, guid: f6a51d97d3b49da4893972f3961a2b8b, type: 2}
+  - tile: {fileID: 11400000, guid: 0a59f4d672b2d4544b47e514fb21a912, type: 2}
     type: 1
   <LoadMapInCurrentScene>k__BackingField: 1
   <MapPrefab>k__BackingField: {fileID: 8227713409367015042, guid: 5f8a012069c1dbc4f8cd7e4df38d44f6, type: 3}
@@ -93,4 +93,4 @@ MonoBehaviour:
   <RegionHeight>k__BackingField: 0
   currentMap: {fileID: 0}
   nextMap: {fileID: 0}
-  wallMapTest: {fileID: 0}
+  stopTileRefresh: 1

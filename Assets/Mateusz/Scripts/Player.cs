@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 [RequireComponent(typeof(Controller2D))]
@@ -111,6 +112,7 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
 
     public event EventHandler OnRegionSwitch;
 
+    [SerializeField] private Renderer groundRenderer;
 
     private void Awake()
     {
@@ -175,7 +177,10 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
 
         if (InputDirection != Vector3.zero || IsBeingKnockedBack)
         {
+            groundRenderer.material.mainTextureOffset = transform.position * new Vector2(0.2f, 0.2f);
+
             if (sprinting)
+
             {
                 currentMoveSpeed = Mathf.Lerp(currentMoveSpeed, sprintMoveSpeed, sprintAcceleration);
                 Stamina -= sprintCost * Time.deltaTime;
@@ -189,7 +194,7 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
             {
                 if (CurrentRegion != Vector2Int.FloorToInt(new Vector2(transform.position.x / (MapManager.Instance.RegionWidth * 0.5f), transform.position.y / (MapManager.Instance.RegionHeight * 0.5f))))
                 {
-                    //UpdateRegion();
+                    UpdateRegion();
                 }
             }
         }

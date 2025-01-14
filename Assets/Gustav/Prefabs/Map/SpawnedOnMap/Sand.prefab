@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 6780329507980714199}
   - component: {fileID: 6166967011596467529}
   m_Layer: 0
-  m_Name: DeadTree
+  m_Name: Sand
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -26,7 +26,7 @@ Transform:
   m_GameObject: {fileID: 7192014239374397492}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 41.084167, y: 0.56381446, z: -0.21197604}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -76,7 +76,7 @@ SpriteRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Sprite: {fileID: 4347544937462273523, guid: 67434a83cadadfe4782d43b36e6c84b1, type: 3}
+  m_Sprite: {fileID: -1506921188, guid: 6188589d98eabf244ab2211fa398149e, type: 3}
   m_Color: {r: 1, g: 1, b: 1, a: 1}
   m_FlipX: 0
   m_FlipY: 0

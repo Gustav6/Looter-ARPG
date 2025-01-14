@@ -10,6 +10,7 @@ public class SelectRandomPrefab : MonoBehaviour
     {
         StartCoroutine(WaitForMapLoad());
     }
+
     private IEnumerator WaitForMapLoad()
     {
         while (!MapManager.Instance.currentMap.readyToLoad)
@@ -18,17 +19,30 @@ public class SelectRandomPrefab : MonoBehaviour
         }
 
         float value = UnityEngine.Random.Range(0, 100);
+        GameObject prfabToSpawn = null;
+        Vector3 offset = Vector2.zero;
 
         foreach (PrefabChancePair pair in pairs)
         {
-            
+            if (pair.spawnChance >= value)
+            {
+                prfabToSpawn = pair.prefab;
+                offset = pair.offset;
+            }
+        }
+
+        if (prfabToSpawn != null)
+        {
+            Instantiate(prfabToSpawn, transform.position + offset, Quaternion.identity);
+            Destroy(this);
         }
     }
 
     [Serializable]
     public struct PrefabChancePair
     {
-        public float chance;
+        public float spawnChance;
         public GameObject prefab;
+        public Vector2 offset;
     }
 }

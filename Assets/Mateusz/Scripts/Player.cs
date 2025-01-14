@@ -1,4 +1,5 @@
 
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -108,7 +109,7 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
     [field: SerializeField] public AnimationCurve KnockbackForceCurve { get; set; }
     public Coroutine KnockbackCoroutine { get; set; }
 
-    //public event EventHandler OnRegionSwitch;
+    public event EventHandler OnRegionSwitch;
 
 
     private void Awake()
@@ -237,12 +238,12 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
         data.playerCurrentHealth = CurrentHealth;
     }
 
-    //public void UpdateRegion()
-    //{
-    //    CurrentRegion = new Vector2Int((int)(transform.position.x / MapManager.Instance.RegionWidth), (int)(transform.position.y / MapManager.Instance.RegionHeight));
-    //    OnRegionSwitch?.Invoke(this, EventArgs.Empty);
-    //    PreviousRegion = CurrentRegion;
-    //}
+    public void UpdateRegion()
+    {
+        CurrentRegion = new Vector2Int((int)(transform.position.x / MapManager.Instance.RegionWidth), (int)(transform.position.y / MapManager.Instance.RegionHeight));
+        OnRegionSwitch?.Invoke(this, EventArgs.Empty);
+        PreviousRegion = CurrentRegion;
+    }
 
     void UpdateStaminaBar()
     {

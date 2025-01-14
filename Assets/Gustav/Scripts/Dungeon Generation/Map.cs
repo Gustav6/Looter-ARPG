@@ -11,7 +11,7 @@ public class Map : MonoBehaviour
     [field: SerializeField] public Tilemap WallMapIcons { get; private set; }
     [field: SerializeField] public GameObject ActiveGameObjectsParent { get; private set; }
 
-    public int amountOfCoreroutinesStarted, amountOfCoreroutinesFinished;
+    public int amountOfTilemapCoreroutinesStarted, amountOfTilemapCoreroutinesFinished;
 
     public Dictionary<Vector2Int, List<GameObject>> MapRegions { get; set; }
 

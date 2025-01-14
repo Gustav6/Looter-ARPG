@@ -35,6 +35,7 @@ public class MapManager : MonoBehaviour, IDataPersistence
     [HideInInspector] public Map currentMap, nextMap;
     public bool TryingToLoadMap { get; private set; }
 
+    public bool stopTileRefresh;
     private void Awake()
     {
         if (Instance == null)
@@ -231,22 +232,14 @@ public class MapManager : MonoBehaviour, IDataPersistence
     #region Load map methods
     private void LoadMap(Map map)
     {
-        map.gameObject.SetActive(true);
-
         mapRegions = map.MapRegions;
 
         Player.Instance.transform.position = map.startRoom.WorldPosition;
         cameraReference.transform.position = Player.Instance.transform.position;
 
-        map.WallMap.RefreshAllTiles();
-
         UpdateActiveRegions();
 
-        //GameObject g1 = new() { name = "Start Room" };
-        //g1.transform.position = map.startRoom.WorldPosition;
-
-        //GameObject g2 = new() { name = "End Room" };
-        //g2.transform.position = map.endRoom.WorldPosition;
+        map.gameObject.SetActive(true);
     }
 
     public IEnumerator TryToLoadMap(Map mapToLoad)

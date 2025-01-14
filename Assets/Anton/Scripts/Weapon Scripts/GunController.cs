@@ -10,7 +10,7 @@ public class GunController : MonoBehaviour
     public static GunController Instance { get; private set; }
 
     public GameObject damagePopupPrefab;
-    [SerializeField] public ScriptableObjectsGuns gun;
+    public ScriptableObjectsGuns gun;
     public Transform firePoint;
     public Transform firePoint2;
     public SpriteRenderer sprite;

@@ -33,8 +33,6 @@ public class MapManager : MonoBehaviour, IDataPersistence
     private Vector2Int cBottomLeft, cTopRight, region;
 
     [HideInInspector] public Map currentMap, nextMap;
-
-    public Tilemap wallMapTest;
     public bool TryingToLoadMap { get; private set; }
 
     private void Awake()

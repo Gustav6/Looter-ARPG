@@ -263,7 +263,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 1689737114163325548, guid: 7782a358ea2820641ad509817eaa57d8, type: 3}
       propertyPath: orthographic size
-      value: 8
+      value: 7.5
       objectReference: {fileID: 0}
     - target: {fileID: 1689737114163325548, guid: 7782a358ea2820641ad509817eaa57d8, type: 3}
       propertyPath: m_BackGroundColor.a
@@ -329,6 +329,10 @@ PrefabInstance:
       propertyPath: m_Follow
       value: 
       objectReference: {fileID: 1481790109}
+    - target: {fileID: 9171151727829813142, guid: 7782a358ea2820641ad509817eaa57d8, type: 3}
+      propertyPath: m_Lens.OrthographicSize
+      value: 7.5
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -372,11 +376,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2550612651143373822, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: <KnockbackForceCurve>k__BackingField.m_Curve.Array.data[1].time
-      value: 0.022982847
+      value: 0.012980711
       objectReference: {fileID: 0}
     - target: {fileID: 2550612651143373822, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: <KnockbackForceCurve>k__BackingField.m_Curve.Array.data[2].time
-      value: 0.13618483
+      value: 0.1135062
       objectReference: {fileID: 0}
     - target: {fileID: 2550612651143373822, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: <KnockbackForceCurve>k__BackingField.m_Curve.Array.data[3].time
@@ -388,11 +392,11 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2550612651143373822, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: <KnockbackForceCurve>k__BackingField.m_Curve.Array.data[1].value
-      value: 0.631805
+      value: 0.6091915
       objectReference: {fileID: 0}
     - target: {fileID: 2550612651143373822, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: <KnockbackForceCurve>k__BackingField.m_Curve.Array.data[2].value
-      value: 0.22808667
+      value: 0.4128065
       objectReference: {fileID: 0}
     - target: {fileID: 2550612651143373822, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: <KnockbackForceCurve>k__BackingField.m_Curve.Array.data[0].inSlope
@@ -404,7 +408,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2550612651143373822, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: <KnockbackForceCurve>k__BackingField.m_Curve.Array.data[2].inSlope
-      value: -8.495651
+      value: -0.29732928
       objectReference: {fileID: 0}
     - target: {fileID: 2550612651143373822, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: <KnockbackForceCurve>k__BackingField.m_Curve.Array.data[0].outSlope
@@ -424,7 +428,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2550612651143373822, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: <KnockbackForceCurve>k__BackingField.m_Curve.Array.data[2].outSlope
-      value: -8.495651
+      value: -0.29732928
       objectReference: {fileID: 0}
     - target: {fileID: 2550612651143373822, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: <KnockbackForceCurve>k__BackingField.m_Curve.Array.data[1].outWeight
@@ -432,7 +436,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2550612651143373822, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: <KnockbackForceCurve>k__BackingField.m_Curve.Array.data[2].outWeight
-      value: 0.33333334
+      value: 0.4709765
       objectReference: {fileID: 0}
     - target: {fileID: 2550612651143373822, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: <KnockbackForceCurve>k__BackingField.m_Curve.Array.data[0].tangentMode
@@ -867,6 +871,66 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: roomMaxSize.x
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: roomMinSize.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: hallwayMaxWidth
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: hallwayMinWidth
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: prefabsToSpawn.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: prefabsToSpawn.Array.data[0].amount
+      value: 25
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: prefabsToSpawn.Array.data[0].prefab
+      value: 
+      objectReference: {fileID: 5259599443454497189, guid: 069b66689d64da543ac9dc2a184d3457, type: 3}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[0].prefabs.Array.size
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: prefabsToSpawn.Array.data[0].tileMapEffected
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: prefabsToSpawn.Array.data[0].canRandomizePosition
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: prefabsToSpawn.Array.data[0].randomPositionRange.x
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: prefabsToSpawn.Array.data[0].randomPositionRange.y
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[0].prefab
+      value: 
+      objectReference: {fileID: 4889750398875816261, guid: 46289d76540a0724e9abe84559d0610c, type: 3}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[1].prefab
+      value: 
+      objectReference: {fileID: 5964063023200584229, guid: 911133c5d8bf06445ba6686da926fee6, type: 3}
     - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: wallMapTest
       value: 

@@ -24,8 +24,6 @@ public class ChaseState : MoveState
                 moveDirection = (lastSeenLocation.Value - (Vector2)transform.position).normalized;
             }
         }
-
-        Debug.Log(moveDirection);
     }
     public override void Enter()
     {

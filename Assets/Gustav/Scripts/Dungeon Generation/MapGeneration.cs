@@ -858,11 +858,6 @@ public static class MapGeneration
 
         foreach (Edge connection in minimumSpanningTree)
         {
-            if (manager.Settings.randomizedHallwayWidth)
-            {
-                hallwayWidth = rng.Next(manager.Settings.hallwayMinWidth, manager.Settings.hallwayMaxWidth);
-            }
-
             List<Room> roomList = new();
 
             foreach (Room room in rooms)
@@ -893,7 +888,7 @@ public static class MapGeneration
                     break;
                 }
 
-                ExpandHallwayAndAddTiles(hallwayPath[i], hallwayPath[i + 1], hallwayWidth, 5);
+                ExpandHallwayAndAddTiles(manager, hallwayPath[i], hallwayPath[i + 1], 5);
             }
 
             // *Working* but not very good looking
@@ -937,10 +932,17 @@ public static class MapGeneration
     }
 
     #region Expand hallway path
-    private static void ExpandHallwayAndAddTiles(Vector3Int current, Vector3Int next, int hallwayWidth, int wallWidth)
+    private static void ExpandHallwayAndAddTiles(MapManager manager, Vector3Int current, Vector3Int next, int wallWidth)
     {
+        int hallwayWidth = manager.Settings.hallwayWidth;
+
         for (int i = -wallWidth; i < hallwayWidth + wallWidth + 1; i++)
         {
+            if (manager.Settings.randomizedHallwayWidth)
+            {
+                hallwayWidth = rng.Next(manager.Settings.hallwayMinWidth, manager.Settings.hallwayMaxWidth);
+            }
+
             for (int j = -wallWidth; j < hallwayWidth + wallWidth + 1; j++)
             {
                 if (i >= 0 && j >= 0 && i <= hallwayWidth && j <= hallwayWidth)

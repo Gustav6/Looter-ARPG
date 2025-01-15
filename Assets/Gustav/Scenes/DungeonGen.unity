@@ -979,7 +979,35 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: roomMaxSize.x
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: roomMaxSize.y
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: roomMinSize.x
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: roomMinSize.y
+      value: 4
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: hallwayMaxWidth
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: hallwayMinWidth
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: distanceFromRoomToRoom
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
@@ -988,19 +1016,39 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].octaves
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].octaves
       value: 3
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].lacunarity
-      value: 3
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].noiseScale
-      value: 9
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].lacunarity
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].noiseScale
+      value: 7
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: doNotAllowInStartingRoom.Array.size
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].persistence
-      value: 0.5
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].persistence
+      value: 0.25
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: prefabsToSpawn.Array.data[0].amount
@@ -1036,7 +1084,7 @@ PrefabInstance:
       objectReference: {fileID: 9099915591299465098, guid: df0e8c2308fb36e4ebf35d715590e3ec, type: 3}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].tileMapEffected
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].amountOfNoiseLoops
@@ -1044,7 +1092,15 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.size
-      value: 1
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].amountOfNoiseLoops
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].prefabs.Array.size
+      value: 2
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: prefabsToSpawn.Array.data[0].tileMapEffected
@@ -1068,15 +1124,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[0].name
-      value: Cactus
+      value: Large Cactus
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[1].name
-      value: Cactus
+      value: Empty
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[2].name
-      value: Cactus
+      value: Small Cactus
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].prefabs.Array.data[0].name
+      value: Empty
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].prefabs.Array.data[1].name
+      value: Pot
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: prefabsToSpawn.Array.data[0].randomPositionRange.x
@@ -1113,25 +1177,41 @@ PrefabInstance:
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[0].prefab
       value: 
-      objectReference: {fileID: 5259599443454497189, guid: 069b66689d64da543ac9dc2a184d3457, type: 3}
+      objectReference: {fileID: 5964063023200584229, guid: db1e5b91f39f95f4191e05fad265d61f, type: 3}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[1].prefab
       value: 
-      objectReference: {fileID: 5964063023200584229, guid: 911133c5d8bf06445ba6686da926fee6, type: 3}
+      objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[2].prefab
       value: 
       objectReference: {fileID: 5964063023200584229, guid: 73176dd83bf1b394d9ba4adb97008bac, type: 3}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].prefabs.Array.data[0].prefab
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].prefabs.Array.data[1].prefab
+      value: 
+      objectReference: {fileID: 4889750398875816261, guid: 46289d76540a0724e9abe84559d0610c, type: 3}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[0].heightValue
-      value: 0.065
+      value: 0.025
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[1].heightValue
-      value: 0.075
+      value: 0.045
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[2].heightValue
+      value: 0.065
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].prefabs.Array.data[0].heightValue
+      value: 0.025
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].prefabs.Array.data[1].heightValue
       value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
@@ -1140,35 +1220,59 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[1].canRandomizePosition
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[2].canRandomizePosition
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].prefabs.Array.data[0].canRandomizePosition
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].prefabs.Array.data[1].canRandomizePosition
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[0].randomPositionRange.x
-      value: 5
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[0].randomPositionRange.y
-      value: 5
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[1].randomPositionRange.x
-      value: 5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[1].randomPositionRange.y
-      value: 5
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[2].randomPositionRange.x
-      value: 10
+      value: 5
       objectReference: {fileID: 0}
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: noiseMaps.Array.data[0].prefabs.Array.data[2].randomPositionRange.y
-      value: 10
+      value: 5
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].prefabs.Array.data[0].randomPositionRange.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].prefabs.Array.data[0].randomPositionRange.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].prefabs.Array.data[1].randomPositionRange.x
+      value: 15
+      objectReference: {fileID: 0}
+    - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
+      propertyPath: noiseMaps.Array.data[1].prefabs.Array.data[1].randomPositionRange.y
+      value: 15
       objectReference: {fileID: 0}
     - target: {fileID: 3649946842529648313, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: m_LocalPosition.x

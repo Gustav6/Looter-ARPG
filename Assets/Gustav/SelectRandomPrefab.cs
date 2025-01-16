@@ -5,6 +5,8 @@ using UnityEngine;
 public class SelectRandomPrefab : MonoBehaviour
 {
     public PrefabChancePair[] pairs;
+    public Map mapToSpawnOn;
+    public float value;
 
     void Start()
     {
@@ -17,23 +19,24 @@ public class SelectRandomPrefab : MonoBehaviour
         {
             yield return new WaitForEndOfFrame();
         }
+        
+        Debug.Log("H" + value);
 
-        float value = UnityEngine.Random.Range(0, 100);
-        GameObject prfabToSpawn = null;
+        GameObject prefabToSpawn = null;
         Vector3 offset = Vector2.zero;
 
         foreach (PrefabChancePair pair in pairs)
         {
             if (pair.spawnChance >= value)
             {
-                prfabToSpawn = pair.prefab;
+                prefabToSpawn = pair.prefab;
                 offset = pair.offset;
             }
         }
 
-        if (prfabToSpawn != null)
+        if (prefabToSpawn != null)
         {
-            Instantiate(prfabToSpawn, transform.position + offset, Quaternion.identity);
+            MapManager.Instance.SpawnPrefab(prefabToSpawn, transform.position - (Vector3)(Vector2.one / 2) + offset, mapToSpawnOn, false);
             Destroy(this);
         }
     }

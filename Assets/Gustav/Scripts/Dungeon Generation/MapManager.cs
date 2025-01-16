@@ -35,7 +35,6 @@ public class MapManager : MonoBehaviour, IDataPersistence
     [HideInInspector] public Map currentMap, nextMap;
     public bool TryingToLoadMap { get; private set; }
 
-    public bool stopTileRefresh;
     private void Awake()
     {
         if (Instance == null)
@@ -150,7 +149,7 @@ public class MapManager : MonoBehaviour, IDataPersistence
                 StartCoroutine(TryToLoadMap(currentMap));
             }
 
-            //MapGeneration.GenerateMapAsync(this, MapPrefab);
+            MapGeneration.GenerateMapAsync(this, MapPrefab);
         }
     }
 

@@ -46,29 +46,81 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   seed: 0
-  spawnFunction: 0
+  spawnFunction: 1
   radiusForGen: 35
-  stripSizeForGen: {x: 100, y: 50}
-  totalRoomsCount: 30
-  amountOfMainRooms: 30
-  roomMaxSize: {x: 9, y: 7}
-  roomMinSize: {x: 6, y: 4}
-  distanceFromRoomToRoom: 1
-  doNotAllowInStartingRoom:
-  - {fileID: 7687138853657912553, guid: f5fbfca504f544347a5c2c54d12a41ed, type: 3}
-  - {fileID: 8525698252564195251, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
+  stripSizeForGen: {x: 100, y: 35}
+  totalRoomsCount: 25
+  amountOfMainRooms: 25
+  roomMaxSize: {x: 8, y: 7}
+  roomMinSize: {x: 5, y: 5}
+  distanceFromRoomToRoom: 2
+  doNotAllowInStartingRoom: []
   amountOfHallwayLoops: 12.5
   randomizedHallwayWidth: 1
   randomizeHallwayPath: 1
   hallwayWidth: 2
-  hallwayMinWidth: 4
-  hallwayMaxWidth: 7
+  hallwayMinWidth: 3
+  hallwayMaxWidth: 6
   enemyPrefabs:
   - {fileID: 8525698252564195251, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
   - {fileID: 4034984483810168527, guid: 12de41d7f2e7c6c42a65656cef92f90c, type: 3}
   amountOfEnemies: 0
-  noiseMaps: []
-  prefabsToSpawn: []
+  noiseMaps:
+  - tileMapEffected: 0
+    amountOfNoiseLoops: 5
+    noiseScale: 7
+    octaves: 5
+    persistence: 1
+    lacunarity: 2
+    prefabs:
+    - name: Large Cactus
+      heightValue: 0.025
+      prefab: {fileID: 5964063023200584229, guid: db1e5b91f39f95f4191e05fad265d61f, type: 3}
+      canRandomizePosition: 1
+      randomPositionRange: {x: 15, y: 15}
+    - name: Empty
+      heightValue: 0.045
+      prefab: {fileID: 0}
+      canRandomizePosition: 0
+      randomPositionRange: {x: 0, y: 0}
+    - name: Small Cactus
+      heightValue: 0.065
+      prefab: {fileID: 5964063023200584229, guid: 73176dd83bf1b394d9ba4adb97008bac, type: 3}
+      canRandomizePosition: 1
+      randomPositionRange: {x: 5, y: 5}
+  - tileMapEffected: 0
+    amountOfNoiseLoops: 3
+    noiseScale: 7
+    octaves: 3
+    persistence: 0.25
+    lacunarity: 2
+    prefabs:
+    - name: Empty
+      heightValue: 0.025
+      prefab: {fileID: 0}
+      canRandomizePosition: 0
+      randomPositionRange: {x: 0, y: 0}
+    - name: Pot
+      heightValue: 0.1
+      prefab: {fileID: 4889750398875816261, guid: 46289d76540a0724e9abe84559d0610c, type: 3}
+      canRandomizePosition: 1
+      randomPositionRange: {x: 15, y: 15}
+  prefabsToSpawn:
+  - amount: 15
+    prefab: {fileID: 5259599443454497189, guid: 069b66689d64da543ac9dc2a184d3457, type: 3}
+    tileMapEffected: 1
+    canRandomizePosition: 0
+    randomPositionRange: {x: 5, y: 5}
+  - amount: 25
+    prefab: {fileID: 9099915591299465098, guid: df0e8c2308fb36e4ebf35d715590e3ec, type: 3}
+    tileMapEffected: 1
+    canRandomizePosition: 0
+    randomPositionRange: {x: 10, y: 10}
+  - amount: 8
+    prefab: {fileID: 9099915591299465098, guid: 5911242ce11f8384e9775445b04b7102, type: 3}
+    tileMapEffected: 1
+    canRandomizePosition: 0
+    randomPositionRange: {x: 10, y: 10}
 --- !u!114 &3171003164158351417
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -93,4 +145,3 @@ MonoBehaviour:
   <RegionHeight>k__BackingField: 0
   currentMap: {fileID: 0}
   nextMap: {fileID: 0}
-  stopTileRefresh: 1

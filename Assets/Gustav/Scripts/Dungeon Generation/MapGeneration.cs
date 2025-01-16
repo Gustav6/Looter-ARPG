@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
-using static UnityEngine.RuleTile.TilingRuleOutput;
 
 public static class MapGeneration
 {
@@ -362,18 +361,32 @@ public static class MapGeneration
     {
         map.WallMap.RefreshAllTiles();
 
-        while (map.WallMap.transform.childCount > 0)
+        while (true)
         {
+            bool wallMapFinished = true;
+
             for (int i = map.WallMap.transform.childCount - 1; i >= 0; i--)
             {
-                Debug.Log(map.WallMap.transform.childCount);
-
-                Vector3Int position = Vector3Int.FloorToInt(map.WallMap.transform.GetChild(i).position);
-                MapManager.Instance.currentMap.WallMap.SetTile(position, null);
-                MapManager.Instance.currentMap.GroundMap.SetTile(position, MapManager.Instance.tilePairs[TileTexture.ground]);
+                if (map.WallMap.transform.GetChild(i).GetComponent<TileRemover>() != null)
+                {
+                    wallMapFinished = false;
+                    Vector3Int position = Vector3Int.FloorToInt(map.WallMap.transform.GetChild(i).position);
+                    map.WallMap.SetTile(position, null);
+                    map.GroundMap.SetTile(position, MapManager.Instance.tilePairs[TileTexture.ground]);
+                }
+                else if (map.WallMap.transform.GetChild(i).TryGetComponent(out SelectRandomPrefab randomPrefab))
+                {
+                    randomPrefab.value = rng.Next(0, 101);
+                    randomPrefab.mapToSpawnOn = map;
+                }
             }
 
             map.WallMap.RefreshAllTiles();
+
+            if (wallMapFinished)
+            {
+                break;
+            }
 
             yield return new WaitForEndOfFrame();
         }

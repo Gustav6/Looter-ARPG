@@ -12,7 +12,7 @@ public class CustomWallRuleTile : RuleTile<CustomWallRuleTile.Neighbor> {
 
     public override void RefreshTile(Vector3Int position, ITilemap tilemap)
     {
-        if (MapManager.Instance.stopTileRefresh)
+        if (Application.isPlaying)
         {
             return;
         }

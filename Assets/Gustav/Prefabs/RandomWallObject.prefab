@@ -45,6 +45,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   pairs:
-  - spawnChance: 10
+  - spawnChance: 5
     prefab: {fileID: 7192014239374397492, guid: 51fbf7eeb4ea1674c87f1d713c33b584, type: 3}
-    offset: {x: 0, y: -0.5}
+    offset: {x: 0, y: -0.55}

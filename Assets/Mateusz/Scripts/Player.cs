@@ -275,7 +275,7 @@ public class Player : MonoBehaviour, IDamagable, IDataPersistence
     {
         if (inventory != null)
         {
-            inventory.Container.Items = new InventorySlot[28];
+            inventory.Container.Items = new InventorySlot[35];
         }
     }
 

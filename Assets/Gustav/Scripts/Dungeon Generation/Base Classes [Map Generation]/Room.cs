@@ -65,14 +65,14 @@ public class Room : IHeapItem<Room>
             if (width < height)
             {
                 r = width / 2f;
-                tempPosition1 = new Vector2((int)position.x + width / 2f, (int)position.y + height - width / 2.65f);
-                tempPosition2 = new Vector2((int)position.x + width / 2f, (int)position.y + width / 2.65f);
+                tempPosition1 = new Vector2((int)position.x + width / 2f, (int)position.y + height - width / 2.75f);
+                tempPosition2 = new Vector2((int)position.x + width / 2f, (int)position.y + width / 2.75f);
             }
             else if (width >= height)
             {
                 r = height / 2f;
-                tempPosition1 = new Vector2((int)position.x + width - height / 2.65f, (int)position.y + height / 2f);
-                tempPosition2 = new Vector2((int)position.x + height / 2.65f, (int)position.y + height / 2f);
+                tempPosition1 = new Vector2((int)position.x + width - height / 2.75f, (int)position.y + height / 2f);
+                tempPosition2 = new Vector2((int)position.x + height / 2.75f, (int)position.y + height / 2f);
             }
             else
             {
@@ -143,6 +143,22 @@ public class Room : IHeapItem<Room>
         }
 
         center = new Vector2(width / 2f, height / 2f) + position;
+    }
+
+    public bool Intersects(Room room, int expandedSize = 0)
+    {
+        if (room != this)
+        {
+            if (room.BottomLeft.x - expandedSize < TopRight.x + expandedSize && room.TopRight.x + expandedSize > BottomLeft.x - expandedSize)
+            {
+                if (room.BottomLeft.y - expandedSize < TopRight.y + expandedSize && room.TopRight.y + expandedSize > BottomLeft.y - expandedSize)
+                {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public void MoveRoom(Vector3Int direction)

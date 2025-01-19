@@ -6,13 +6,15 @@ using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Tilemaps;
+using UnityEngine.UIElements;
+using UnityEngine.WSA;
 
 public static class MapGeneration
 {
     private static System.Random rng;
 
     private static Dictionary<TileMapType, HashSet<Vector3Int>> tileMaps;
-    private static readonly int tilesSetPerFrame = 100;
+    private static readonly int tilesSetPerFrame = 50;
 
     private static HashSet<Vector3Int> availableGroundPositions, availableWallPositions;
 
@@ -26,7 +28,9 @@ public static class MapGeneration
         List<GameObjectPositionPair> gameObjects = new();
 
         // Ranges for how many tiles will be set at the same time
-        List<Range> groundTileRanges = new(), wallTileRanges = new();
+        List<Range> rangesGroundTiles = new(), rangesWallTiles = new(), rangesRemoveTiles = new();
+
+        HashSet<Vector3Int> tilesToRemove = new();
 
         // Spawn map game object
         GameObject mapGameObject = UnityEngine.Object.Instantiate(mapPrefab);
@@ -209,37 +213,38 @@ public static class MapGeneration
             AddPrefabsToList(manager, gameObjects);
 
             #region Set ranges for coroutine
+            Range range;
+
             foreach (TileMapType tileMap in tileMaps.Keys)
             {
                 for (int i = 0; i < tileMaps[tileMap].Count; i++)
                 {
                     if (i > 0 && i % tilesSetPerFrame == 0)
                     {
-                        Range range;
-
                         range = new(-tilesSetPerFrame + i, i);
 
                         switch (tileMap)
                         {
                             case TileMapType.ground:
-                                groundTileRanges.Add(range);
 
                                 if (i + tilesSetPerFrame >= tileMaps[tileMap].Count)
                                 {
                                     range = new(i - tilesSetPerFrame, tileMaps[tileMap].Count);
-                                    groundTileRanges.Add(range);
+                                    rangesGroundTiles.Add(range);
                                     break;
                                 }
+
+                                rangesGroundTiles.Add(range);
                                 break;
                             case TileMapType.wall:
-                                wallTileRanges.Add(range);
-
                                 if (i + tilesSetPerFrame >= tileMaps[tileMap].Count)
                                 {
                                     range = new(i - tilesSetPerFrame, tileMaps[tileMap].Count);
-                                    wallTileRanges.Add(range);
+                                    rangesWallTiles.Add(range);
                                     break;
                                 }
+
+                                rangesWallTiles.Add(range);
                                 break;
                             default:
                                 break;
@@ -248,6 +253,33 @@ public static class MapGeneration
                 }
             }
             #endregion
+
+            for (int i = 0; i < tileMaps[TileMapType.wall].Count; i++)
+            {
+                if (!WallNeighborsAGroundTile(tileMaps[TileMapType.wall].ElementAt(i)))
+                {
+                    tilesToRemove.Add(tileMaps[TileMapType.wall].ElementAt(i));
+                }
+            }
+
+            Range tempRange;
+
+            for (int i = 0; i < tilesToRemove.Count; i++)
+            {
+                if (i > 0 && i % tilesSetPerFrame == 0)
+                {
+                    tempRange = new(-tilesSetPerFrame + i, i);
+
+                    if (i + tilesSetPerFrame >= tilesToRemove.Count)
+                    {
+                        tempRange = new(i - tilesSetPerFrame, tilesToRemove.Count);
+                        rangesRemoveTiles.Add(tempRange);
+                        break;
+                    }
+
+                    rangesRemoveTiles.Add(tempRange);
+                }
+            }
 
             #region Diagnostic End
             stopwatch.Stop();
@@ -265,8 +297,6 @@ public static class MapGeneration
 
         manager.SpawnPrefab(manager.TravelToNextMapPrefab, travelToNextMapObjectPosition, mapReference, false);
 
-        mapReference.WallMap.transform.GetComponent<TilemapCollider2D>().enabled = false;
-
         #region Coroutines
         mapReference.amountOfTilemapCoreroutinesStarted = 0;
         mapReference.amountOfTilemapCoreroutinesFinished = 0;
@@ -278,30 +308,23 @@ public static class MapGeneration
         tiles = new TileBase[1000];
         Array.Fill(tiles, manager.tilePairs[TileTexture.ground]);
 
-        manager.StartCoroutine(SetTiles(manager, mapReference, TileMapType.ground, groundTileRanges, tileMaps[TileMapType.ground].ToArray(), tiles));
+        manager.StartCoroutine(SetTiles(mapReference, TileMapType.ground, rangesGroundTiles, tileMaps[TileMapType.ground].ToArray(), tiles));
         mapReference.amountOfTilemapCoreroutinesStarted++;
-
-        //tiles = new TileBase[tileMaps[TileMapType.wall].Count];
-        //Array.Fill(tiles, manager.tilePairs[TileTexture.wall]);
-
-        //manager.wallMapTest.SetTiles(tileMaps[TileMapType.wall].ToArray(), tiles);
 
         tiles = new TileBase[1000];
         Array.Fill(tiles, manager.tilePairs[TileTexture.wall]);
 
-        manager.StartCoroutine(SetTiles(manager, mapReference, TileMapType.wall, wallTileRanges, tileMaps[TileMapType.wall].ToArray(), tiles));
+        manager.StartCoroutine(SetTiles(mapReference, TileMapType.wall, rangesWallTiles, tileMaps[TileMapType.wall].ToArray(), tiles));
         mapReference.amountOfTilemapCoreroutinesStarted++;
 
-        //tiles = new TileBase[1000];
-        //Array.Fill(tiles, manager.tilePairs[TileTexture.walkableIcon]);
+        tiles = new TileBase[1000];
+        Array.Fill(tiles, null);
 
-        //manager.StartCoroutine(SetTiles(mapReference, TileMapType.walkableIcon, groundTileRanges, tileMaps[TileMapType.ground].ToArray(), tiles));
+        manager.StartCoroutine(CleanUpTileMap(mapReference, rangesRemoveTiles, tilesToRemove.ToArray(), tiles));
         #endregion
     }
 
     #region Coroutines
-
-    #region Spawning game objects
     private static IEnumerator SpawnGameObjects(MapManager manager, Map map, List<GameObjectPositionPair> gameObjectPairs)
     {
         for (int i = 0; i < gameObjectPairs.Count; i++)
@@ -313,13 +336,9 @@ public static class MapGeneration
                 yield return null;
             }
         }
-
-        Debug.Log("Prefabs have finished spawning");
     }
-    #endregion
 
-    #region placing tiles on tilemap
-    private static IEnumerator SetTiles(MapManager manager, Map map, TileMapType tileMapType, List<Range> ranges, Vector3Int[] mapPositions, TileBase[] tiles)
+    private static IEnumerator SetTiles(Map map, TileMapType tileMapType, List<Range> ranges, Vector3Int[] mapPositions, TileBase[] tiles)
     {
         foreach (Range range in ranges)
         {
@@ -341,66 +360,87 @@ public static class MapGeneration
             yield return null;
         }
 
-        if (tileMapType == TileMapType.wall)
-        {
-            map.WallMap.GetComponent<TilemapCollider2D>().enabled = true;
-        }
-
         map.amountOfTilemapCoreroutinesFinished++;
+    }
 
-        if (map.amountOfTilemapCoreroutinesFinished == map.amountOfTilemapCoreroutinesStarted)
+    private static IEnumerator CleanUpTileMap(Map map, List<Range> ranges, Vector3Int[] mapPositions, TileBase[] tiles)
+    {
+        while (map.amountOfTilemapCoreroutinesStarted != map.amountOfTilemapCoreroutinesFinished)
         {
-            manager.StartCoroutine(CleanUpTileMap(map));
+            yield return null;
         }
 
-        Debug.Log(tileMapType + " Is done");
-    }
-    #endregion
-
-    private static IEnumerator CleanUpTileMap(Map map)
-    {
         map.WallMap.RefreshAllTiles();
+
+        List<Vector3Int> toRemove = new();
+        bool wallMapFinished;
 
         while (true)
         {
-            bool wallMapFinished = true;
+            yield return new WaitForEndOfFrame();
 
-            for (int i = map.WallMap.transform.childCount - 1; i >= 0; i--)
+            toRemove.Clear();
+            wallMapFinished = true;
+
+            for (int i = 0; i < map.WallMap.transform.childCount; i++)
             {
-                if (map.WallMap.transform.GetChild(i).GetComponent<TileRemover>() != null)
+                toRemove.Add(Vector3Int.FloorToInt(map.WallMap.transform.GetChild(i).position));
+            }
+
+            if (toRemove.Count != 0)
+            {
+                map.WallMap.SetTiles(toRemove.ToArray(), tiles);
+                wallMapFinished = false;
+
+                for (int i = 0; i < toRemove.Count; i++)
                 {
-                    wallMapFinished = false;
-                    Vector3Int position = Vector3Int.FloorToInt(map.WallMap.transform.GetChild(i).position);
-                    map.WallMap.SetTile(position, null);
-                    map.GroundMap.SetTile(position, MapManager.Instance.tilePairs[TileTexture.ground]);
-                }
-                else if (map.WallMap.transform.GetChild(i).TryGetComponent(out SelectRandomPrefab randomPrefab))
-                {
-                    randomPrefab.value = rng.Next(0, 101);
-                    randomPrefab.mapToSpawnOn = map;
+                    for (int x = -1; x < 2; x++)
+                    {
+                        for (int y = -1; y < 2; y++)
+                        {
+                            map.WallMap.RefreshTile(toRemove[i] + new Vector3Int(x, y));
+                        }
+                    }
                 }
             }
 
-            map.WallMap.RefreshAllTiles();
+            //for (int i = map.WallMap.transform.childCount - 1; i >= 0; i--)
+            //{
+            //    wallMapFinished = false;
+            //    Vector3Int position = Vector3Int.FloorToInt(map.WallMap.transform.GetChild(i).position);
+            //    map.WallMap.SetTile(position, null);
+
+            //    //if (map.WallMap.transform.GetChild(i).GetComponent<TileRemover>() != null)
+            //    //{
+            //    //    wallMapFinished = false;
+            //    //    Vector3Int position = Vector3Int.FloorToInt(map.WallMap.transform.GetChild(i).position);
+            //    //    map.WallMap.SetTile(position, null);
+            //    //    map.GroundMap.SetTile(position, MapManager.Instance.tilePairs[TileTexture.ground]);
+            //    //}
+            //    //else if (map.WallMap.transform.GetChild(i).TryGetComponent(out SelectRandomPrefab randomPrefab))
+            //    //{
+            //    //    randomPrefab.value = rng.Next(0, 101);
+            //    //    randomPrefab.mapToSpawnOn = map;
+            //    //}
+            //}
 
             if (wallMapFinished)
             {
                 break;
             }
-
-            yield return new WaitForEndOfFrame();
         }
 
-        for (int i = tileMaps[TileMapType.wall].Count - 1; i >= 0; i--)
+        foreach (Range range in ranges)
         {
-            if (!WallTileNeighborsAGroundTile(tileMaps[TileMapType.wall].ElementAt(i)))
-            {
-                map.WallMap.SetTile(tileMaps[TileMapType.wall].ElementAt(i), null);
-            }
+            yield return new WaitForEndOfFrame();
+
+            map.WallMap.SetTiles(mapPositions[range], tiles);
         }
 
         map.readyToLoad = true;
-        Debug.Log("Map ready to load");
+
+        Debug.Log(map + " can be loaded");
+
         OnGenerationCompleted?.Invoke(null, EventArgs.Empty);
     }
 
@@ -444,7 +484,6 @@ public static class MapGeneration
     #endregion
 
     #region Room seperation
-
     private static Vector2Int GetDirection(MapManager manager, Room currentRoom, Room[] rooms)
     {
         Vector2 separationVelocity = Vector2.zero;
@@ -452,7 +491,7 @@ public static class MapGeneration
 
         foreach (Room room in rooms)
         {
-            if (!RoomIntersects(currentRoom, room, manager.Settings.distanceFromRoomToRoom))
+            if (!room.Intersects(currentRoom, manager.Settings.distanceFromRoomToRoom))
             {
                 continue;
             }
@@ -490,26 +529,6 @@ public static class MapGeneration
 
         return new Vector2Int((int)separationVelocity.x, (int)separationVelocity.y);
     }
-
-    #region Room intersection
-
-    private static bool RoomIntersects(Room roomA, Room roomB, int expandedSize = 0)
-    {
-        if (roomA != roomB)
-        {
-            if (roomA.BottomLeft.x - expandedSize < roomB.TopRight.x + expandedSize && roomA.TopRight.x + expandedSize > roomB.BottomLeft.x - expandedSize)
-            {
-                if (roomA.BottomLeft.y - expandedSize < roomB.TopRight.y + expandedSize && roomA.TopRight.y + expandedSize > roomB.BottomLeft.y - expandedSize)
-                {
-                    return true;
-                }
-            }
-        }
-
-        return false;
-    }
-
-    #endregion
     #endregion
 
     #region Delaunay triangulation
@@ -867,8 +886,6 @@ public static class MapGeneration
     #region Hallway generation
     private static void GenerateHallways(MapManager manager, List<Edge> minimumSpanningTree, Room[] rooms)
     {
-        int hallwayWidth = manager.Settings.hallwayWidth;
-
         foreach (Edge connection in minimumSpanningTree)
         {
             List<Room> roomList = new();
@@ -901,7 +918,7 @@ public static class MapGeneration
                     break;
                 }
 
-                ExpandHallwayAndAddTiles(manager, hallwayPath[i], hallwayPath[i + 1], 5);
+                ExpandHallwayAndAddTiles(manager, hallwayPath[i], 5);
             }
 
             // *Working* but not very good looking
@@ -940,133 +957,42 @@ public static class MapGeneration
             //    }
             //}
             #endregion
-
         }
     }
-
-    #region Expand hallway path
-    private static void ExpandHallwayAndAddTiles(MapManager manager, Vector3Int current, Vector3Int next, int wallWidth)
+    private static void ExpandHallwayAndAddTiles(MapManager manager, Vector3Int current, int wallWidth)
     {
         int hallwayWidth = manager.Settings.hallwayWidth;
+        Vector3Int currentPosition;
 
-        for (int i = -wallWidth; i < hallwayWidth + wallWidth + 1; i++)
+        for (int x = -wallWidth; x < hallwayWidth + wallWidth + 1; x++)
         {
             if (manager.Settings.randomizedHallwayWidth)
             {
                 hallwayWidth = rng.Next(manager.Settings.hallwayMinWidth, manager.Settings.hallwayMaxWidth);
             }
 
-            for (int j = -wallWidth; j < hallwayWidth + wallWidth + 1; j++)
+            for (int y = -wallWidth; y < hallwayWidth + wallWidth + 1; y++)
             {
-                if (i >= 0 && j >= 0 && i <= hallwayWidth && j <= hallwayWidth)
+                currentPosition = new(current.x + x - (hallwayWidth / 2), current.y + y - (hallwayWidth / 2));
+
+                if (x < 0 || y < 0 || x > hallwayWidth || y > hallwayWidth)
                 {
-                    tileMaps[TileMapType.ground].Add(new(current.x + i - (hallwayWidth / 2), current.y + j - (hallwayWidth / 2)));
+                    if (x >= -5 && y >= -5 && x <= hallwayWidth + 5 && y <= hallwayWidth + 5)
+                    {
+                        tileMaps[TileMapType.wall].Add(currentPosition);
+                    }
+                    else
+                    {
+                        availableWallPositions.Add(currentPosition);
+                    }
                 }
                 else
                 {
-                    tileMaps[TileMapType.wall].Add(new(current.x + i - (hallwayWidth / 2), current.y + j - (hallwayWidth / 2)));
+                    tileMaps[TileMapType.ground].Add(currentPosition);
                 }
-                //tileMaps[TileMapType.ground].Add(new(current.x, current.y + i - (hallwayWidth / 2)));
             }
         }
-
-        //for (int i = 0; i < 2; i++)
-        {
-            //for (int j = 0; j < 2; j++)
-            {
-                //tileMaps[TileMapType.ground].Add(new(current.x + i - (hallwayWidth / 2), current.y + j - (hallwayWidth / 2)));
-            }
-
-            //tileMaps[TileMapType.wall].Add(new(current.x, current.y + hallwayWidth + i));
-            //tileMaps[TileMapType.wall].Add(new(current.x, current.y - hallwayWidth - i));
-            //tileMaps[TileMapType.wall].Add(new(current.x + hallwayWidth + i, current.y));
-            //tileMaps[TileMapType.wall].Add(new(current.x - hallwayWidth - i, current.y));
-        }
-
-        /*
-        if (current.y == next.y)
-        {
-            for (int i = -hallwayWidth; i < hallwayWidth; i++)
-            {
-                tileMaps[TileMapType.ground].Add(new(current.x + i, current.y));
-                tileMaps[TileMapType.ground].Add(new(current.x, current.y + i));
-            }
-
-            for (int i = 1; i < 4; i++)
-            {
-                tileMaps[TileMapType.wall].Add(new(current.x, current.y + hallwayWidth + i - 1));
-                tileMaps[TileMapType.wall].Add(new(current.x, current.y - hallwayWidth - i));
-            }
-        }
-        else if (current.x == next.x)
-        {
-            for (int i = -hallwayWidth; i < hallwayWidth; i++)
-            {
-                tileMaps[TileMapType.ground].Add(new(current.x, current.y + i));
-                tileMaps[TileMapType.ground].Add(new(current.x + i, current.y));
-            }
-
-            for (int i = 1; i < 4; i++)
-            {
-                tileMaps[TileMapType.wall].Add(new(current.x + hallwayWidth + i - 1, current.y));
-                tileMaps[TileMapType.wall].Add(new(current.x - hallwayWidth - i, current.y));
-            }
-        }
-        else
-        {
-            for (int i = 0; i < hallwayWidth; i++)
-            {
-                if (current.y > next.y)
-                {
-                    tileMaps[TileMapType.ground].Add(new(current.x, current.y - i));
-                }
-                else
-                {
-                    tileMaps[TileMapType.ground].Add(new(current.x, current.y + i));
-                }
-
-                if (current.x > next.x)
-                {
-                    tileMaps[TileMapType.ground].Add(new(current.x - i, current.y));
-                }
-                else
-                {
-                    tileMaps[TileMapType.ground].Add(new(current.x + i, current.y));
-                }
-            }
-
-            if (current.y > next.y)
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    tileMaps[TileMapType.wall].Add(new(current.x, current.y - hallwayWidth - i));
-                }
-            }
-            else
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    tileMaps[TileMapType.wall].Add(new(current.x, current.y + hallwayWidth + i));
-                }
-            }
-
-            if (current.x > next.x)
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    tileMaps[TileMapType.wall].Add(new(current.x - hallwayWidth - i, current.y));
-                }
-            }
-            else
-            {
-                for (int i = 0; i < 5; i++)
-                {
-                    tileMaps[TileMapType.wall].Add(new(current.x + hallwayWidth + i, current.y));
-                }
-            }
-        }*/
     }
-    #endregion
     #endregion
 
     #region Generate noise maps
@@ -1115,7 +1041,7 @@ public static class MapGeneration
                                     }
                                     break;
                                 case TileMapType.wall:
-                                    if (availableWallPositions.Contains(tilePosition) && !WallTileNeighborsAGroundTile(tilePosition))
+                                    if (availableWallPositions.Contains(tilePosition) && !WallNeighborsAGroundTile(tilePosition))
                                     {
                                         availableWallPositions.Remove(tilePosition);
                                     }
@@ -1206,7 +1132,7 @@ public static class MapGeneration
 
                         tilePosition = availableWallPositions.ElementAt(rng.Next(0, availableWallPositions.Count + 1));
 
-                        while (WallTileNeighborsAGroundTile(tilePosition) && availableWallPositions.Count > 0)
+                        while (WallNeighborsAGroundTile(tilePosition) && availableWallPositions.Count > 0)
                         {
                             availableWallPositions.Remove(tilePosition);
 
@@ -1231,7 +1157,7 @@ public static class MapGeneration
     }
     #endregion
 
-    private static bool WallTileNeighborsAGroundTile(Vector3Int position)
+    private static bool WallNeighborsAGroundTile(Vector3Int position)
     {
         for (int x = -1; x < 2; x++)
         {

@@ -19,8 +19,11 @@ public class SelectRandomPrefab : MonoBehaviour
         {
             yield return new WaitForEndOfFrame();
         }
-        
-        Debug.Log("H" + value);
+
+        if (mapToSpawnOn == null)
+        {
+            yield break;
+        }
 
         GameObject prefabToSpawn = null;
         Vector3 offset = Vector2.zero;
@@ -36,7 +39,7 @@ public class SelectRandomPrefab : MonoBehaviour
 
         if (prefabToSpawn != null)
         {
-            MapManager.Instance.SpawnPrefab(prefabToSpawn, transform.position - (Vector3)(Vector2.one / 2) + offset, mapToSpawnOn, false);
+            MapManager.Instance.SpawnPrefab(prefabToSpawn, transform.position - (Vector3)(Vector2.one / 2) + offset, mapToSpawnOn);
             Destroy(this);
         }
     }

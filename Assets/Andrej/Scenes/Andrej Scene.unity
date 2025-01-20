@@ -370,6 +370,10 @@ PrefabInstance:
       propertyPath: m_UsedByEffector
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3572589732216584131, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
+      propertyPath: collisionMask.m_Bits
+      value: 128
+      objectReference: {fileID: 0}
     - target: {fileID: 4239414238914401201, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: enemyProperties
       value: 

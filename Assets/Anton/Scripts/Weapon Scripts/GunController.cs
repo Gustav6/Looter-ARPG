@@ -17,6 +17,7 @@ public class GunController : MonoBehaviour
     public LayerMask collidableLayersRaycast;
     public TextMeshPro ammoCount;
     public Transform weaponRotateAxis;
+    private float rotationReloadSpeed = 4f;
     int ammo;
 
     public int Damage;
@@ -29,6 +30,8 @@ public class GunController : MonoBehaviour
 
     private float attackTimer;
     float reloadTimer;
+
+    [SerializeField] private bool realodingGun = false;
 
     private void Awake()
     {
@@ -107,16 +110,17 @@ public class GunController : MonoBehaviour
         {
             CameraShake.StopShakeCamera();
         }
-       
 
-        if (Input.GetKeyDown(KeyCode.R))
+        if (!realodingGun)
         {
-            Reload();
-        }
-
-        if (ammo <= 0)
-        {
-            Reload();
+            if (ammo <= 0)
+            {
+                TestFlash();
+            }
+            if (Input.GetKeyDown(KeyCode.R))
+            {
+                TestFlash();
+            }
         }
         #endregion
 
@@ -143,13 +147,23 @@ public class GunController : MonoBehaviour
         attackTimer = 0;
     }
 
-    void Reload()
+    private void TestFlash()
     {
-        reloadTimer += Time.deltaTime;
-        if (reloadTimer >= gun.reloadTime)
-        {
-            ammo = gun.Ammo;
-            reloadTimer = 0;
-        } 
+        Debug.Log("Test");
+        realodingGun = true;
+        TransitionSystem.AddTransition(new ColorTransition(transform, gun.reloadTime * 0.075f, new Color(1, 1, 1, 0.75f), TransitionType.SmoothStop2, Reload), gameObject);
+    }
+
+    private void Reload()
+    {
+        Debug.Log("Test : 2");
+        TransitionSystem.AddTransition(new ColorTransition(transform, gun.reloadTime * 0.075f, new Color(1, 1, 1, 1), TransitionType.SmoothStart2), gameObject);
+        TransitionSystem.AddTransition(new RotationTransition(transform, gun.reloadTime, new Vector3(0, 0, 360), TransitionType.SmoothStop4, ResetAmmo), gameObject);
+    }
+
+    private void ResetAmmo()
+    {
+        ammo = gun.Ammo;
+        realodingGun = false;
     }
 }

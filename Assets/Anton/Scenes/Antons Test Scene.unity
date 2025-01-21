@@ -180,11 +180,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 06747a0b8372b4649b069ee3b69e655c, type: 3}
---- !u!4 &889398599 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 2442056998277691869, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
-  m_PrefabInstance: {fileID: 1466876505}
-  m_PrefabAsset: {fileID: 0}
 --- !u!1 &1168078352 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 7850766631232578949, guid: 7782a358ea2820641ad509817eaa57d8, type: 3}
@@ -207,29 +202,6 @@ MonoBehaviour:
   m_AmplitudeGain: 0
   m_FrequencyGain: 1
   mNoiseOffsets: {x: 0, y: 0, z: 0}
---- !u!1 &1428420749 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 5726100941016837525, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
-  m_PrefabInstance: {fileID: 1466876505}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &1428420753
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1428420749}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 850a7cf3bc743074f95fe7e2ac869250, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  guns:
-  - {fileID: 11400000, guid: d234681e08f71794a9d85c9c6f692c14, type: 2}
-  - {fileID: 11400000, guid: 5950cf9b2f094f345835220248f8da87, type: 2}
-  - {fileID: 11400000, guid: 269593c87e578bd4f80b4af796f261da, type: 2}
-  - {fileID: 11400000, guid: 9dcf49aaf94415b44971313920b4e13f, type: 2}
-  - {fileID: 11400000, guid: ddbc4c73383053443ab6145f503f179d, type: 2}
 --- !u!1001 &1466876505
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -241,23 +213,11 @@ PrefabInstance:
     - target: {fileID: 63582763776312651, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: gun
       value: 
-      objectReference: {fileID: 11400000, guid: 5950cf9b2f094f345835220248f8da87, type: 2}
+      objectReference: {fileID: 11400000, guid: ddbc4c73383053443ab6145f503f179d, type: 2}
     - target: {fileID: 63582763776312651, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: playerPos
       value: 
       objectReference: {fileID: 1629195659}
-    - target: {fileID: 63582763776312651, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
-      propertyPath: weaponRotateAxis
-      value: 
-      objectReference: {fileID: 889398599}
-    - target: {fileID: 63582763776312651, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
-      propertyPath: collidableLayersRaycast.m_Bits
-      value: 128
-      objectReference: {fileID: 0}
-    - target: {fileID: 717219227269886209, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 2550612651143373822, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: inventory
       value: 
@@ -277,6 +237,18 @@ PrefabInstance:
     - target: {fileID: 2550612651143373822, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: <MaxHealth>k__BackingField
       value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 2671221220713967294, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
+      propertyPath: m_Color.b
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2671221220713967294, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
+      propertyPath: m_Color.g
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2671221220713967294, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
+      propertyPath: m_Color.r
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4432005165935021020, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: m_LocalScale.x
@@ -342,10 +314,7 @@ PrefabInstance:
     - {fileID: 8146332157051368663, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 5726100941016837525, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 1428420753}
+    m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
 --- !u!1001 &1603019951
 PrefabInstance:
@@ -519,7 +488,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 2847025328454488880, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: amountOfEnemies
-      value: 250
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 3171003164158351417, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: <LoadMapInCurrentScene>k__BackingField

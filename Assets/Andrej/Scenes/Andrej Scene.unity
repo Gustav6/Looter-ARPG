@@ -340,7 +340,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2045918298356660606, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: findNewPos
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 2045918298356660606, guid: ba0ce500c77a6db499c9238487403c21, type: 3}
       propertyPath: 'moveSpots.Array.data[0]'

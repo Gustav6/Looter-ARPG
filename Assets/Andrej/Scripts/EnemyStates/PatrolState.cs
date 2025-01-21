@@ -25,8 +25,8 @@ public class PatrolState : MoveState
                 if (patrolTimer <= 0)
                 {
                     patrolTimer = 3;
-                    FindNewPosition();
                     findNewPos = true;
+                    FindNewPosition();
                 }
             }
             else
@@ -50,8 +50,8 @@ public class PatrolState : MoveState
 
     public void FindNewPosition()
     {
-        randomPos = transform.position;
-        randomPos = Random.insideUnitCircle * enemyProperties.aggroRange;
+        Vector2 offset = Random.insideUnitCircle * enemyProperties.aggroRange;
+        randomPos = (Vector2)transform.position + offset;
         distanceFromPos = Vector2.Distance(randomPos, transform.position);
         if (distanceFromPos < 1)
         {

@@ -282,6 +282,7 @@ MonoBehaviour:
   dmgOverTime: 0
   fireForce: 0
   fireDmg: 0
+  realodingGun: 0
 --- !u!114 &2397017819759502829
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -311,7 +312,6 @@ GameObject:
   - component: {fileID: 1384711901357972610}
   - component: {fileID: 8750154237998243379}
   - component: {fileID: 7295028532562621285}
-  - component: {fileID: 4219114926220668367}
   m_Layer: 0
   m_Name: Terrain
   m_TagString: Untagged
@@ -387,19 +387,6 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!114 &4219114926220668367
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6925339135612320311}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 84643f58b9c19484d8c2f071b212f2cb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  ren: {fileID: 7295028532562621285}
 --- !u!1 &7328012613175727987
 GameObject:
   m_ObjectHideFlags: 0

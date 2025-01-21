@@ -517,11 +517,47 @@ MonoBehaviour:
   <IsBeingKnockedBack>k__BackingField: 0
   <KnockbackForceCurve>k__BackingField:
     serializedVersion: 2
-    m_Curve: []
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 0.012980711
+      value: 0.6091915
+      inSlope: -4.4550853
+      outSlope: -4.4550853
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 1
+      outWeight: 0.06571784
+    - serializedVersion: 3
+      time: 0.1135062
+      value: 0.4128065
+      inSlope: -0.29732928
+      outSlope: -0.29732928
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.11280795
+      outWeight: 0.4709765
+    - serializedVersion: 3
+      time: 0.2
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  groundRenderer: {fileID: 0}
+  groundRenderer: {fileID: 7295028532562621285}
 --- !u!61 &4939972271045843890
 BoxCollider2D:
   m_ObjectHideFlags: 0
@@ -556,7 +592,7 @@ BoxCollider2D:
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
-  m_Offset: {x: 0, y: -0.1}
+  m_Offset: {x: 0.023888707, y: -0.074478865}
   m_SpriteTilingProperty:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
@@ -566,7 +602,7 @@ BoxCollider2D:
     drawMode: 0
     adaptiveTiling: 0
   m_AutoTiling: 0
-  m_Size: {x: 1, y: 1.8065267}
+  m_Size: {x: 0.60344744, y: 1.7672982}
   m_EdgeRadius: 0
 --- !u!1 &8980735876513060430
 GameObject:

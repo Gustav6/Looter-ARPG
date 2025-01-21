@@ -16,7 +16,7 @@ MonoBehaviour:
   description: 
   sprite: {fileID: -243570577, guid: e89a104cc74b80444afa07fa92cd8e81, type: 3}
   bulletPrefab: {fileID: 4550873575046521524, guid: 6dad99b5a107b0c4b864d8bbc31059aa, type: 3}
-  damage: 250
+  damage: 15
   Ammo: 20
   critChanse: 0
   fireRate: 0.2

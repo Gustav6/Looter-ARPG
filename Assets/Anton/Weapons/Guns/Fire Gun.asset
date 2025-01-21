@@ -16,12 +16,12 @@ MonoBehaviour:
   description: 
   sprite: {fileID: 755783589, guid: 95ed301aadc503645b106b472b391a98, type: 3}
   bulletPrefab: {fileID: 4550873575046521524, guid: a200788b222f71746820a0f720dd684b, type: 3}
-  damage: 50
+  damage: 25
   Ammo: 5
   critChanse: 0
   fireRate: 0.9
-  fireForce: 100
-  reloadTime: 0
+  fireForce: 70
+  reloadTime: 2
   effects: 0100000000000000
   amountOfPircableEnemies: 0
   damageTypes: 02000000

@@ -10,6 +10,7 @@ public class ChangeEquipedGun : MonoBehaviour
             int randomValue = Random.Range(0, 4);
             GunController.Instance.gun = guns[randomValue];
             GunController.Instance.sprite.sprite = guns[randomValue].sprite;
+            GunController.Instance.gun.reloadTime = guns[randomValue].reloadTime;
         }
     }
 }

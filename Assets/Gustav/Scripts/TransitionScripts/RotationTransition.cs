@@ -14,7 +14,7 @@ public class RotationTransition : Transition
         timerMax = time;
         transitionType = type;
 
-        startingRotation = t.rotation.eulerAngles;
+        startingRotation = t.localRotation.eulerAngles;
         targetRotation = target;
 
         Debug.Log("Start: " + startingRotation);

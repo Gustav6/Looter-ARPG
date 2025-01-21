@@ -8,7 +8,7 @@ public class PatrolState : MoveState
     Vector2 randomPos;
     float patrolTimer = 3;
     public float distanceFromPos;
-    public bool findNewPos;
+    public bool findNewPos = false;
     public override void Enter()
     {
         FindNewPosition();
@@ -16,7 +16,7 @@ public class PatrolState : MoveState
 
     public override void Do()
     {
-        if (findNewPos!)
+        if (!findNewPos)
         {
             if (distanceFromPos <= 0.5f)
             {

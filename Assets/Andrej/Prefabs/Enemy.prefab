@@ -437,7 +437,7 @@ MonoBehaviour:
   distanceToPlayer: 1e+11
   aggroRange: 12
   attackRange: 1.3
-  speed: 15
+  speed: 3
   health: 0
   damage: 0
   knockback: 0

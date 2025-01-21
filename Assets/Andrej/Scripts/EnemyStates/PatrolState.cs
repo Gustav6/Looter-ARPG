@@ -6,9 +6,9 @@ using UnityEngine;
 public class PatrolState : MoveState
 {
     Vector2 randomPos;
-    float patrolTimer;
-    float distanceFromPos;
-    bool findNewPos = true;
+    float patrolTimer = 3;
+    public float distanceFromPos;
+    public bool findNewPos;
     public override void Enter()
     {
         FindNewPosition();
@@ -20,13 +20,19 @@ public class PatrolState : MoveState
         {
             if (distanceFromPos <= 0.5f)
             {
-                FindNewPosition();
-                findNewPos = true;
+                moveDirection = Vector2.zero;
+                patrolTimer -= Time.deltaTime;
+                if (patrolTimer <= 0)
+                {
+                    patrolTimer = 3;
+                    FindNewPosition();
+                    findNewPos = true;
+                }
             }
             else
             {
                 distanceFromPos = Vector2.Distance(randomPos, transform.position);
-                //moveDirection = (randomPos - transform.position).normalized;
+                moveDirection = (randomPos - (Vector2)transform.position).normalized;
             }
         }
 
@@ -44,6 +50,7 @@ public class PatrolState : MoveState
 
     public void FindNewPosition()
     {
+        randomPos = transform.position;
         randomPos = Random.insideUnitCircle * enemyProperties.aggroRange;
         distanceFromPos = Vector2.Distance(randomPos, transform.position);
         if (distanceFromPos < 1)

@@ -264,7 +264,7 @@ MonoBehaviour:
   distanceToPlayer: 1e+11
   aggroRange: 17
   attackRange: 9
-  speed: 2.5
+  speed: 4.5
   health: 0
   damage: 0
   knockback: 0
@@ -336,6 +336,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyProperties: {fileID: 1953963940699207726}
+  distanceFromPos: 0
+  findNewPos: 0
 --- !u!1 &8910339427985307057
 GameObject:
   m_ObjectHideFlags: 0

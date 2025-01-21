@@ -17,7 +17,6 @@ public class GunController : MonoBehaviour
     public LayerMask collidableLayersRaycast;
     public TextMeshPro ammoCount;
     public Transform weaponRotateAxis;
-    private float rotationReloadSpeed = 4f;
     int ammo;
 
     public int Damage;
@@ -92,7 +91,7 @@ public class GunController : MonoBehaviour
         #region Input
         if (attackTimer >= gun.fireRate)
         {
-            if (Input.GetMouseButton(0))
+            if (Input.GetMouseButton(0) && !realodingGun)
             {
                 RaycastHit2D raycastHit = Physics2D.Raycast(weaponRotateAxis.transform.position, WeaponRotate.dir, 3.2f, collidableLayersRaycast);
                 Debug.DrawRay(weaponRotateAxis.transform.position, WeaponRotate.dir.normalized * 3.2f, Color.red);

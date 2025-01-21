@@ -6,21 +6,27 @@ public class ColorTransition : Transition
 {
     private readonly Image image;
     private readonly TextMeshProUGUI text;
+    private readonly SpriteRenderer sprite;
 
     private readonly Color startingColor;
     private readonly Color targetColor;
 
     public ColorTransition(Component c, float time, Color target, TransitionType type, ExecuteAfterTransition execute = null)
     {
-        if (c.GetComponent<Image>() != null)
+        if (c.TryGetComponent(out Image i))
         {
-            image = c.GetComponent<Image>();
-            startingColor = image.color;
+            startingColor = i.color;
+            image = i;
         }
-        else if (c.GetComponent<TextMeshProUGUI>() != null)
+        else if (c.TryGetComponent(out TextMeshProUGUI t))
         {
-            text = c.GetComponent<TextMeshProUGUI>();
-            startingColor = text.color;
+            startingColor = t.color;
+            text = t;
+        }
+        else if (c.TryGetComponent(out SpriteRenderer s))
+        {
+            startingColor = s.color;
+            sprite = s;
         }
         else
         {
@@ -71,12 +77,6 @@ public class ColorTransition : Transition
     {
         base.Update();
 
-        if (image == null && text == null)
-        {
-            isRemoved = true;
-            return;
-        }
-
         if (image != null)
         {
             image.color = Color.Lerp(startingColor, targetColor, t);
@@ -84,6 +84,14 @@ public class ColorTransition : Transition
         else if (text != null)
         {
             text.color = Color.Lerp(startingColor, targetColor, t);
+        }
+        else if (sprite != null)
+        {
+            sprite.color = Color.Lerp(startingColor, targetColor, t);
+        }
+        else
+        {
+            isRemoved = true;
         }
     }
 

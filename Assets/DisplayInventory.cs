@@ -105,10 +105,10 @@ public class DisplayInventory : MonoBehaviour
         {
             inventory.MoveItem(itemsDisplayed[obj], itemsDisplayed[mouseItem.hoverObj]);
         }
-        else
-        {
-            inventory.RemoveItem(itemsDisplayed[obj].item);
-        }
+        //else
+        //{
+        //    inventory.RemoveItem(itemsDisplayed[obj].item);
+        //}
         Destroy(mouseItem.obj);
         mouseItem.item = null;
     }

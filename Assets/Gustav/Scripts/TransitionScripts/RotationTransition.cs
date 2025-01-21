@@ -14,8 +14,11 @@ public class RotationTransition : Transition
         timerMax = time;
         transitionType = type;
 
-        startingRotation = t.rotation.eulerAngles;
+        startingRotation = t.localRotation.eulerAngles;
         targetRotation = target;
+
+        Debug.Log("Start: " + startingRotation);
+        Debug.Log("Target: " + targetRotation);
 
         this.execute += execute;
     }
@@ -58,7 +61,9 @@ public class RotationTransition : Transition
                 transform.Rotate(new Vector2(TransitionSystem.CosCurve(timer / timerMax, curveInterval, curveAmplitude.x) + curveOffset.x, TransitionSystem.CosCurve(timer / timerMax, curveInterval, curveAmplitude.y) + curveOffset.y));
                 break;
             default:
-                transform.Rotate(Vector3.Lerp(startingRotation, targetRotation, t));
+
+                transform.localRotation = Quaternion.Euler(Vector3.Lerp(startingRotation, targetRotation, t));
+                //transform.Rotate(Vector3.Lerp(startingRotation, targetRotation, t));
                 break;
         }
     }
@@ -79,7 +84,7 @@ public class RotationTransition : Transition
     {
         if (transform != null)
         {
-            transform.Rotate(targetRotation);
+            transform.localRotation = Quaternion.Euler(targetRotation);
         }
     }
 }

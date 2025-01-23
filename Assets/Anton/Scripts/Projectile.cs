@@ -28,6 +28,8 @@ public abstract class Projectile : MonoBehaviour
     private float horizontalRaySpacing;
     private float verticalRaySpacing;
 
+    private bool sentOutDmgPopUp = false;
+
     public virtual void Start()
     {       
         rb = GetComponent<Rigidbody2D>();
@@ -71,8 +73,12 @@ public abstract class Projectile : MonoBehaviour
 
     public virtual void OnHit(RaycastHit2D hit, IDamagable damagable)
     {
-        damagable.DamagePopUp(GunController.Instance.damagePopupPrefab, hit.transform.position, GunController.Instance.Damage);
         damagable.Damage(GunController.Instance.Damage);
+        if (sentOutDmgPopUp!)
+        {
+            damagable.DamagePopUp(GunController.Instance.damagePopupPrefab, hit.transform.position, GunController.Instance.Damage);
+            sentOutDmgPopUp = true;
+        }
     }
 
     private bool ProjectileHit()

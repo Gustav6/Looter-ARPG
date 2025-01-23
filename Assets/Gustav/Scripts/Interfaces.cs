@@ -73,6 +73,5 @@ public interface IDamagable
     public void DamagePopUp(GameObject textPrefab, Vector3 spawnPosition, int damageAmount)
     {
         GameObject textPopUp = Object.Instantiate(textPrefab, spawnPosition, Quaternion.identity);
-        textPopUp.GetComponent<TextMeshPro>().text = damageAmount.ToString();
     }
 }

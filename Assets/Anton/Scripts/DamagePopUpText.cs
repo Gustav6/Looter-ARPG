@@ -15,7 +15,7 @@ public class DamagePopUpText : MonoBehaviour
     void Start()
     {
         timer = destructTimer;
-
+        textMeshPro.text = GunController.Instance.gun.damage.ToString();
         rb = GetComponent<Rigidbody2D>();
         rb.linearVelocity = new Vector2(Random.Range(-0.2f, 0.2f), 0.7f) * moveSpeed;
 

@@ -262,6 +262,9 @@ MonoBehaviour:
   enemyProperties: {fileID: 4321649477641307041}
   distanceFromPos: 0
   findNewPos: 0
+  cantPassThrough:
+    serializedVersion: 2
+    m_Bits: 0
 --- !u!1 &8525698252564195251
 GameObject:
   m_ObjectHideFlags: 0
@@ -276,6 +279,7 @@ GameObject:
   - component: {fileID: 578418195324838049}
   - component: {fileID: 4321649477641307041}
   - component: {fileID: 3572589732216584131}
+  - component: {fileID: -4289432994222651802}
   m_Layer: 3
   m_Name: Enemy
   m_TagString: Enemy
@@ -387,7 +391,7 @@ BoxCollider2D:
   m_CallbackLayers:
     serializedVersion: 2
     m_Bits: 4294967295
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_UsedByEffector: 0
   m_CompositeOperation: 0
   m_CompositeOrder: 0
@@ -447,7 +451,7 @@ MonoBehaviour:
   isAttacking: 0
   cantPassThrough:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   <MaxHealth>k__BackingField: 100
 --- !u!114 &3572589732216584131
 MonoBehaviour:
@@ -466,3 +470,31 @@ MonoBehaviour:
     m_Bits: 128
   horizontalRayCount: 0
   verticalRayCount: 0
+--- !u!114 &-4289432994222651802
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8525698252564195251}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 373b52eb9bf8c40f785bb6947a1aee66, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 1
+  drawGizmos: 1
+  detailedGizmos: 0
+  startEndModifier:
+    addPoints: 0
+    exactStartPoint: 3
+    exactEndPoint: 3
+    useRaycasting: 0
+    mask:
+      serializedVersion: 2
+      m_Bits: 4294967295
+    useGraphRaycasting: 0
+  traversableTags: -1
+  tagPenalties: 0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000
+  graphMask:
+    value: -1

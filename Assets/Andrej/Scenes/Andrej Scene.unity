@@ -119,6 +119,93 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &130749733
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 130749735}
+  - component: {fileID: 130749734}
+  m_Layer: 0
+  m_Name: A*
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &130749734
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 130749733}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 78396926cbbfc4ac3b48fc5fc34a87d1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 1
+  data:
+    dataString: UEsDBBQAAAgIAAAIIexeVuuPeQIAADQFAAALACQAZ3JhcGgwLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQFlVE1zmzAQ/SsenWsP4ATs3lriOD0k8cTt5MJFRovRWEiMJGI7Gf/3rgQY6nKx/N5+vH1a+CJcmhpyq/Rac/asGJDvE+LO5NtkIJ/gRPdKbvkn9DHvnNnSBVEf80YtV4iHLs2oCqzm+Q+5Fy44QLCRvFC6WrE9pMpYg3BBhQGktLIuWyL0NSEn/JkuXcoZT1HiTp94WgaTCx5zkBb0KDRazO6W+MRRl5LMAveEXV44i+7DeJkkyWoaxL5GI3NBqxqYG2goFfocXyLycRJn7UIckyshuOmEEnuuvREprU2DY2IA4xQH9+rC2RyBEvi+tG6McfprURiwnS+anh+4RgfbuuSnam2tqDm00j6oaLyEaOFVtUWf/+OnoacLraqnvm8YuB625PnhjZ5zauzI9zH8MJLuHTpScaA7Ae8lyBe11qqRDEmrG5faGIgehr/X0dIS8sOAt1JvwKYeLO+vub9kN8PFT39KBa92jprdtcBWKO+43w3QeDe/ULDfHNOVQNSp+GPgN92PV6wjHrk2FqluSunk7VSjXShZec/cNI1NlZbg4U50DZIKe95gGXt7hTfcqO0N80jdy9Q177j+HblJ8fAQHwQ31EYdr5dlSnV8BlO+NlZwCYNoR7ygT6mSst2wsSd92rbRBc1HafuGs39Xi+x2CQ2S8H4RL8JFzJbTZUxZsVtQms+TeRLnxO8elzgnFZtWaGcP3pocikvcs/4bM1lrWvttZ5oe1/yzUmOBXBZqm2sA+dqWuCoHjV3wxWQrxtGhLVjLpb9w8pURofIDsOzaM/Ojrk5W02yokpGafyjrkIyk/quSEQdfl3mj4YPD0TXvi13I5S9QSwMEFAAACAgAAAgh7Me7qMhtAAAAeAAAAAkAJABtZXRhLmpzb24KACAAAAAAAAEAGAAAgD7V3rGdAQCAPtXesZ0BAIA+1d6xnQGrVipLLSrOzM9TslIw0TPSMzTXUVBKL0osyCgGihiCOKWZKSB2tFJSknmigbmhqYWZhaGFWYqlrqVZYkpakkViYrKxubG5WbJSLFB9SWVBql9ibipET0BiSUZaZl5KZl66nntRZoo7yGil2FoAUEsBAi0AFAAACAgAAAgh7F5W6495AgAANAUAAAsAJAAAAAAAAAAAAAAAAAAAAGdyYXBoMC5qc29uCgAgAAAAAAABABgAAIA+1d6xnQEAgD7V3rGdAQCAPtXesZ0BUEsBAi0AFAAACAgAAAgh7Me7qMhtAAAAeAAAAAkAJAAAAAAAAAAAAAAAxgIAAG1ldGEuanNvbgoAIAAAAAAAAQAYAACAPtXesZ0BAIA+1d6xnQEAgD7V3rGdAVBLBQYAAAAAAgACALgAAAB+AwAAAAA=
+    upgradeData: 
+    file_cachedStartup: {fileID: 0}
+    data_cachedStartup: 
+    cacheStartup: 0
+  showNavGraphs: 1
+  showUnwalkableNodes: 1
+  debugMode: 0
+  debugFloor: 0
+  debugRoof: 1
+  manualDebugFloorRoof: 0
+  showSearchTree: 0
+  unwalkableNodeDebugSize: 0.3
+  logPathResults: 1
+  maxNearestNodeDistance: 100
+  scanOnStartup: 1
+  fullGetNearestSearch: 0
+  prioritizeGraphs: 0
+  prioritizeGraphsLimit: 1
+  colorSettings:
+    _SolidColor: {r: 0.11764706, g: 0.4, b: 0.7882353, a: 0.9}
+    _UnwalkableNode: {r: 1, g: 0, b: 0, a: 0.5}
+    _BoundsHandles: {r: 0.29, g: 0.454, b: 0.741, a: 0.9}
+    _ConnectionLowLerp: {r: 0, g: 1, b: 0, a: 0.5}
+    _ConnectionHighLerp: {r: 1, g: 0, b: 0, a: 0.5}
+    _MeshEdgeColor: {r: 0, g: 0, b: 0, a: 0.5}
+    _AreaColors:
+    - {r: 0, g: 0, b: 0, a: 0}
+  tagNames: []
+  heuristic: 2
+  heuristicScale: 1
+  threadCount: 1
+  maxFrameTime: 1
+  batchGraphUpdates: 0
+  graphUpdateBatchingInterval: 0.2
+  euclideanEmbedding:
+    mode: 0
+    seed: 0
+    pivotPointRoot: {fileID: 0}
+    spreadOutCount: 1
+  showGraphs: 1
+--- !u!4 &130749735
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 130749733}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &447254344 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8060619667817851746, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
@@ -1111,3 +1198,4 @@ SceneRoots:
   - {fileID: 1616853905}
   - {fileID: 2092717767}
   - {fileID: 904973169}
+  - {fileID: 130749735}

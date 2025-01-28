@@ -12,7 +12,7 @@ public abstract class Projectile : MonoBehaviour
     [HideInInspector] public int amountOfEnemiesHit;
     [HideInInspector] public RaycastHit2D raycastHit;
     private float sprtRendY;
-    private int numberOfHitEnemies;
+    private int numberOfHitEnemies = 0;
 
     public Rigidbody2D rb;
     public LayerMask collidableLayers;
@@ -63,7 +63,7 @@ public abstract class Projectile : MonoBehaviour
                 OnHit(raycastHit, damagable);
             }
 
-            if (numberOfHitEnemies >= amountOfPiercableObjects)
+            if (numberOfHitEnemies >= GunController.Instance.pierceAmount)
             {
                 Destroy(gameObject);
             }
@@ -73,6 +73,7 @@ public abstract class Projectile : MonoBehaviour
 
     public virtual void OnHit(RaycastHit2D hit, IDamagable damagable)
     {
+
         damagable.Damage(GunController.Instance.Damage);
         if (sentOutDmgPopUp!)
         {
@@ -83,7 +84,6 @@ public abstract class Projectile : MonoBehaviour
 
     private bool ProjectileHit()
     {
-        numberOfHitEnemies += 1;
         for (int i = 0; i < 3; i++)
         {
             float distance = Vector2.Distance(transform.position, transform.position + (Vector3)rb.linearVelocity * Time.fixedDeltaTime);

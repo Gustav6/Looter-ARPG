@@ -12,6 +12,7 @@ public class ChangeEquipedGun : MonoBehaviour
             GunController.Instance.sprite.sprite = guns[randomValue].sprite;
             GunController.Instance.gun.reloadTime = guns[randomValue].reloadTime;
             GunController.Instance.Damage = guns[randomValue].damage;
+            GunController.Instance.pierceAmount = guns[randomValue].amountOfPircableEnemies;
         }
     }
 }

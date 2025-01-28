@@ -19,22 +19,6 @@ public class NormalBullet : Projectile
 
     public override void Update()
     {
-
-        // amountOfEnemiesHit += 1;
-        //if (GunController.explosion)
-        //{
-        //   Instantiate(explosionCiclePrefab, transform.position, Quaternion.identity);
-        //}
-
-        //if (GunController.pierce)
-        //{
-        //   if (amountOfEnemiesHit >= GunController.pierceAmount)
-        //   {
-        //      Destroy(gameObject);
-        //   }    
-        //} 
-        //else { Destroy(gameObject); }
-
         base.Update();
     }      
 }

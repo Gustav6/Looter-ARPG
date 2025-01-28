@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: 
   description: 
-  sprite: {fileID: -243570577, guid: e89a104cc74b80444afa07fa92cd8e81, type: 3}
+  sprite: {fileID: -3970273392844986731, guid: e7acde4c95af8a945933a65df7f39e1b, type: 3}
   bulletPrefab: {fileID: 4550873575046521524, guid: 6dad99b5a107b0c4b864d8bbc31059aa, type: 3}
   damage: 15
   Ammo: 20

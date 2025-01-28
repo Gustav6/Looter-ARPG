@@ -15,7 +15,7 @@ public class CameraShake : MonoBehaviour
     public static void ShakeCamera(float intensity)
     {
         CinemachineBasicMultiChannelPerlin _cbmcp = cinemachinVirtualCamera.GetCinemachineComponent<CinemachineBasicMultiChannelPerlin>();
-        _cbmcp.m_AmplitudeGain = intensity * (GunController.Instance.fireForce / 90);
+        _cbmcp.m_AmplitudeGain = intensity * (GunController.Instance.fireForce / 45);
     }
 
     public static void StopShakeCamera()

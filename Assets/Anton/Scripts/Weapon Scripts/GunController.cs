@@ -43,6 +43,7 @@ public class GunController : MonoBehaviour
             Destroy(gameObject);
             return;
         }
+
     }
 
     void Start()
@@ -105,7 +106,7 @@ public class GunController : MonoBehaviour
                 }
             }
         }
-        else if (attackTimer >= gun.fireRate / 4)
+        else if (attackTimer >= gun.fireRate)
         {
             CameraShake.StopShakeCamera();
         }
@@ -131,9 +132,10 @@ public class GunController : MonoBehaviour
 
     void Attack()
     {
-        CameraShake.ShakeCamera(2);
+        //CameraShake.ShakeCamera(2);
         GameObject bullet = Instantiate(gun.bulletPrefab, firePoint.transform.position, Quaternion.identity);
-        bullet.GetComponent<Rigidbody2D>().AddForce(firePoint.right * gun.fireForce, ForceMode2D.Impulse);      
+        bullet.GetComponent<Rigidbody2D>().AddForce(firePoint.right * gun.fireForce, ForceMode2D.Impulse);
+        StartRecoil();
         if (gun.effects != null && gun.effects.Length != 0)
         {
             if (gun.effects.Contains(WeaponEffect.dubbelShot))
@@ -146,16 +148,25 @@ public class GunController : MonoBehaviour
         attackTimer = 0;
     }
 
+    private void StartRecoil()
+    {
+        TransitionSystem.AddTransition(new MoveTransition(transform, gun.fireRate / 2, TransitionType.CosCurve, 2, new Vector2(1, 0), Vector2.zero, false), gameObject);
+    //TransitionSystem.AddTransition(new MoveTransition(transform, gun.fireRate / 2, new Vector3(0.69f, 0, 0), TransitionType.SmoothStop2, false, FixWeaponPos), gameObject);
+    }
+
+    private void FixWeaponPos()
+    {
+        TransitionSystem.AddTransition(new MoveTransition(transform, gun.fireRate / 2, new Vector3(1.79f, 0, 0), TransitionType.SmoothStop2, false), gameObject);
+    }
+
     private void TestFlash()
     {
-        Debug.Log("Test");
         realodingGun = true;
         TransitionSystem.AddTransition(new ColorTransition(transform, gun.reloadTime * 0.075f, new Color(1, 1, 1, 0.75f), TransitionType.SmoothStop2, Reload), gameObject);
     }
 
     private void Reload()
-    {
-        Debug.Log("Test : 2");
+    {       
         TransitionSystem.AddTransition(new ColorTransition(transform, gun.reloadTime * 0.075f, new Color(1, 1, 1, 1), TransitionType.SmoothStart2), gameObject);
         TransitionSystem.AddTransition(new RotationTransition(transform, gun.reloadTime, new Vector3(0, 0, 360), TransitionType.SmoothStop4, ResetAmmo), gameObject);
     }

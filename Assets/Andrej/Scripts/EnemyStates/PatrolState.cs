@@ -9,6 +9,8 @@ public class PatrolState : MoveState
     float patrolTimer = 3;
     public float distanceFromPos;
     public bool findNewPos = false;
+
+    public LayerMask cantPassThrough;
     public override void Enter()
     {
         FindNewPosition();
@@ -53,7 +55,9 @@ public class PatrolState : MoveState
         Vector2 offset = Random.insideUnitCircle * enemyProperties.aggroRange;
         randomPos = (Vector2)transform.position + offset;
         distanceFromPos = Vector2.Distance(randomPos, transform.position);
-        if (distanceFromPos < 1)
+        Vector2 direction = (randomPos - (Vector2)transform.position).normalized;
+        RaycastHit2D ray = Physics2D.Raycast(transform.position, direction, distanceFromPos, cantPassThrough);
+        if (distanceFromPos < 1 || ray)
         {
             FindNewPosition();
             return;

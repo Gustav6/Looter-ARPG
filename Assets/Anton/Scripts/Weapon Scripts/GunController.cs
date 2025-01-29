@@ -105,6 +105,7 @@ public class GunController : MonoBehaviour
                     Attack();
                 }
             }
+            FixWeaponPos();
         }
         else if (attackTimer >= gun.fireRate)
         {
@@ -133,9 +134,9 @@ public class GunController : MonoBehaviour
     void Attack()
     {
         //CameraShake.ShakeCamera(2);
+        StartRecoil();
         GameObject bullet = Instantiate(gun.bulletPrefab, firePoint.transform.position, Quaternion.identity);
         bullet.GetComponent<Rigidbody2D>().AddForce(firePoint.right * gun.fireForce, ForceMode2D.Impulse);
-        StartRecoil();
         if (gun.effects != null && gun.effects.Length != 0)
         {
             if (gun.effects.Contains(WeaponEffect.dubbelShot))
@@ -150,13 +151,14 @@ public class GunController : MonoBehaviour
 
     private void StartRecoil()
     {
-        TransitionSystem.AddTransition(new MoveTransition(transform, gun.fireRate / 2, TransitionType.CosCurve, 2, new Vector2(1, 0), Vector2.zero, false), gameObject);
+        TransitionSystem.AddTransition(new MoveTransition(transform, gun.fireRate, TransitionType.SinCurve, 2, new Vector2(0.08f, 0), new Vector2(2, 0), false), gameObject);
     //TransitionSystem.AddTransition(new MoveTransition(transform, gun.fireRate / 2, new Vector3(0.69f, 0, 0), TransitionType.SmoothStop2, false, FixWeaponPos), gameObject);
     }
 
     private void FixWeaponPos()
     {
-        TransitionSystem.AddTransition(new MoveTransition(transform, gun.fireRate / 2, new Vector3(1.79f, 0, 0), TransitionType.SmoothStop2, false), gameObject);
+        transform.localPosition = new Vector3(1.79f, 0, 0);
+        //TransitionSystem.AddTransition(new MoveTransition(transform, gun.fireRate / 2, new Vector3(1.79f, 0, 0), TransitionType.SmoothStop2, false), gameObject);
     }
 
     private void TestFlash()

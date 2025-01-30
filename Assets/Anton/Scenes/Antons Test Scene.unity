@@ -191,7 +191,7 @@ PrefabInstance:
     - target: {fileID: 63582763776312651, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: gun
       value: 
-      objectReference: {fileID: 11400000, guid: 5950cf9b2f094f345835220248f8da87, type: 2}
+      objectReference: {fileID: 11400000, guid: 90fcc859577e2d84eae63d06f9794000, type: 2}
     - target: {fileID: 63582763776312651, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: playerPos
       value: 
@@ -291,6 +291,10 @@ PrefabInstance:
     - target: {fileID: 4939972271045843890, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: m_IsTrigger
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6925339135612320311, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8060619667817851746, guid: 82d88887d9490df4aade394592c2a6c9, type: 3}
       propertyPath: m_Name
@@ -551,7 +555,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4600069235979334545, guid: ecf9ab768264edc40988f51091e323f2, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []

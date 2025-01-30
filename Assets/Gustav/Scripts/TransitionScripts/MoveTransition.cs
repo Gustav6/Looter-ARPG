@@ -107,13 +107,28 @@ public class MoveTransition : Transition
     {
         if (transform != null)
         {
-            if (targetIsInWorldPosition)
+            switch (transitionType)
             {
-                transform.position = targetPosition;
-            }
-            else
-            {
-                transform.position = startingPosition + targetPosition;
+                case TransitionType.SinCurve:
+
+                    //transform.position = startingPosition + (Vector3)curveOffset;
+
+                    break;
+                case TransitionType.CosCurve:
+
+                    //transform.position = startingPosition + (Vector3)curveOffset;
+
+                    break;
+                default:
+                    if (targetIsInWorldPosition)
+                    {
+                        transform.position = targetPosition;
+                    }
+                    else
+                    {
+                        transform.position = startingPosition + targetPosition;
+                    }
+                    break;
             }
         }
     }

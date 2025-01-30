@@ -105,7 +105,7 @@ public class GunController : MonoBehaviour
                     Attack();
                 }
             }
-            FixWeaponPos();
+            //FixWeaponPos();
         }
         else if (attackTimer >= gun.fireRate)
         {
@@ -133,7 +133,7 @@ public class GunController : MonoBehaviour
 
     void Attack()
     {
-        //CameraShake.ShakeCamera(2);
+        CameraShake.ShakeCamera(2);
         StartRecoil();
         GameObject bullet = Instantiate(gun.bulletPrefab, firePoint.transform.position, Quaternion.identity);
         bullet.GetComponent<Rigidbody2D>().AddForce(firePoint.right * gun.fireForce, ForceMode2D.Impulse);
@@ -151,14 +151,30 @@ public class GunController : MonoBehaviour
 
     private void StartRecoil()
     {
-        TransitionSystem.AddTransition(new MoveTransition(transform, gun.fireRate, TransitionType.SinCurve, 2, new Vector2(0.08f, 0), new Vector2(2, 0), false), gameObject);
-    //TransitionSystem.AddTransition(new MoveTransition(transform, gun.fireRate / 2, new Vector3(0.69f, 0, 0), TransitionType.SmoothStop2, false, FixWeaponPos), gameObject);
+        Vector2 test = (Player.Instance.transform.position - transform.position).normalized;
+        Vector2 test2 = (transform.position - Player.Instance.transform.position).normalized;
+
+        float animationTime;
+        float animationForce = fireForce/10;
+
+        if (gun.fireRate >= 0.7f)
+        {
+           animationTime = 0.6f;
+           animationTime /= animationForce;
+        }
+        else
+        {
+            animationTime = gun.fireRate;
+            animationTime /= animationForce;
+        }
+
+        TransitionSystem.AddTransition(new MoveTransition(transform, animationTime, TransitionType.SinCurve, -1, new Vector2(1, 0), new Vector2(1.79f, 0), false, FixWeaponPos), gameObject);     
     }
 
     private void FixWeaponPos()
     {
         transform.localPosition = new Vector3(1.79f, 0, 0);
-        //TransitionSystem.AddTransition(new MoveTransition(transform, gun.fireRate / 2, new Vector3(1.79f, 0, 0), TransitionType.SmoothStop2, false), gameObject);
+        CameraShake.StopShakeCamera();
     }
 
     private void TestFlash()

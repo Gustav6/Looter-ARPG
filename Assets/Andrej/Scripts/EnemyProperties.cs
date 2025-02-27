@@ -1,9 +1,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Pathfinding;
 
 public class EnemyProperties : MonoBehaviour, IDamagable
 {
+    public Seeker seeker;
+    public Transform target;
+
     public GameObject player;
     public GameObject damagePopupPrefab;
 
@@ -12,6 +16,11 @@ public class EnemyProperties : MonoBehaviour, IDamagable
     public float distanceToPlayer;
     public float aggroRange;
     public float attackRange;
+
+    public float nextWayPointDistance;
+    Path path;
+    int currentWayPoint = 0;
+    bool reachedEndOfPath = false;
 
     public float speed;
     public int health;
@@ -57,6 +66,19 @@ public class EnemyProperties : MonoBehaviour, IDamagable
         origin = transform.position;
 
         controller = GetComponent<Controller2D>();
+
+        seeker = GetComponent<Seeker>();
+
+        seeker.StartPath(transform.position, target.position);
+    }
+
+    void OnPathComplete(Path p)
+    {
+        if (!p.error)
+        {
+            path = p;
+            currentWayPoint = 0;
+        }
     }
 
     private void Update()

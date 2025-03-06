@@ -83,7 +83,27 @@ public class EnemyProperties : MonoBehaviour, IDamagable
 
     private void Update()
     {
+        if (path == null)
+            return;
+        if (currentWayPoint >= path.vectorPath.Count)
+        {
+            reachedEndOfPath = true;
+            return;
+        } else
+        {
+            reachedEndOfPath = false;
+        }
+
+        Vector2 direction = (path.vectorPath[currentWayPoint] - transform.position).normalized;
+
+        float distance = Vector2.Distance(transform.position, path.vectorPath[currentWayPoint]);
+
+        if (distance < nextWayPointDistance)
+        {
+            currentWayPoint++;
+        }
         distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
+        
     }
 
     public void FixedUpdate()

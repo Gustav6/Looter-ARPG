@@ -244,7 +244,8 @@ Transform:
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1079805798858391682}
   m_Father: {fileID: 7150605382936732098}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &2045918298356660606
@@ -260,11 +261,43 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   enemyProperties: {fileID: 4321649477641307041}
+  randomPos: {fileID: 1079805798858391682}
   distanceFromPos: 0
   findNewPos: 0
   cantPassThrough:
     serializedVersion: 2
     m_Bits: 0
+--- !u!1 &7685542941302643705
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1079805798858391682}
+  m_Layer: 0
+  m_Name: RandomPos
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1079805798858391682
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7685542941302643705}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 3403999157092351010}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &8525698252564195251
 GameObject:
   m_ObjectHideFlags: 0
@@ -437,16 +470,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: af0a733662cfa3e4f86f208ebfd74d06, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  seeker: {fileID: 0}
+  target: {fileID: 0}
   player: {fileID: 0}
   damagePopupPrefab: {fileID: 5801573854073587537, guid: 46d9f7e137d7efb4c84315a58e250950, type: 3}
   controller: {fileID: 0}
   distanceToPlayer: 1e+11
   aggroRange: 12
   attackRange: 1.3
+  nextWayPointDistance: 0
   speed: 5
   health: 0
   damage: 0
   knockback: 0
+  direction: {x: 0, y: 0}
   hasLineOfSight: 0
   isAttacking: 0
   cantPassThrough:

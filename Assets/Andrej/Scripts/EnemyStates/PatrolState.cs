@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class PatrolState : MoveState
 {
-    Vector2 randomPos;
+    public Transform randomPos;
     float patrolTimer = 3;
     public float distanceFromPos;
     public bool findNewPos = false;
@@ -22,7 +22,6 @@ public class PatrolState : MoveState
         {
             if (distanceFromPos <= 0.5f)
             {
-                moveDirection = Vector2.zero;
                 patrolTimer -= Time.deltaTime;
                 if (patrolTimer <= 0)
                 {
@@ -30,11 +29,15 @@ public class PatrolState : MoveState
                     findNewPos = true;
                     FindNewPosition();
                 }
+                if (enemyProperties.target != null)
+                {
+                    enemyProperties.target = null;
+                }
             }
             else
             {
-                distanceFromPos = Vector2.Distance(randomPos, transform.position);
-                moveDirection = (randomPos - (Vector2)transform.position).normalized;
+                distanceFromPos = Vector2.Distance(randomPos.position, transform.position);
+                enemyProperties.target = randomPos;
             }
         }
 
@@ -53,9 +56,9 @@ public class PatrolState : MoveState
     public void FindNewPosition()
     {
         Vector2 offset = Random.insideUnitCircle * enemyProperties.aggroRange;
-        randomPos = (Vector2)transform.position + offset;
-        distanceFromPos = Vector2.Distance(randomPos, transform.position);
-        Vector2 direction = (randomPos - (Vector2)transform.position).normalized;
+        randomPos.position = (Vector2)transform.position + offset;
+        distanceFromPos = Vector2.Distance(randomPos.position, transform.position);
+        Vector2 direction = (randomPos.position -= transform.position).normalized;
         RaycastHit2D ray = Physics2D.Raycast(transform.position, direction, distanceFromPos, cantPassThrough);
         if (distanceFromPos < 1 || ray)
         {

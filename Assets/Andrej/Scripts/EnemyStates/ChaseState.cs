@@ -15,13 +15,13 @@ public class ChaseState : MoveState
     {
         if (enemyProperties.hasLineOfSight)
         {
-            moveDirection = (enemyProperties.player.transform.position - transform.position).normalized;
+            enemyProperties.target = enemyProperties.player.transform;
         }
         else
         {
             if (!checkedLastLocation && lastSeenLocation != null)
             {
-                moveDirection = (lastSeenLocation.Value - (Vector2)transform.position).normalized;
+                enemyProperties.target.position = lastSeenLocation.Value;
             }
         }
     }
@@ -58,7 +58,10 @@ public class ChaseState : MoveState
 
             if (distanceFromLastLocation < 0.05)
             {
-                moveDirection = Vector2.zero;
+                if (enemyProperties.target != null)
+                {
+                    enemyProperties = null;
+                }
 
                 checkedLastLocation = true;
                 lastSeenLocation = null;

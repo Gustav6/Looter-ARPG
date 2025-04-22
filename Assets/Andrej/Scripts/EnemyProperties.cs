@@ -27,6 +27,8 @@ public class EnemyProperties : MonoBehaviour, IDamagable
     public int damage;
     public int knockback;
 
+    public Vector2 direction;
+
     public bool hasLineOfSight;
     public bool isAttacking;
 
@@ -69,9 +71,18 @@ public class EnemyProperties : MonoBehaviour, IDamagable
 
         seeker = GetComponent<Seeker>();
 
-        seeker.StartPath(transform.position, target.position);
+        seeker.StartPath(transform.position, target.position, OnPathComplete);
+
+        InvokeRepeating("UpdatePath", 0f, .5f);
     }
 
+    void UpdatePath()
+    {
+        if (seeker.IsDone())
+        {
+            seeker.StartPath(transform.position, target.position, OnPathComplete);
+        }
+    }
     void OnPathComplete(Path p)
     {
         if (!p.error)
@@ -94,7 +105,7 @@ public class EnemyProperties : MonoBehaviour, IDamagable
             reachedEndOfPath = false;
         }
 
-        Vector2 direction = (path.vectorPath[currentWayPoint] - transform.position).normalized;
+        direction = (path.vectorPath[currentWayPoint] - transform.position).normalized;
 
         float distance = Vector2.Distance(transform.position, path.vectorPath[currentWayPoint]);
 
@@ -103,7 +114,6 @@ public class EnemyProperties : MonoBehaviour, IDamagable
             currentWayPoint++;
         }
         distanceToPlayer = Vector3.Distance(transform.position, player.transform.position);
-        
     }
 
     public void FixedUpdate()

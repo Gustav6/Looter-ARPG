@@ -92,7 +92,7 @@ public class EnemyProperties : MonoBehaviour, IDamagable
         }
     }
 
-    private void Update()
+    public void Update()
     {
         if (path == null)
             return;
@@ -106,7 +106,6 @@ public class EnemyProperties : MonoBehaviour, IDamagable
         }
 
         direction = (path.vectorPath[currentWayPoint] - transform.position).normalized;
-
         float distance = Vector2.Distance(transform.position, path.vectorPath[currentWayPoint]);
 
         if (distance < nextWayPointDistance)

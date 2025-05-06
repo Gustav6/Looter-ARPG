@@ -21,7 +21,7 @@ public class ChaseState : MoveState
         {
             if (!checkedLastLocation && lastSeenLocation != null)
             {
-                enemyProperties.target.position = lastSeenLocation.Value;
+                lastSeenLocation = enemyProperties.target.position;
             }
         }
     }
@@ -58,11 +58,6 @@ public class ChaseState : MoveState
 
             if (distanceFromLastLocation < 0.05)
             {
-                if (enemyProperties.target != null)
-                {
-                    enemyProperties = null;
-                }
-
                 checkedLastLocation = true;
                 lastSeenLocation = null;
                 isComplete = true;
